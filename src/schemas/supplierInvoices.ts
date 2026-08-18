@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ConfirmField } from "../services/safety.js";
 import { ResponseFormat, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "../constants.js";
 import { DatePeriodEnum } from "./invoices.js";
 
@@ -97,7 +98,8 @@ export const ApproveSupplierInvoiceSchema = z.object({
     .describe("The supplier invoice given number to approve"),
   response_format: z.nativeEnum(ResponseFormat)
     .default(ResponseFormat.MARKDOWN)
-    .describe("Output format: 'markdown' or 'json'")
+    .describe("Output format: 'markdown' or 'json'"),
+  ...ConfirmField
 }).strict();
 
 export type ApproveSupplierInvoiceInput = z.infer<typeof ApproveSupplierInvoiceSchema>;

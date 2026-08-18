@@ -12,6 +12,7 @@ import {
   buildPaginationMeta
 } from "../services/formatters.js";
 import { periodToDateRange, getPeriodDescription } from "../services/dateHelpers.js";
+import { buildConfirmationRequiredResponse, irreversibleWarning } from "../services/safety.js";
 import {
   ListInvoicesSchema,
   GetInvoiceSchema,
@@ -604,8 +605,11 @@ Returns:
       title: "Bookkeep Fortnox Invoice",
       description: `Bookkeep an invoice, creating the accounting entries. Once booked, the invoice cannot be edited.
 
+${irreversibleWarning("Bookkeeping creates permanent accounting entries and locks the invoice from editing.")}
+
 Args:
   - document_number (string): Invoice document number to bookkeep (required)
+  - confirm (boolean): Must be true to execute (see warning)
   - response_format ('markdown' | 'json'): Output format
 
 Returns:
@@ -613,13 +617,19 @@ Returns:
       inputSchema: InvoiceActionSchema,
       annotations: {
         readOnlyHint: false,
-        destructiveHint: false,
+        destructiveHint: true,
         idempotentHint: false,
         openWorldHint: true
       }
     },
     async (params: InvoiceActionInput) => {
       try {
+        if (!params.confirm) {
+          return buildConfirmationRequiredResponse(
+            `Bookkeep invoice #${params.document_number}`,
+            "Permanent accounting entries are created and the invoice can no longer be edited."
+          );
+        }
         const response = await fortnoxRequest<InvoiceResponse>(
           `/3/invoices/${encodeURIComponent(params.document_number)}/bookkeep`,
           "PUT"
@@ -656,8 +666,11 @@ Returns:
       title: "Cancel Fortnox Invoice",
       description: `Cancel an invoice. Booked invoices will have reversal entries created.
 
+${irreversibleWarning("A cancelled invoice cannot be un-cancelled; booked invoices get permanent reversal entries.")}
+
 Args:
   - document_number (string): Invoice document number to cancel (required)
+  - confirm (boolean): Must be true to execute (see warning)
   - response_format ('markdown' | 'json'): Output format
 
 Returns:
@@ -672,6 +685,12 @@ Returns:
     },
     async (params: InvoiceActionInput) => {
       try {
+        if (!params.confirm) {
+          return buildConfirmationRequiredResponse(
+            `Cancel invoice #${params.document_number}`,
+            "The invoice is cancelled permanently; booked invoices get reversal entries in the bookkeeping."
+          );
+        }
         const response = await fortnoxRequest<InvoiceResponse>(
           `/3/invoices/${encodeURIComponent(params.document_number)}/cancel`,
           "PUT"
@@ -707,8 +726,11 @@ Returns:
       title: "Credit Fortnox Invoice",
       description: `Create a credit note for an invoice. This creates a new credit invoice referencing the original.
 
+${irreversibleWarning("A credit invoice is a real financial document; removing it afterwards requires cancelling the credit invoice.")}
+
 Args:
   - document_number (string): Invoice document number to credit (required)
+  - confirm (boolean): Must be true to execute (see warning)
   - response_format ('markdown' | 'json'): Output format
 
 Returns:
@@ -716,13 +738,19 @@ Returns:
       inputSchema: InvoiceActionSchema,
       annotations: {
         readOnlyHint: false,
-        destructiveHint: false,
+        destructiveHint: true,
         idempotentHint: false,
         openWorldHint: true
       }
     },
     async (params: InvoiceActionInput) => {
       try {
+        if (!params.confirm) {
+          return buildConfirmationRequiredResponse(
+            `Create credit invoice for invoice #${params.document_number}`,
+            "A new credit invoice (financial document) is created against the original invoice."
+          );
+        }
         const response = await fortnoxRequest<InvoiceResponse>(
           `/3/invoices/${encodeURIComponent(params.document_number)}/credit`,
           "PUT"
@@ -763,8 +791,11 @@ Returns:
 
 The invoice will be sent to the email address configured for the customer.
 
+${irreversibleWarning("An email is sent to an external recipient (the customer) and cannot be recalled.")}
+
 Args:
   - document_number (string): Invoice document number to send (required)
+  - confirm (boolean): Must be true to execute (see warning)
   - response_format ('markdown' | 'json'): Output format
 
 Returns:
@@ -772,13 +803,19 @@ Returns:
       inputSchema: SendInvoiceEmailSchema,
       annotations: {
         readOnlyHint: false,
-        destructiveHint: false,
+        destructiveHint: true,
         idempotentHint: false,
         openWorldHint: true
       }
     },
     async (params: SendInvoiceEmailInput) => {
       try {
+        if (!params.confirm) {
+          return buildConfirmationRequiredResponse(
+            `Send invoice #${params.document_number} by email to the customer`,
+            "The invoice is emailed to the customer's configured address. A sent email cannot be recalled."
+          );
+        }
         const response = await fortnoxRequest<InvoiceResponse>(
           `/3/invoices/${encodeURIComponent(params.document_number)}/email`,
           "PUT"

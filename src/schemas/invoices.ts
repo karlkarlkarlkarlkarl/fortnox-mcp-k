@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ResponseFormat, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "../constants.js";
+import { ConfirmField } from "../services/safety.js";
 
 /**
  * Date period enum for convenience date filtering
@@ -263,7 +264,8 @@ export const InvoiceActionSchema = z.object({
     .describe("Invoice document number"),
   response_format: z.nativeEnum(ResponseFormat)
     .default(ResponseFormat.MARKDOWN)
-    .describe("Output format: 'markdown' or 'json'")
+    .describe("Output format: 'markdown' or 'json'"),
+  ...ConfirmField
 }).strict();
 
 export type InvoiceActionInput = z.infer<typeof InvoiceActionSchema>;
@@ -277,7 +279,8 @@ export const SendInvoiceEmailSchema = z.object({
     .describe("Invoice document number"),
   response_format: z.nativeEnum(ResponseFormat)
     .default(ResponseFormat.MARKDOWN)
-    .describe("Output format: 'markdown' or 'json'")
+    .describe("Output format: 'markdown' or 'json'"),
+  ...ConfirmField
 }).strict();
 
 export type SendInvoiceEmailInput = z.infer<typeof SendInvoiceEmailSchema>;

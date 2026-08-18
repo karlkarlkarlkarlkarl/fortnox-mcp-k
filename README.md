@@ -1,6 +1,6 @@
 # Fortnox MCP Server
 
-An MCP (Model Context Protocol) server for integrating with the Fortnox Swedish accounting system. This server enables LLMs to interact with Fortnox for managing invoices, customers, suppliers, orders, accounts, vouchers, and provides business intelligence analytics.
+An MCP (Model Context Protocol) server for integrating with the Fortnox Swedish accounting system. This server enables LLMs to interact with Fortnox for managing invoices, customers, suppliers, orders, accounts, vouchers, articles, and the Fortnox Lager (warehouse) module — stock balances, production orders (tillverkningsordrar), purchase orders, deliveries, stock taking and stock transfers — and provides business intelligence analytics. Irreversible operations are gated behind an explicit confirmation parameter (see [Safety](#safety-irreversible-operations)).
 
 ## Two Ways to Use
 
@@ -156,6 +156,58 @@ That's it! You can now ask Claude to manage your Fortnox invoices, customers, an
 - `fortnox_expense_analysis` - Analyze expenses by category
 - `fortnox_yearly_comparison` - Compare year-over-year performance
 - `fortnox_gross_margin_trend` - Track gross margin trends over time
+
+### Article Management
+- `fortnox_list_articles` - List articles with stock quantities
+- `fortnox_get_article` - Get article details incl. stock status
+- `fortnox_create_article` - Create new article
+- `fortnox_update_article` - Update article
+- `fortnox_delete_article` - Delete article ⚠️
+
+### Warehouse (Lager module)
+Requires the Fortnox Lager module to be activated on the company.
+
+- `fortnox_get_warehouse_status` - Check Lager module activation
+- `fortnox_get_stock_balance` - Stock balance per article and stock point
+- `fortnox_list_stock_points` / `fortnox_get_stock_point` - Stock points with stock locations
+- `fortnox_create_stock_point` - Create stock point
+
+### Production Orders (Tillverkningsordrar)
+- `fortnox_list_production_orders` / `fortnox_get_production_order`
+- `fortnox_create_production_order` / `fortnox_update_production_order`
+- `fortnox_get_bill_of_materials` - Component requirements for a production article
+- `fortnox_production_order_action` - Release or void ⚠️
+
+### Purchase Orders (Inköpsordrar)
+- `fortnox_list_purchase_orders` / `fortnox_get_purchase_order`
+- `fortnox_create_purchase_order` / `fortnox_update_purchase_order`
+- `fortnox_send_purchase_order` - Email order to supplier ⚠️
+- `fortnox_purchase_order_action` - Complete or void ⚠️
+
+### Deliveries & Incoming Goods
+- `fortnox_list_warehouse_deliveries` - Manual in/outbound documents
+- `fortnox_get_warehouse_delivery` / `fortnox_create_warehouse_delivery`
+- `fortnox_warehouse_delivery_action` - Release or void ⚠️
+- `fortnox_list_incoming_goods` / `fortnox_get_incoming_goods` / `fortnox_create_incoming_goods`
+- `fortnox_incoming_goods_action` - Release, complete or void ⚠️
+
+### Stock Taking & Transfers (Inventering & Lagerflytt)
+- `fortnox_list_stock_takings` / `fortnox_get_stock_taking` / `fortnox_create_stock_taking`
+- `fortnox_add_stock_taking_rows` - Add articles to count by filter
+- `fortnox_stock_taking_action` - Release, void or delete ⚠️
+- `fortnox_create_stock_transfer` / `fortnox_get_stock_transfer`
+- `fortnox_stock_transfer_action` - Release or void ⚠️
+
+## Safety: Irreversible Operations
+
+Fortnox is a bookkeeping system — many operations are permanent by design (released documents are locked and bookkept, vouchers cannot be deleted, sent emails cannot be recalled).
+
+Tools marked ⚠️ above, plus `fortnox_bookkeep_invoice`, `fortnox_cancel_invoice`, `fortnox_credit_invoice`, `fortnox_send_invoice_email`, `fortnox_create_voucher`, `fortnox_approve_supplier_invoice`, and the delete tools for customers/suppliers/accounts, are gated behind an explicit `confirm: true` parameter:
+
+- Called **without** `confirm: true`, the tool performs **nothing** and returns a preview of the action and its consequence, instructing the model to obtain explicit user approval first.
+- Only after the user has approved the specific action should the tool be called again with `confirm: true`.
+
+All destructive tools also carry the MCP `destructiveHint` annotation so clients can apply their own approval UI.
 
 ## Installation
 

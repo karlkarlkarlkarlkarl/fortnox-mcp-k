@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ResponseFormat, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "../constants.js";
+import { ConfirmField } from "../services/safety.js";
 
 /**
  * Schema for listing accounts
@@ -134,7 +135,8 @@ export const DeleteAccountSchema = z.object({
     .int()
     .min(1000)
     .max(9999)
-    .describe("Account number to delete")
+    .describe("Account number to delete"),
+  ...ConfirmField
 }).strict();
 
 export type DeleteAccountInput = z.infer<typeof DeleteAccountSchema>;

@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { fortnoxRequest } from "../services/api.js";
+import { buildConfirmationRequiredResponse, irreversibleWarning } from "../services/safety.js";
 import { ResponseFormat } from "../constants.js";
 import {
   buildToolResponse,
@@ -391,10 +392,11 @@ Returns:
       title: "Delete Fortnox Supplier",
       description: `Delete a supplier from Fortnox.
 
-WARNING: This action cannot be undone. The supplier must not have any invoices.
+${irreversibleWarning("The supplier is deleted permanently. The supplier must not have any invoices.")}
 
 Args:
   - supplier_number (string): Supplier number to delete (required)
+  - confirm (boolean): Must be true to execute (see warning)
 
 Returns:
   Confirmation of deletion.`,
@@ -408,6 +410,12 @@ Returns:
     },
     async (params: DeleteSupplierInput) => {
       try {
+        if (!params.confirm) {
+          return buildConfirmationRequiredResponse(
+            `Delete supplier ${params.supplier_number}`,
+            "The supplier is permanently deleted and cannot be restored."
+          );
+        }
         await fortnoxRequest(
           `/3/suppliers/${encodeURIComponent(params.supplier_number)}`,
           "DELETE"

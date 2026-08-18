@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { fortnoxRequest } from "../services/api.js";
+import { buildConfirmationRequiredResponse, irreversibleWarning } from "../services/safety.js";
 import { ResponseFormat } from "../constants.js";
 import {
   buildToolResponse,
@@ -345,10 +346,11 @@ Returns:
       title: "Delete Fortnox Account",
       description: `Delete an account from the chart of accounts.
 
-WARNING: This action cannot be undone. The account must not have any transactions.
+${irreversibleWarning("The account is deleted permanently. The account must not have any transactions.")}
 
 Args:
   - account_number (number): Account number to delete (required)
+  - confirm (boolean): Must be true to execute (see warning)
 
 Returns:
   Confirmation of deletion.`,
@@ -362,6 +364,12 @@ Returns:
     },
     async (params: DeleteAccountInput) => {
       try {
+        if (!params.confirm) {
+          return buildConfirmationRequiredResponse(
+            `Delete account ${params.account_number}`,
+            "The account is permanently deleted from the chart of accounts and cannot be restored."
+          );
+        }
         await fortnoxRequest(
           `/3/accounts/${params.account_number}`,
           "DELETE"

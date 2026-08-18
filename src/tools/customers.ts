@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { fortnoxRequest } from "../services/api.js";
+import { buildConfirmationRequiredResponse, irreversibleWarning } from "../services/safety.js";
 import { ResponseFormat } from "../constants.js";
 import {
   buildToolResponse,
@@ -399,10 +400,11 @@ Returns:
       title: "Delete Fortnox Customer",
       description: `Delete a customer from Fortnox.
 
-WARNING: This action cannot be undone. The customer must not have any invoices or orders.
+${irreversibleWarning("The customer is deleted permanently. The customer must not have any invoices or orders.")}
 
 Args:
   - customer_number (string): Customer number to delete (required)
+  - confirm (boolean): Must be true to execute (see warning)
 
 Returns:
   Confirmation of deletion.`,
@@ -416,6 +418,12 @@ Returns:
     },
     async (params: DeleteCustomerInput) => {
       try {
+        if (!params.confirm) {
+          return buildConfirmationRequiredResponse(
+            `Delete customer ${params.customer_number}`,
+            "The customer is permanently deleted and cannot be restored."
+          );
+        }
         await fortnoxRequest(
           `/3/customers/${encodeURIComponent(params.customer_number)}`,
           "DELETE"

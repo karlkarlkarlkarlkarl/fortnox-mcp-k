@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ResponseFormat, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "../constants.js";
+import { ConfirmField } from "../services/safety.js";
 
 /**
  * Schema for listing suppliers
@@ -207,7 +208,8 @@ export type UpdateSupplierInput = z.infer<typeof UpdateSupplierSchema>;
 export const DeleteSupplierSchema = z.object({
   supplier_number: z.string()
     .min(1)
-    .describe("Supplier number to delete")
+    .describe("Supplier number to delete"),
+  ...ConfirmField
 }).strict();
 
 export type DeleteSupplierInput = z.infer<typeof DeleteSupplierSchema>;

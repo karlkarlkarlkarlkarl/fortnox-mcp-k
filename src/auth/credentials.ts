@@ -54,5 +54,11 @@ export const FORTNOX_SCOPES = [
   "customer",
   "invoice",
   "supplier",
-  "bookkeeping"
+  "bookkeeping",
+  // Articles register (lager & tillverkning expansion)
+  "article",
+  // Fortnox Lager module: stock balance, stock points, deliveries,
+  // production orders, purchase orders, stock taking, stock transfers.
+  // Existing users must re-authorize for the new scopes to take effect.
+  "warehouse"
 ];

@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { fortnoxRequest, fetchAllPages } from "../services/api.js";
+import { buildConfirmationRequiredResponse } from "../services/safety.js";
 import { ResponseFormat, FETCH_ALL_DELAY_MS } from "../constants.js";
 import {
   buildToolResponse,
@@ -280,6 +281,10 @@ Args:
     - Each row: { account_number, debit?, credit?, description?, cost_center?, project? }
   - cost_center (string): Default cost center for all rows
   - project (string): Default project for all rows
+  - confirm (boolean): Must be true to execute (see warning)
+
+⚠️ IRREVERSIBLE: Vouchers cannot be deleted in Fortnox — a created voucher is a permanent bookkeeping entry that can only be corrected with a reversing voucher.
+This tool requires confirm: true to execute. Never set confirm: true unless the user has explicitly approved this specific action. A call without confirm: true is safe and only returns a preview.
 
 Returns:
   The created voucher with assigned voucher number.
@@ -298,7 +303,7 @@ Example:
       inputSchema: CreateVoucherSchema,
       annotations: {
         readOnlyHint: false,
-        destructiveHint: false,
+        destructiveHint: true,
         idempotentHint: false,
         openWorldHint: true
       }
@@ -318,6 +323,13 @@ Example:
             new Error(
               `Voucher is not balanced. Total debit (${totalDebit}) must equal total credit (${totalCredit}).`
             )
+          );
+        }
+
+        if (!params.confirm) {
+          return buildConfirmationRequiredResponse(
+            `Create voucher in series ${params.voucher_series}: "${params.description}" (${params.transaction_date}, total ${totalDebit})`,
+            "A voucher is a permanent bookkeeping entry. It cannot be deleted, only corrected with a reversing voucher."
           );
         }
 

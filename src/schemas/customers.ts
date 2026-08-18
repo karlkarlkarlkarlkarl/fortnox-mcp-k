@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ResponseFormat, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "../constants.js";
+import { ConfirmField } from "../services/safety.js";
 
 /**
  * Schema for listing customers
@@ -210,7 +211,8 @@ export type UpdateCustomerInput = z.infer<typeof UpdateCustomerSchema>;
 export const DeleteCustomerSchema = z.object({
   customer_number: z.string()
     .min(1)
-    .describe("Customer number to delete")
+    .describe("Customer number to delete"),
+  ...ConfirmField
 }).strict();
 
 export type DeleteCustomerInput = z.infer<typeof DeleteCustomerSchema>;

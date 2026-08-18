@@ -43,6 +43,12 @@ import { registerAnalyticsTools } from "./tools/analytics.js";
 import { registerSupplierInvoiceTools } from "./tools/supplierInvoices.js";
 import { registerOrderTools } from "./tools/orders.js";
 import { registerBIAnalyticsTools } from "./tools/biAnalytics.js";
+import { registerArticleTools } from "./tools/articles.js";
+import { registerWarehouseTools } from "./tools/warehouse.js";
+import { registerProductionOrderTools } from "./tools/productionOrders.js";
+import { registerPurchaseOrderTools } from "./tools/purchaseOrders.js";
+import { registerWarehouseDeliveryTools } from "./tools/warehouseDeliveries.js";
+import { registerStockOperationTools } from "./tools/stockOperations.js";
 
 function createMcpServer(): McpServer {
   const server = new McpServer({
@@ -60,6 +66,12 @@ function createMcpServer(): McpServer {
   registerAnalyticsTools(server);
   registerOrderTools(server);
   registerBIAnalyticsTools(server);
+  registerArticleTools(server);
+  registerWarehouseTools(server);
+  registerProductionOrderTools(server);
+  registerPurchaseOrderTools(server);
+  registerWarehouseDeliveryTools(server);
+  registerStockOperationTools(server);
 
   return server;
 }

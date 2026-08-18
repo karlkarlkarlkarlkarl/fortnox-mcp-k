@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { fortnoxRequest, fetchAllPages } from "../services/api.js";
+import { buildConfirmationRequiredResponse } from "../services/safety.js";
 import { ResponseFormat } from "../constants.js";
 import {
   buildToolResponse,
@@ -419,8 +420,12 @@ Returns:
 
 This approves the invoice and marks it ready for payment processing.
 
+⚠️ IRREVERSIBLE: Approval marks the invoice ready for payment processing and is hard to undo.
+This tool requires confirm: true to execute. Never set confirm: true unless the user has explicitly approved this specific action. A call without confirm: true is safe and only returns a preview.
+
 Args:
   - given_number (string): The supplier invoice given number to approve (required)
+  - confirm (boolean): Must be true to execute (see warning)
   - response_format ('markdown' | 'json'): Output format
 
 Returns:
@@ -428,13 +433,19 @@ Returns:
       inputSchema: ApproveSupplierInvoiceSchema,
       annotations: {
         readOnlyHint: false,
-        destructiveHint: false,
+        destructiveHint: true,
         idempotentHint: false,
         openWorldHint: true
       }
     },
     async (params: ApproveSupplierInvoiceInput) => {
       try {
+        if (!params.confirm) {
+          return buildConfirmationRequiredResponse(
+            `Approve supplier invoice #${params.given_number} for payment`,
+            "The invoice is marked as approved and ready for payment processing."
+          );
+        }
         const response = await fortnoxRequest<SupplierInvoiceResponse>(
           `/3/supplierinvoices/${encodeURIComponent(params.given_number)}/approvalpayment`,
           "PUT"
