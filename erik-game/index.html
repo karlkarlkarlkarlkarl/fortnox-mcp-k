@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Super-Eric</title>
+<title>Super-Erik</title>
 <style>
 /* Inbäddade typsnitt (Baloo 2 + Nunito, latin) — spelet funkar helt offline */
 @font-face {
@@ -44,8 +44,8 @@
 </style>
 <style>
 /* ============================================================
-   SUPER-ERIC — Superstjärnan · ett födelsedagsspel
-   Ett enda fil-arkadspel: vektor-Eric, syntetiserat ljud,
+   SUPER-ERIK — Superstjärnan · ett födelsedagsspel
+   Ett enda fil-arkadspel: vektor-Erik, syntetiserat ljud,
    svensk sommaräng, balettfeber och topplista.
    ============================================================ */
 :root{
@@ -367,7 +367,7 @@ kbd{
   font:italic 700 13.5px/1.5 "Nunito", sans-serif;
   color:var(--ink-soft);
 }
-.quote::before{ content:"“"; } .quote::after{ content:"” — Eric"; font-style:normal; }
+.quote::before{ content:"“"; } .quote::after{ content:"” — Erik"; font-style:normal; }
 
 @media (prefers-reduced-motion: reduce){
   *{ animation-duration:.001s !important; animation-iteration-count:1 !important; transition-duration:.001s !important; }
@@ -386,9 +386,9 @@ kbd{
     <div class="card">
       <div id="title-main">
         <div class="eyebrow">Familjen presenterar</div>
-        <h1 class="logo">SUPER‑ERIC</h1>
+        <h1 class="logo">SUPER‑ERIK</h1>
         <div class="sub">Fixaren · Lekproffset · Osteopaten · Balettdansören</div>
-        <div class="bday">🎂 Grattis på födelsedagen, Eric! 🎂</div>
+        <div class="bday">🎂 Grattis på födelsedagen, Erik! 🎂</div>
 
         <div class="stickers" aria-hidden="true">
           <div class="st st-fix"><span class="em">🔧</span>FIXA</div>
@@ -398,7 +398,7 @@ kbd{
         </div>
 
         <p class="howto">
-          Var Eric! Fånga allt han älskar och samla poäng.
+          Var Erik! Fånga allt han älskar och samla poäng.
           <b>Undvik stressmoln ⛈️ och tråkiga möten 💼.</b>
           Fånga en balettsko för <b>BALETTFEBER</b> med dubbla poäng!
         </p>
@@ -411,7 +411,7 @@ kbd{
           <button id="btn-board" class="btn btn-ghost">🏆 Topplista</button>
         </div>
         <p class="quote" id="title-quote">Jag fixar det där sen!</p>
-        <div class="foot">Med ❤️ från familjen · Super‑Eric v1.0</div>
+        <div class="foot">Med ❤️ från familjen · Super‑Erik v1.0</div>
       </div>
 
       <div id="title-board" style="display:none">
@@ -446,7 +446,7 @@ kbd{
 
       <div class="score-label">Dina poäng</div>
       <div class="score-big" id="over-score">0</div>
-      <div><span class="rank-chip" id="over-rank">Nybörjar‑Eric</span></div>
+      <div><span class="rank-chip" id="over-rank">Nybörjar‑Erik</span></div>
       <div id="over-newrec" class="newrec" style="display:none">🎉 NYTT REKORD! 🎉</div>
 
       <div class="stats" id="over-stats"></div>
@@ -508,7 +508,7 @@ function resize(){
   cv.style.height = H + 'px';
   U = clamp(Math.min(W, H) * 0.155, 78, 148);
   groundY = H - Math.max(H * 0.09, 54);
-  if (G.eric) G.eric.x = clamp(G.eric.x, U * 0.6, W - U * 0.6);
+  if (G.erik) G.erik.x = clamp(G.erik.x, U * 0.6, W - U * 0.6);
 }
 window.addEventListener('resize', resize);
 if (window.visualViewport) window.visualViewport.addEventListener('resize', resize);
@@ -532,7 +532,7 @@ const store = {
     } catch (e) {}
   }
 };
-const BOARD_KEY = 'ericTopplista';
+const BOARD_KEY = 'erikTopplista';
 const getBoard = () => store.get(BOARD_KEY, []);
 function addToBoard(name, score){
   const board = getBoard();
@@ -549,7 +549,7 @@ function addToBoard(name, score){
    ============================================================ */
 const AudioMan = {
   ac: null, master: null, musicGain: null, sfxGain: null,
-  muted: store.get('ericMuted', false),
+  muted: store.get('erikMuted', false),
   mode: 'none',            // 'pop' | 'waltz' | 'none'
   step: 0, nextT: 0, timer: null,
 
@@ -570,7 +570,7 @@ const AudioMan = {
   },
   setMuted(m){
     this.muted = m;
-    store.set('ericMuted', m);
+    store.set('erikMuted', m);
     if (this.master) this.master.gain.value = m ? 0 : 1;
     $('btn-mute').textContent = m ? '🔇' : '🔊';
   },
@@ -727,7 +727,7 @@ const TYPES = {
   shoe:    { good: true, ring: '#B07BE0', base: 300, emo: ['🩰'],
              pops: ['BALETTFEBER!'] },
   cake:    { good: true, ring: '#FFC94B', base: 500, emo: ['🎂'],
-             pops: ['GRATTIS ERIC!'] },
+             pops: ['GRATTIS ERIK!'] },
   cloud:   { good: false, ring: '#3E415C', base: 0, emo: ['⛈️'],
              pops: ['STRESS! AJ!'] },
   brief:   { good: false, ring: '#3E415C', base: 0, emo: ['💼'],
@@ -743,13 +743,13 @@ const QUOTES = [
   'Femte positionen, alltid.'
 ];
 const RANKS = [
-  [800,   'Nybörjar‑Eric 🐣'],
+  [800,   'Nybörjar‑Erik 🐣'],
   [2500,  'Hemmafixare 🔧'],
   [5000,  'Kalasfarbror 🎈'],
   [9000,  'Ryggknäckarmästare 💆'],
   [14000, 'Piruettproffs 🩰'],
   [20000, 'Superstjärna ⭐'],
-  [Infinity, 'DEN ÄKTA ERIC 👑']
+  [Infinity, 'DEN ÄKTA ERIK 👑']
 ];
 const rankFor = s => { for (const [lim, name] of RANKS) if (s < lim) return name; return RANKS[RANKS.length - 1][1]; };
 
@@ -770,11 +770,11 @@ const G = {
   invuln: 0,
   dieT: 0,
   stats: null,
-  eric: null,
+  erik: null,
   aiT: 0,               // attract-läge
   savedThisRound: false
 };
-function newEric(){
+function newErik(){
   return {
     x: W / 2, y: 0, vy: 0, onGround: true,
     tx: W / 2, keyDir: 0, usePointer: false,
@@ -791,7 +791,7 @@ function resetRound(){
   G.fever = 0; G.feverSince = 99; G.spins = 0; G.spinAcc = 0;
   G.curtain = 0; G.shake = 0; G.flash = 0; G.invuln = 0; G.dieT = 0;
   G.stats = { tool: 0, kid: 0, patient: 0, cake: 0, air: 0, maxCombo: 0 };
-  G.eric = newEric();
+  G.erik = newErik();
   G.savedThisRound = false;
 }
 
@@ -815,8 +815,8 @@ cv.addEventListener('pointerdown', e => {
   AudioMan.ensure();
   ptr = { down: true, x: e.clientX, y: e.clientY, t: performance.now(), moved: 0 };
   if (G.mode === 'playing'){
-    G.eric.usePointer = true;
-    G.eric.tx = e.clientX;
+    G.erik.usePointer = true;
+    G.erik.tx = e.clientX;
   }
   cv.setPointerCapture(e.pointerId);
 });
@@ -824,7 +824,7 @@ cv.addEventListener('pointermove', e => {
   if (!ptr.down) return;
   ptr.moved += Math.abs(e.clientX - ptr.x) + Math.abs(e.clientY - ptr.y);
   ptr.x = e.clientX;
-  if (G.mode === 'playing'){ G.eric.usePointer = true; G.eric.tx = e.clientX; }
+  if (G.mode === 'playing'){ G.erik.usePointer = true; G.erik.tx = e.clientX; }
 });
 cv.addEventListener('pointerup', e => {
   if (!ptr.down) return;
@@ -839,7 +839,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function jump(){
-  const e = G.eric;
+  const e = G.erik;
   if (!e || !e.onGround || G.fever > 0) return;
   e.onGround = false;
   e.vy = -Math.sqrt(2 * gravity() * U * 1.55);
@@ -885,7 +885,7 @@ function spawnItem(forceType){
 }
 
 function updateItems(dt){
-  const e = G.eric;
+  const e = G.erik;
   const chestY = e.y - U * 0.85;
   for (let i = G.items.length - 1; i >= 0; i--){
     const it = G.items[i];
@@ -924,7 +924,7 @@ const multOf = () => Math.min(1 + Math.floor(G.combo / 6), 5);
 
 function onCatch(it){
   const T = TYPES[it.type];
-  const e = G.eric;
+  const e = G.erik;
   if (T.good){
     G.combo++;
     G.stats.maxCombo = Math.max(G.stats.maxCombo, G.combo);
@@ -975,12 +975,12 @@ function startFever(){
   AudioMan.sfxGliss();
   AudioMan.startMusic('waltz');
   addFloat(W / 2, H * 0.3, 'BALETTFEBER! ×2', '#B07BE0', 1.6, true);
-  confetti(G.eric.x, G.eric.y - U, 26);
+  confetti(G.erik.x, G.erik.y - U, 26);
 }
 function endFever(){
   G.fever = 0;
   G.feverSince = 0;
-  G.eric.spin = 0;
+  G.erik.spin = 0;
   AudioMan.startMusic('pop');
 }
 
@@ -1193,7 +1193,7 @@ function drawGround(){
 }
 function drawSpotlight(){
   if (!(G.fever > 0 || G.mode === 'dying')) return;
-  const e = G.eric;
+  const e = G.erik;
   const ex = e.x, ey = e.y - U * 0.7;
   const gr = ctx.createRadialGradient(ex, ey, U * 0.9, ex, ey, Math.max(W, H) * 0.85);
   gr.addColorStop(0, 'rgba(14,9,30,0)');
@@ -1348,15 +1348,15 @@ function drawFloats(){
 }
 
 /* ============================================================
-   13. RITNING — ERIC (vektorfigur)
+   13. RITNING — ERIK (vektorfigur)
    ============================================================ */
 const SKIN = '#F2C49B', SKIN_D = '#DBA97F',
       HAIR = '#C99B62', HAIR_D = '#AD7F49',
       SHIRT = '#3E5C8F', SHIRT_D = '#31497A',
       PANTS = '#2E3550', SHOE_C = '#7A4A2B';
 
-function drawEric(){
-  const e = G.eric;
+function drawErik(){
+  const e = G.erik;
   const t = G.t;
   const feet = e.y;
   const airK = e.onGround ? 0 : clamp(-e.vy / (U * 6), -1, 1);
@@ -1517,7 +1517,7 @@ function drawEric(){
     ctx.save();
     ctx.globalAlpha = Math.min(1, e.kidT * 2);
     ctx.translate(0, headY + hb - headR * 1.3);
-    // ben som hänger ner på varsin sida om Erics huvud
+    // ben som hänger ner på varsin sida om Eriks huvud
     ctx.strokeStyle = '#E85D4A';
     ctx.lineWidth = U * 0.055;
     ctx.lineCap = 'round';
@@ -1685,7 +1685,7 @@ function drawEric(){
   }
   ctx.restore(); // huvud
 
-  ctx.restore(); // eric
+  ctx.restore(); // erik
   ctx.globalAlpha = 1;
 }
 
@@ -1774,8 +1774,8 @@ function drawHUD(){
 /* ============================================================
    15. UPPDATERING
    ============================================================ */
-function updateEric(dt){
-  const e = G.eric;
+function updateErik(dt){
+  const e = G.erik;
   // riktning
   let dir = 0;
   if (keys['ArrowLeft'] || keys['KeyA']) dir -= 1;
@@ -1851,13 +1851,13 @@ function updatePlaying(dt){
     if (ramp() > 0.5 && Math.random() < 0.25) spawnItem();
   }
 
-  updateEric(dt);
+  updateErik(dt);
   updateItems(dt);
 }
 
 function updateDying(dt){
   G.dieT += dt;
-  const e = G.eric;
+  const e = G.erik;
   e.moving = 0;
   e.bow = clamp((G.dieT - 0.4) / 0.5, 0, 1) * (0.5 + Math.sin(Math.min(G.dieT, 2) * 2) * 0.1);
   if (G.dieT > 0.8) G.curtain = clamp(G.curtain + dt * 1.1, 0, 1);
@@ -1868,8 +1868,8 @@ function updateDying(dt){
 }
 
 function updateAttract(dt){
-  // Eric underhåller bakom titelkortet
-  const e = G.eric;
+  // Erik underhåller bakom titelkortet
+  const e = G.erik;
   G.aiT -= dt;
   if (G.aiT <= 0){
     e.tx = rnd(W * 0.2, W * 0.8);
@@ -1877,7 +1877,7 @@ function updateAttract(dt){
     G.aiT = rnd(1.6, 3.2);
     if (Math.random() < 0.3 && e.onGround){ e.onGround = false; e.vy = -Math.sqrt(2 * gravity() * U * 1.3); }
   }
-  updateEric(dt);
+  updateErik(dt);
   if (Math.random() < dt * 0.5) spawnItem(pick(['tool', 'kid', 'patient', 'shoe']));
   for (let i = G.items.length - 1; i >= 0; i--){
     const it = G.items[i];
@@ -1919,7 +1919,7 @@ function render(){
   drawGround();
   drawSpotlight();
   drawItems();
-  if (G.eric) drawEric();
+  if (G.erik) drawErik();
   drawParts();
   drawFloats();
   drawCurtains();
@@ -1967,13 +1967,13 @@ function startGame(){
   AudioMan.ensure();
   AudioMan.sfxClick();
   resetRound();
-  G.eric.y = groundY;
+  G.erik.y = groundY;
   G.items = []; G.parts = []; G.floats = [];
   G.mode = 'playing';
   hide(ovlTitle); hide(ovlOver); hide(ovlPause);
   show($('btn-pause')); show($('btn-mute'));
   AudioMan.startMusic('pop');
-  addFloat(W / 2, H * 0.35, 'KÖR ERIC! 💪', '#9E3F2F', 1.4, true);
+  addFloat(W / 2, H * 0.35, 'KÖR ERIK! 💪', '#9E3F2F', 1.4, true);
 }
 function pauseGame(){
   if (G.mode !== 'playing') return;
@@ -1990,7 +1990,7 @@ function resumeGame(){
 function toTitle(){
   G.mode = 'title';
   resetRound();
-  G.eric.y = groundY;
+  G.erik.y = groundY;
   AudioMan.stopMusic();
   if (AudioMan.ac && AudioMan.ac.state === 'suspended') AudioMan.ac.resume();
   hide(ovlOver); hide(ovlPause);
@@ -2007,7 +2007,7 @@ function showGameOver(){
   AudioMan.sfxFanfare();
   const prevTop = getBoard()[0];
   const isRecord = !prevTop || G.score > prevTop.s;
-  $('over-heading').textContent = pick(['FÖRESTÄLLNINGEN ÄR SLUT', 'BRAVO, ERIC!', 'VILKEN SHOW!']);
+  $('over-heading').textContent = pick(['FÖRESTÄLLNINGEN ÄR SLUT', 'BRAVO, ERIK!', 'VILKEN SHOW!']);
   $('over-rank').textContent = rankFor(G.score);
   $('over-newrec').style.display = (isRecord && G.score > 0) ? '' : 'none';
   $('over-quote').textContent = pick(QUOTES);
@@ -2031,7 +2031,7 @@ function showGameOver(){
 
   $('save-block').style.display = '';
   $('btn-save').disabled = false;
-  $('inp-name').value = store.get('ericLastName', '');
+  $('inp-name').value = store.get('erikLastName', '');
   fmtBoard($('over-board-list'));
 
   // räkna upp poängen
@@ -2056,7 +2056,7 @@ function saveScore(){
   let name = $('inp-name').value.trim();
   if (!name) name = 'Hemlig beundrare';
   name = name.slice(0, 14);
-  store.set('ericLastName', name);
+  store.set('erikLastName', name);
   const idx = addToBoard(name, G.score);
   G.savedThisRound = true;
   $('save-block').style.display = 'none';
@@ -2093,8 +2093,8 @@ $('btn-back').addEventListener('click', () => {
    ============================================================ */
 function boot(){
   resize();
-  G.eric = newEric();
-  G.eric.y = groundY;
+  G.erik = newErik();
+  G.erik.y = groundY;
   const isTouch = matchMedia('(pointer: coarse)').matches;
   $('hint-controls').innerHTML = isTouch
     ? '📱 <b>Dra fingret</b> för att springa · <b>snabbtryck</b> för att hoppa'
@@ -2111,7 +2111,7 @@ function boot(){
 boot();
 
 /* test-krokar (används av automatiska tester) */
-window.__eric = {
+window.__erik = {
   get G(){ return G; },
   start: startGame,
   startFever,

@@ -1,11 +1,11 @@
-# 🌟 SUPER-ERIC — Superstjärnan
+# 🌟 SUPER-ERIK — Superstjärnan
 
-Ett födelsedagsspel för hela familjen, där alla får spela som **Eric**:
+Ett födelsedagsspel för hela familjen, där alla får spela som **Erik**:
 fixaren, lekproffset, osteopaten och balettdansören.
 
 ## Så spelar du
 
-Fånga allt Eric älskar och samla poäng:
+Fånga allt Erik älskar och samla poäng:
 
 | | Föremål | Poäng |
 |---|---|---|
@@ -29,8 +29,8 @@ Allt är en enda fil — `index.html` — med inbäddade typsnitt och
 syntetiserat ljud (WebAudio). Ingen internetuppkoppling behövs.
 
 - **Öppna direkt:** dubbelklicka på `index.html` i valfri webbläsare.
-- **Lokal server:** `npx serve eric-game` eller `python3 -m http.server` i den här mappen.
-- **GitHub Pages:** aktivera Pages på repot och länka till `eric-game/index.html`.
+- **Lokal server:** `npx serve erik-game` eller `python3 -m http.server` i den här mappen.
+- **GitHub Pages:** aktivera Pages på repot och länka till `erik-game/index.html`.
 
 Topplistan sparas per enhet (localStorage) — precis som på ett riktigt
 arkadspel: den som håller i telefonen på kalaset försvarar rekordet.
