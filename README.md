@@ -140,9 +140,16 @@ That's it! You can now ask Claude to manage your Fortnox invoices, customers, an
 - `fortnox_list_financial_years` - List company financial years
 
 ### Analytics
+- `fortnox_net_revenue` - **Exact net revenue (ex VAT, SEK) from the bookkeeping** — the correct source for omsättning
 - `fortnox_invoice_summary` - Get invoice statistics by period
-- `fortnox_top_customers` - Get top customers by revenue
+- `fortnox_top_customers` - Get top customers by invoiced amount
 - `fortnox_unpaid_report` - Get detailed unpaid invoice report
+
+#### Money conventions (all analytics tools)
+- All aggregated amounts are converted to **SEK** using each document's currency rate; fields are suffixed `_sek`.
+- Amounts from invoice/order/offer lists **include VAT** (the Fortnox list API exposes no net amounts); fields are suffixed `_inc_vat_sek`.
+- Exact ex-VAT revenue (nettoomsättning) comes from the bookkeeping via `fortnox_net_revenue` (sums revenue accounts 3000-3799 from vouchers — always SEK, always ex VAT).
+- Order/offer lists carry no exchange rate, so foreign currency documents are excluded from those SEK totals and reported separately per currency instead of being silently mixed in.
 
 ### Business Intelligence
 - `fortnox_cash_flow_forecast` - Forecast cash flow based on invoices and payables

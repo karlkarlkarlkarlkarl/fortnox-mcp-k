@@ -24,7 +24,6 @@
  *   - UPSTASH_REDIS_REST_TOKEN: Redis token
  */
 
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
@@ -33,48 +32,7 @@ import { loadConfig, validateEnvironment, logConfig } from "./config.js";
 import { getFortnoxAuth } from "./services/auth.js";
 import { getStorageFromEnv } from "./auth/storage/index.js";
 import { runRemoteServer } from "./server/remote.js";
-import { registerCustomerTools } from "./tools/customers.js";
-import { registerInvoiceTools } from "./tools/invoices.js";
-import { registerSupplierTools } from "./tools/suppliers.js";
-import { registerAccountTools } from "./tools/accounts.js";
-import { registerVoucherTools } from "./tools/vouchers.js";
-import { registerCompanyTools } from "./tools/company.js";
-import { registerAnalyticsTools } from "./tools/analytics.js";
-import { registerSupplierInvoiceTools } from "./tools/supplierInvoices.js";
-import { registerOrderTools } from "./tools/orders.js";
-import { registerBIAnalyticsTools } from "./tools/biAnalytics.js";
-import { registerArticleTools } from "./tools/articles.js";
-import { registerWarehouseTools } from "./tools/warehouse.js";
-import { registerProductionOrderTools } from "./tools/productionOrders.js";
-import { registerPurchaseOrderTools } from "./tools/purchaseOrders.js";
-import { registerWarehouseDeliveryTools } from "./tools/warehouseDeliveries.js";
-import { registerStockOperationTools } from "./tools/stockOperations.js";
-
-function createMcpServer(): McpServer {
-  const server = new McpServer({
-    name: "fortnox-mcp-server",
-    version: "1.0.0"
-  });
-
-  registerCustomerTools(server);
-  registerInvoiceTools(server);
-  registerSupplierTools(server);
-  registerSupplierInvoiceTools(server);
-  registerAccountTools(server);
-  registerVoucherTools(server);
-  registerCompanyTools(server);
-  registerAnalyticsTools(server);
-  registerOrderTools(server);
-  registerBIAnalyticsTools(server);
-  registerArticleTools(server);
-  registerWarehouseTools(server);
-  registerProductionOrderTools(server);
-  registerPurchaseOrderTools(server);
-  registerWarehouseDeliveryTools(server);
-  registerStockOperationTools(server);
-
-  return server;
-}
+import { createMcpServer } from "./server/createServer.js";
 
 async function runStdio(): Promise<void> {
   try {

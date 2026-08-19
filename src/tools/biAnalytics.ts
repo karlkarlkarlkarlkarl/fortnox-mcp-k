@@ -34,6 +34,14 @@ import {
   type GrowthResult
 } from "../services/aggregationHelpers.js";
 import {
+  totalInSEK,
+  balanceInSEK,
+  foreignCurrencies,
+  sumByCurrency,
+  foreignCurrencyWarning,
+  AMOUNT_CONVENTIONS
+} from "../services/money.js";
+import {
   CashFlowForecastSchema,
   OrderPipelineSchema,
   SalesFunnelSchema,
@@ -68,6 +76,8 @@ interface FortnoxInvoiceListItem {
   Total?: number;
   Balance?: number;
   Currency?: string;
+  CurrencyRate?: number;
+  CurrencyUnit?: number;
   Booked?: boolean;
   Cancelled?: boolean;
 }
@@ -90,6 +100,8 @@ interface FortnoxSupplierInvoiceListItem {
   Total?: number;
   Balance?: number;
   Currency?: string;
+  CurrencyRate?: number;
+  CurrencyUnit?: number;
   Booked?: boolean;
   Cancelled?: boolean;
 }
@@ -228,7 +240,9 @@ export function registerBIAnalyticsTools(server: McpServer): void {
     "fortnox_cash_flow_forecast",
     {
       title: "Cash Flow Forecast",
-      description: `Generate cash flow forecast from unpaid receivables and payables. Shows expected inflows, outflows, net flow, and running balance grouped by week or month.`,
+      description: `Generate cash flow forecast from unpaid receivables and payables. Shows expected inflows, outflows, net flow, and running balance grouped by week or month.
+
+All amounts are in SEK, converted per document currency rate. Cash flow amounts include VAT (they are the amounts actually paid/received).`,
       inputSchema: CashFlowForecastSchema,
       annotations: {
         readOnlyHint: true,
@@ -331,8 +345,8 @@ export function registerBIAnalyticsTools(server: McpServer): void {
           const periodReceivables = receivablesByPeriod.get(bucket) || [];
           const periodPayables = payablesByPeriod.get(bucket) || [];
 
-          const inflows = sumBy(periodReceivables, inv => inv.Balance || 0);
-          const outflows = sumBy(periodPayables, inv => inv.Balance || 0);
+          const inflows = sumBy(periodReceivables, balanceInSEK);
+          const outflows = sumBy(periodPayables, balanceInSEK);
           const netFlow = inflows - outflows;
           runningBalance += netFlow;
 
@@ -348,8 +362,8 @@ export function registerBIAnalyticsTools(server: McpServer): void {
         }
 
         // Calculate totals
-        const totalInflows = sumBy(receivables, inv => inv.Balance || 0);
-        const totalOutflows = sumBy(payables, inv => inv.Balance || 0);
+        const totalInflows = sumBy(receivables, balanceInSEK);
+        const totalOutflows = sumBy(payables, balanceInSEK);
 
         const output: Record<string, unknown> = {
           forecast: {
@@ -360,13 +374,14 @@ export function registerBIAnalyticsTools(server: McpServer): void {
             include_overdue: params.include_overdue,
             starting_balance: params.starting_balance || 0
           },
+          amount_basis: "SEK, including VAT (cash amounts, converted per document currency rate)",
           summary: {
-            total_receivables: totalInflows,
-            total_payables: totalOutflows,
-            net_position: totalInflows - totalOutflows,
+            total_receivables_sek: totalInflows,
+            total_payables_sek: totalOutflows,
+            net_position_sek: totalInflows - totalOutflows,
             receivables_count: receivables.length,
             payables_count: payables.length,
-            ending_balance: runningBalance
+            ending_balance_sek: runningBalance
           },
           periods,
           truncated: receivablesResult.truncated || payablesResult.truncated,
@@ -433,7 +448,9 @@ export function registerBIAnalyticsTools(server: McpServer): void {
     "fortnox_order_pipeline",
     {
       title: "Order Pipeline Analytics",
-      description: `Analyze order pipeline and backlog. Shows pending vs invoiced orders grouped by status, customer, or month.`,
+      description: `Analyze order pipeline and backlog. Shows pending vs invoiced orders grouped by status, customer, or month.
+
+Amounts include VAT and are reported in SEK. The order list API exposes no exchange rate, so orders in foreign currencies are excluded from SEK totals and reported separately per currency.`,
       inputSchema: OrderPipelineSchema,
       annotations: {
         readOnlyHint: true,
@@ -490,39 +507,52 @@ export function registerBIAnalyticsTools(server: McpServer): void {
             break;
         }
 
-        // Calculate statistics per group
+        // Calculate statistics per group (SEK documents only; foreign reported separately)
         const groupStats = Array.from(groups.entries())
-          .map(([key, items]) => ({
-            key,
-            count: items.length,
-            total_value: sumBy(items, o => o.Total || 0),
-            average_value: items.length > 0 ? sumBy(items, o => o.Total || 0) / items.length : 0
-          }))
-          .sort((a, b) => b.total_value - a.total_value);
+          .map(([key, items]) => {
+            const split = sumByCurrency(items);
+            const sekCount = items.filter(o => !o.Currency || o.Currency === "SEK").length;
+            return {
+              key,
+              count: items.length,
+              total_value_inc_vat_sek: split.sek_total,
+              average_value_inc_vat_sek: sekCount > 0 ? split.sek_total / sekCount : 0,
+              foreign_totals: Object.keys(split.foreign_totals).length > 0 ? split.foreign_totals : undefined
+            };
+          })
+          .sort((a, b) => b.total_value_inc_vat_sek - a.total_value_inc_vat_sek);
 
         // Calculate overall summary
         const pendingOrders = orders.filter(o => !o.Cancelled && !o.InvoiceReference);
         const invoicedOrders = orders.filter(o => o.InvoiceReference && !o.Cancelled);
         const cancelledOrders = orders.filter(o => o.Cancelled);
 
+        const totalSplit = sumByCurrency(orders);
+        const pendingSplit = sumByCurrency(pendingOrders);
+        const invoicedSplit = sumByCurrency(invoicedOrders);
+
         const output = {
           period: params.period || null,
           date_range: dateRangeDescription || null,
           group_by: params.group_by,
+          amount_basis: "SEK, including VAT. Foreign currency orders excluded from SEK totals (no rate in order list) and reported in foreign_currency_totals",
           summary: {
             total_orders: orders.length,
-            total_value: sumBy(orders, o => o.Total || 0),
+            total_value_inc_vat_sek: totalSplit.sek_total,
             pending_orders: pendingOrders.length,
-            pending_value: sumBy(pendingOrders, o => o.Total || 0),
+            pending_value_inc_vat_sek: pendingSplit.sek_total,
             invoiced_orders: invoicedOrders.length,
-            invoiced_value: sumBy(invoicedOrders, o => o.Total || 0),
+            invoiced_value_inc_vat_sek: invoicedSplit.sek_total,
             cancelled_orders: cancelledOrders.length,
-            unique_customers: countUnique(orders, o => o.CustomerNumber || "unknown")
+            unique_customers: countUnique(orders, o => o.CustomerNumber || "unknown"),
+            foreign_currency_totals: totalSplit.foreign_totals
           },
           groups: groupStats,
           truncated: result.truncated,
           truncation_reason: result.truncationReason
         };
+
+        const fxWarning = foreignCurrencyWarning(totalSplit.foreign_totals);
 
         let textContent: string;
         if (params.response_format === ResponseFormat.JSON) {
@@ -538,13 +568,20 @@ export function registerBIAnalyticsTools(server: McpServer): void {
             lines.push("");
           }
 
+          if (fxWarning) {
+            lines.push(fxWarning);
+            lines.push("");
+          }
+
           lines.push("## Summary");
+          lines.push("");
+          lines.push("*Values in SEK, inc VAT.*");
           lines.push("");
           lines.push("| Metric | Count | Value |");
           lines.push("|--------|-------|-------|");
-          lines.push(`| Total Orders | ${orders.length} | ${formatMoney(output.summary.total_value)} |`);
-          lines.push(`| **Pending (Backlog)** | **${pendingOrders.length}** | **${formatMoney(output.summary.pending_value)}** |`);
-          lines.push(`| Invoiced | ${invoicedOrders.length} | ${formatMoney(output.summary.invoiced_value)} |`);
+          lines.push(`| Total Orders | ${orders.length} | ${formatMoney(output.summary.total_value_inc_vat_sek)} |`);
+          lines.push(`| **Pending (Backlog)** | **${pendingOrders.length}** | **${formatMoney(output.summary.pending_value_inc_vat_sek)}** |`);
+          lines.push(`| Invoiced | ${invoicedOrders.length} | ${formatMoney(output.summary.invoiced_value_inc_vat_sek)} |`);
           lines.push(`| Cancelled | ${cancelledOrders.length} | - |`);
           lines.push(`| Unique Customers | ${output.summary.unique_customers} | - |`);
 
@@ -555,7 +592,7 @@ export function registerBIAnalyticsTools(server: McpServer): void {
           lines.push("|--------|--------|-------|-----------|");
 
           for (const group of groupStats.slice(0, 20)) {
-            lines.push(`| ${group.key} | ${group.count} | ${formatMoney(group.total_value)} | ${formatMoney(group.average_value)} |`);
+            lines.push(`| ${group.key} | ${group.count} | ${formatMoney(group.total_value_inc_vat_sek)} | ${formatMoney(group.average_value_inc_vat_sek)} |`);
           }
 
           if (groupStats.length > 20) {
@@ -577,7 +614,9 @@ export function registerBIAnalyticsTools(server: McpServer): void {
     "fortnox_sales_funnel",
     {
       title: "Sales Funnel Analytics",
-      description: `Analyze sales funnel from offers to orders to invoices. Shows counts, values, and conversion rates at each stage.`,
+      description: `Analyze sales funnel from offers to orders to invoices. Shows counts, values, and conversion rates at each stage.
+
+Values include VAT and are in SEK. Invoice values are converted exactly per invoice currency rate; offer/order lists expose no rate, so foreign currency documents are excluded from those SEK values and reported separately.`,
       inputSchema: SalesFunnelSchema,
       annotations: {
         readOnlyHint: true,
@@ -635,15 +674,17 @@ export function registerBIAnalyticsTools(server: McpServer): void {
         // Count converted orders (those with InvoiceReference)
         const convertedOrders = orders.filter(o => o.InvoiceReference);
 
-        // Calculate funnel metrics
+        // Calculate funnel metrics (SEK, inc VAT)
         const offerCount = offers.length;
-        const offerValue = sumBy(offers, o => o.Total || 0);
+        const offerSplit = sumByCurrency(offers);
+        const offerValue = offerSplit.sek_total;
 
         const orderCount = orders.length;
-        const orderValue = sumBy(orders, o => o.Total || 0);
+        const orderSplit = sumByCurrency(orders);
+        const orderValue = orderSplit.sek_total;
 
         const invoiceCount = invoices.length;
-        const invoiceValue = sumBy(invoices, i => i.Total || 0);
+        const invoiceValue = sumBy(invoices, totalInSEK);
 
         // Conversion rates
         const offerToOrderRate = offerCount > 0 ? (convertedOffers.length / offerCount) * 100 : 0;
@@ -674,22 +715,25 @@ export function registerBIAnalyticsTools(server: McpServer): void {
         const output = {
           period: params.period || null,
           date_range: dateRangeDescription || null,
+          amount_basis: "SEK, including VAT. Foreign currency offers/orders excluded from SEK values (no rate in list data)",
           funnel: {
             offers: {
               count: offerCount,
-              value: offerValue,
+              value_inc_vat_sek: offerValue,
+              foreign_currency_totals: offerSplit.foreign_totals,
               converted: convertedOffers.length,
               open: offerCount - convertedOffers.length
             },
             orders: {
               count: orderCount,
-              value: orderValue,
+              value_inc_vat_sek: orderValue,
+              foreign_currency_totals: orderSplit.foreign_totals,
               converted: convertedOrders.length,
               open: orderCount - convertedOrders.length
             },
             invoices: {
               count: invoiceCount,
-              value: invoiceValue
+              value_inc_vat_sek: invoiceValue
             }
           },
           conversion_rates: {
@@ -714,6 +758,13 @@ export function registerBIAnalyticsTools(server: McpServer): void {
             lines.push("");
           }
 
+          lines.push("*Values in SEK, inc VAT.*");
+          const funnelFxWarning = foreignCurrencyWarning({ ...offerSplit.foreign_totals, ...orderSplit.foreign_totals });
+          if (funnelFxWarning) {
+            lines.push("");
+            lines.push(funnelFxWarning);
+          }
+          lines.push("");
           lines.push(formatFunnelVisualization(funnelStages));
 
           lines.push("");
@@ -726,8 +777,8 @@ export function registerBIAnalyticsTools(server: McpServer): void {
           lines.push("");
           lines.push("## Pipeline Value");
           lines.push("");
-          lines.push(`- **Open Offers**: ${formatMoney(sumBy(offers.filter(o => !o.OrderReference), o => o.Total || 0))} (${offerCount - convertedOffers.length} offers)`);
-          lines.push(`- **Open Orders**: ${formatMoney(sumBy(orders.filter(o => !o.InvoiceReference), o => o.Total || 0))} (${orderCount - convertedOrders.length} orders)`);
+          lines.push(`- **Open Offers**: ${formatMoney(sumByCurrency(offers.filter(o => !o.OrderReference)).sek_total)} (${offerCount - convertedOffers.length} offers)`);
+          lines.push(`- **Open Orders**: ${formatMoney(sumByCurrency(orders.filter(o => !o.InvoiceReference)).sek_total)} (${orderCount - convertedOrders.length} orders)`);
 
           textContent = lines.join("\n");
         }
@@ -744,7 +795,9 @@ export function registerBIAnalyticsTools(server: McpServer): void {
     "fortnox_product_performance",
     {
       title: "Product Performance Analytics",
-      description: `Analyze product/customer sales performance. Returns top performers ranked by revenue, quantity, or invoice count.`,
+      description: `Analyze product/customer sales performance. Returns top performers ranked by invoiced amount or invoice count.
+
+Amounts are invoiced amounts INCLUDING VAT, converted to SEK per invoice currency rate. For exact ex-VAT revenue use fortnox_net_revenue.`,
       inputSchema: ProductPerformanceSchema,
       annotations: {
         readOnlyHint: true,
@@ -802,7 +855,7 @@ export function registerBIAnalyticsTools(server: McpServer): void {
             });
           }
           const stats = customerStats.get(key)!;
-          stats.revenue += inv.Total || 0;
+          stats.revenue += totalInSEK(inv);
           stats.invoice_count += 1;
         }
 
@@ -824,8 +877,9 @@ export function registerBIAnalyticsTools(server: McpServer): void {
           period: params.period || null,
           date_range: dateRangeDescription || null,
           metric: params.metric,
+          amount_basis: "SEK, including VAT (converted per invoice currency rate)",
           summary: {
-            total_revenue: sumBy(invoices, i => i.Total || 0),
+            total_invoiced_inc_vat_sek: sumBy(invoices, totalInSEK),
             total_invoices: invoices.length,
             unique_customers: customerStats.size
           },
@@ -834,7 +888,7 @@ export function registerBIAnalyticsTools(server: McpServer): void {
             rank: index + 1,
             identifier: s.customer_number,
             name: s.customer_name,
-            revenue: s.revenue,
+            invoiced_inc_vat_sek: s.revenue,
             invoice_count: s.invoice_count
           })),
           note: "Product-level breakdown requires invoice row details. Showing customer-level aggregation.",
@@ -859,14 +913,14 @@ export function registerBIAnalyticsTools(server: McpServer): void {
 
           lines.push("## Summary");
           lines.push("");
-          lines.push(`- **Total Revenue**: ${formatMoney(output.summary.total_revenue)}`);
+          lines.push(`- **Total Invoiced (inc VAT, SEK)**: ${formatMoney(output.summary.total_invoiced_inc_vat_sek)}`);
           lines.push(`- **Total Invoices**: ${output.summary.total_invoices}`);
           lines.push(`- **Unique Customers**: ${output.summary.unique_customers}`);
           lines.push("");
 
-          lines.push(`## Top ${params.top_n} by ${params.metric === "revenue" ? "Revenue" : "Invoice Count"}`);
+          lines.push(`## Top ${params.top_n} by ${params.metric === "revenue" ? "Invoiced Amount (inc VAT)" : "Invoice Count"}`);
           lines.push("");
-          lines.push("| Rank | Customer | Revenue | Invoices |");
+          lines.push("| Rank | Customer | Invoiced (inc VAT) | Invoices |");
           lines.push("|------|----------|---------|----------|");
 
           for (const s of sortedStats) {
@@ -892,7 +946,9 @@ export function registerBIAnalyticsTools(server: McpServer): void {
     "fortnox_period_comparison",
     {
       title: "Period Comparison Analytics",
-      description: `Compare business metrics (revenue, invoice count, etc.) between two time periods with percentage changes.`,
+      description: `Compare business metrics between two time periods with percentage changes.
+
+The 'revenue' metric is invoiced amount INCLUDING VAT, converted to SEK per invoice currency rate. For exact ex-VAT revenue comparisons use fortnox_net_revenue per period.`,
       inputSchema: PeriodComparisonSchema,
       annotations: {
         readOnlyHint: true,
@@ -931,10 +987,11 @@ export function registerBIAnalyticsTools(server: McpServer): void {
         const previousInvoices = previousResult.items.filter(i => !i.Cancelled);
 
         // Calculate metrics
+        // Amounts in SEK, inc VAT (converted per invoice currency rate)
         const calculateMetrics = (invoices: FortnoxInvoiceListItem[]) => ({
-          revenue: sumBy(invoices, i => i.Total || 0),
+          revenue: sumBy(invoices, totalInSEK),
           invoice_count: invoices.length,
-          average_invoice: invoices.length > 0 ? sumBy(invoices, i => i.Total || 0) / invoices.length : 0,
+          average_invoice: invoices.length > 0 ? sumBy(invoices, totalInSEK) / invoices.length : 0,
           new_customers: countUnique(invoices, i => i.CustomerNumber || "unknown")
         });
 
@@ -951,6 +1008,7 @@ export function registerBIAnalyticsTools(server: McpServer): void {
         }
 
         const output = {
+          amount_basis: "SEK, including VAT (converted per invoice currency rate)",
           current_period: {
             period: comparison.currentPeriod.period,
             description: comparison.currentPeriod.description,
@@ -983,9 +1041,9 @@ export function registerBIAnalyticsTools(server: McpServer): void {
           ];
 
           const metricLabels: Record<string, string> = {
-            revenue: "Revenue",
+            revenue: "Invoiced (inc VAT, SEK)",
             invoice_count: "Invoice Count",
-            average_invoice: "Avg Invoice",
+            average_invoice: "Avg Invoice (inc VAT, SEK)",
             new_customers: "Customers"
           };
 
@@ -1014,7 +1072,9 @@ export function registerBIAnalyticsTools(server: McpServer): void {
     "fortnox_customer_growth",
     {
       title: "Customer Growth Analytics",
-      description: `Identify growing and declining customers by comparing revenue across periods. Shows growth rates and trends.`,
+      description: `Identify growing and declining customers by comparing invoiced amounts across periods. Shows growth rates and trends.
+
+Amounts are invoiced amounts INCLUDING VAT, converted to SEK per invoice currency rate.`,
       inputSchema: CustomerGrowthSchema,
       annotations: {
         readOnlyHint: true,
@@ -1077,8 +1137,8 @@ export function registerBIAnalyticsTools(server: McpServer): void {
           const currentInvoices = currentByCustomer.get(customerNumber) || [];
           const previousInvoices = previousByCustomer.get(customerNumber) || [];
 
-          const currentRevenue = sumBy(currentInvoices, i => i.Total || 0);
-          const previousRevenue = sumBy(previousInvoices, i => i.Total || 0);
+          const currentRevenue = sumBy(currentInvoices, totalInSEK);
+          const previousRevenue = sumBy(previousInvoices, totalInSEK);
 
           // Apply min_revenue filter
           if (params.min_revenue && currentRevenue < params.min_revenue && previousRevenue < params.min_revenue) {
@@ -1122,6 +1182,7 @@ export function registerBIAnalyticsTools(server: McpServer): void {
         const topCustomers = filteredGrowth.slice(0, params.top_n);
 
         const output = {
+          amount_basis: "SEK, including VAT (converted per invoice currency rate)",
           current_period: comparison.currentPeriod,
           previous_period: comparison.previousPeriod,
           filter: params.show,
@@ -1487,7 +1548,9 @@ For actual expense data, use fortnox_account_activity with account_range={from: 
     "fortnox_yearly_comparison",
     {
       title: "Yearly Comparison Analytics",
-      description: `Compare revenue and metrics across multiple years (2-5). Shows year-over-year growth trends.`,
+      description: `Compare invoiced amounts and metrics across multiple years (2-5). Shows year-over-year growth trends.
+
+The 'revenue' metric is invoiced amount INCLUDING VAT, converted to SEK per invoice currency rate. For exact ex-VAT revenue use fortnox_net_revenue per year.`,
       inputSchema: YearlyComparisonSchema,
       annotations: {
         readOnlyHint: true,
@@ -1518,7 +1581,7 @@ For actual expense data, use fortnox_account_activity with account_range={from: 
         // Calculate metrics for each year
         const yearMetrics = yearResults.map(({ year, result }) => {
           const invoices = result.items.filter(i => !i.Cancelled);
-          const revenue = sumBy(invoices, i => i.Total || 0);
+          const revenue = sumBy(invoices, totalInSEK);
 
           return {
             year,
@@ -1547,6 +1610,7 @@ For actual expense data, use fortnox_account_activity with account_range={from: 
         });
 
         const output = {
+          amount_basis: "SEK, including VAT (converted per invoice currency rate)",
           years_compared: params.years,
           metrics: params.metrics,
           years: yearsWithGrowth,
@@ -1568,9 +1632,9 @@ For actual expense data, use fortnox_account_activity with account_range={from: 
 
           // Revenue table
           if (params.metrics.includes("revenue")) {
-            lines.push("### Revenue");
+            lines.push("### Invoiced Amount (inc VAT, SEK)");
             lines.push("");
-            lines.push("| Year | Revenue | YoY Change |");
+            lines.push("| Year | Invoiced (inc VAT) | YoY Change |");
             lines.push("|------|---------|------------|");
             for (const y of yearsWithGrowth) {
               const change = y.growth?.revenue ? formatTrend(y.growth.revenue.percentChange) : "-";

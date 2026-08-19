@@ -101,3 +101,51 @@ export const UnpaidReportSchema = z.object({
 }).strict();
 
 export type UnpaidReportInput = z.infer<typeof UnpaidReportSchema>;
+
+/**
+ * Schema for the bookkeeping-based net revenue tool
+ */
+export const NetRevenueSchema = z.object({
+  period: DatePeriodEnum
+    .optional()
+    .describe("Date period to analyze (e.g., 'this_month', 'this_year')"),
+  from_date: z.string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format")
+    .optional()
+    .describe("Start date (YYYY-MM-DD). Ignored if period is specified."),
+  to_date: z.string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format")
+    .optional()
+    .describe("End date (YYYY-MM-DD). Ignored if period is specified."),
+  financial_year: z.number()
+    .int()
+    .min(1)
+    .optional()
+    .describe("Fortnox financial year ID (sequential 1, 2, 3..., NOT calendar year). Required when the dates fall outside the current financial year — find it with fortnox_list_financial_years"),
+  account_from: z.number()
+    .int()
+    .min(1000)
+    .max(9999)
+    .default(3000)
+    .describe("Start of revenue account range (default 3000)"),
+  account_to: z.number()
+    .int()
+    .min(1000)
+    .max(9999)
+    .default(3799)
+    .describe("End of revenue account range (default 3799 = nettoomsättning; use 3999 to include other operating income)"),
+  group_by: z.enum(["month", "account", "none"])
+    .default("month")
+    .describe("Group revenue by month or account"),
+  max_vouchers: z.number()
+    .int()
+    .min(10)
+    .max(500)
+    .default(500)
+    .describe("Max vouchers to scan (10-500). Narrow the date range if the result reports truncation"),
+  response_format: z.nativeEnum(ResponseFormat)
+    .default(ResponseFormat.MARKDOWN)
+    .describe("Output format: 'markdown' or 'json'")
+}).strict();
+
+export type NetRevenueInput = z.infer<typeof NetRevenueSchema>;
