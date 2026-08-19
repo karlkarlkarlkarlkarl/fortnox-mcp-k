@@ -19,8 +19,17 @@ svenska (åäö). Publiceras som Claude-artifact och som fristående fil.
   avfärdas genom att UTFÖRA momentet (hopp → glid); spawns gated tills fas 3.
   Byggplank (`G.plats`, envägsplattformar via `supportAt`, låg 1.15U/hög 1.95U,
   trappmönster, skruvar+krafter på toppen). Stompbara fiender: portfölj-
-  vandraren `walker` och stressmolnet — hopp uppifrån = +150 & studs
-  (`prof.tot.stomp`); sidokollision skadar.
+  vandraren `walker` och stressmolnet — hopp uppifrån = studs; KEDJOR utan
+  landning dubblar 150→1200 (`G.stompChain`, reset vid landning/träff).
+  Vatten (`G.waters`): mark försvinner via `supportAt`; plask = hjärta +
+  hög studs, under invuln skimrar Erik ofarligt; torrskodd passage räknas
+  (`prof.tot.dry`); plankor garanterar väg; hundarna skuttar över själva.
+  BOSS `JÄTTEMÖTET` var 1000:e m (`G.nextBoss`, hp 3+runda max 6):
+  attacker = pappersflygplan (`plane`), slam→markskalv (`wave`), telegraf →
+  RUSNING (`charge`, lean=1, hastighet 4.6U/s) — SKADA ENDAST vid stomp
+  under lean; annars ofarlig "HÅRT HUVUD"-studs; sidokontakt skadar Erik.
+  Seger: +2000×runda, hjärta + skruvregn, `prof.tot.boss`. Bossmusik =
+  euro-sequencern med dark-flaggan (Am Am F E).
   Parallax: stugor/björkar/granar (0.18×), buskar/Volvo 245/glasskiosk/
   midsommarstång (0.55×, mindre + upphöjda = bakgrundskänsla), grusstig (1×).
 - **`fangaren.html` — FÅNGAREN (v2, klassikern):** fångarspelet med

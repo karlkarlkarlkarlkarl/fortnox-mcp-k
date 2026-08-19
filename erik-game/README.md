@@ -21,6 +21,13 @@ eurodance-loopen på 126 BPM, Volvo 245:an, glasskiosken och midsommarstången).
   muttrar och krafter väntar på övervåningen. Trappmönster i senare skede.
 - **Hoppa PÅ fienderna:** det tråkiga mötet har fått ben — platta till det
   med ett hopp uppifrån (+150 och studs). Stressmolnen går också att poffa.
+  **Kedja studsarna** utan att nudda marken: 150 → 300 → 600 → 1200!
+- **Vatten:** ta dig planka-till-planka över dammarna (badankan i mässing
+  hejar på). Plask kostar ett hjärta — men Erik skimrar vidare över ytan.
+- **JÄTTEMÖTET (boss var 1000:e meter):** en jätteportfölj som kastar
+  pappersflygplan och stampar fram markskalv. När den lutar sig fram och
+  RUSAR — hoppa på huvudet! Tre KNAK häver mötet: +2000 × rundan, ett
+  hjärta och ett skruvregn. Varje nytt möte är segare och argare.
 - **Samla skruvar** i banor och bågar. Undvik STAYHOT-kartonger, hängande
   mötesskyltar, rullande stressmoln och getingsvärmar.
 - **Fyra krafter:** Magnetbältet (drar skruvar) · **KNÄCK-RUSCHEN** (krossa

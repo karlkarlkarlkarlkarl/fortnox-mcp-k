@@ -549,7 +549,7 @@ kbd{
           <button id="btn-board" class="btn btn-ghost"><svg class="ic"><use href="#i-trophy"/></svg> Topplista</button>
         </div>
         <p class="quote" id="title-quote">Jag fixar det där sen!</p>
-        <div class="foot">Med <svg class="ic"><use href="#i-heart"/></svg> från familjen · Turborusningen v3.1 · Klassikern finns i <b>fangaren.html</b></div>
+        <div class="foot">Med <svg class="ic"><use href="#i-heart"/></svg> från familjen · Turborusningen v3.2 · <b>eriks.family</b> · Klassikern: fangaren.html</div>
       </div>
 
       <div id="title-board" style="display:none">
@@ -710,7 +710,7 @@ function newProfile(){
     stars: 0,
     done: {},                       // mission-id -> 1
     tot: { screws: 0, crush: 0, glide: 0, mixtape: 0, knack: 0, rescues: 0, saveB: 0, saveL: 0,
-           stomp: 0, plats: 0,
+           stomp: 0, plats: 0, chain2: 0, dry: 0, boss: 0,
            kid_ruben: 0, kid_juniper: 0, kid_emmalo: 0, kid_irma: 0, kid_olof: 0, kid_siri: 0 },
     best: { dist: 0, score: 0, screws: 0, rescues: 0 },
     name: ''
@@ -848,6 +848,31 @@ const AudioMan = {
     this.tone({ f: 160, f2: 540, dur: 0.18, type: 'sine', vol: 0.24, delay: 0.03 });
   },
   sfxTut(){ this.tone({ f: 620, f2: 880, dur: 0.12, type: 'triangle', vol: 0.14 }); },
+  sfxSplash(){
+    this.noise({ dur: 0.18, vol: 0.3, freq: 900, ftype: 'lowpass' });
+    this.tone({ f: 320, f2: 90, dur: 0.22, type: 'sine', vol: 0.2 });
+    this.noise({ dur: 0.3, vol: 0.1, freq: 3000, delay: 0.1 });
+  },
+  sfxSkip(){ this.tone({ f: 380, f2: 560, dur: 0.1, type: 'sine', vol: 0.14 }); this.noise({ dur: 0.08, vol: 0.12, freq: 1400, ftype: 'lowpass' }); },
+  sfxBossIn(){
+    [110, 104, 98, 92].forEach((f, i) => this.tone({ f, dur: 0.34, type: 'sawtooth', vol: 0.2, delay: i * 0.3 }));
+    this.noise({ dur: 0.4, vol: 0.16, freq: 500, ftype: 'lowpass', delay: 1.1 });
+  },
+  sfxBossHit(){
+    this.noise({ dur: 0.07, vol: 0.5, freq: 900 });
+    this.tone({ f: 100, f2: 45, dur: 0.3, type: 'square', vol: 0.28 });
+    this.tone({ f: 880, f2: 1320, dur: 0.2, type: 'sine', vol: 0.14, delay: 0.1 });
+  },
+  sfxBossDie(){
+    this.noise({ dur: 0.5, vol: 0.3, freq: 700, ftype: 'lowpass' });
+    [523, 659, 784, 1047, 1319].forEach((f, i) => this.tone({ f, dur: 0.3, type: 'triangle', vol: 0.22, delay: 0.3 + i * 0.09 }));
+  },
+  sfxSlam(){
+    this.noise({ dur: 0.12, vol: 0.4, freq: 400, ftype: 'lowpass' });
+    this.tone({ f: 90, f2: 40, dur: 0.35, type: 'sine', vol: 0.34 });
+  },
+  sfxPlane(){ this.noise({ dur: 0.2, vol: 0.1, freq: 2400 }); this.tone({ f: 700, f2: 420, dur: 0.2, type: 'triangle', vol: 0.08 }); },
+  sfxAlert(){ this.tone({ f: 740, dur: 0.11, type: 'square', vol: 0.14 }); this.tone({ f: 740, dur: 0.11, type: 'square', vol: 0.14, delay: 0.15 }); },
   sfxFanfare(){
     const seq = [[523, 0], [659, 0.12], [784, 0.24], [1047, 0.38], [784, 0.56], [1047, 0.68]];
     seq.forEach(([f, d]) => this.tone({ f, dur: 0.28, type: 'triangle', vol: 0.22, delay: d }));
@@ -881,18 +906,23 @@ const AudioMan = {
     if (!this.ac || this.mode === 'none') return;
     while (this.nextT < this.ac.currentTime + 0.14){
       if (this.mode === 'waltz') this.stepWaltz(this.step, this.nextT);
-      else this.stepEuro(this.step, this.nextT, this.mode === 'euroX');
+      else this.stepEuro(this.step, this.nextT, this.mode === 'euroX' || this.mode === 'boss', this.mode === 'boss');
       const stepDur = this.mode === 'waltz' ? 60 / 176 : 60 / 126 / 4;
       this.nextT += stepDur;
       this.step++;
     }
   },
-  stepEuro(s, t, hot){
+  stepEuro(s, t, hot, dark){
     const N = this.N;
-    const bar = Math.floor(s / 16) % 4;              // Am F C G
+    const bar = Math.floor(s / 16) % 4;              // Am F C G (boss: Am Am F E)
     const i16 = s % 16;
-    const roots = [N.A2, 87.3, N.C3, 98];
-    const triads = [
+    const roots = dark ? [N.A2, N.A2, 87.3, 82.4] : [N.A2, 87.3, N.C3, 98];
+    const triads = dark ? [
+      [N.A3, N.C4, N.E4],
+      [N.A3, N.C4, N.E4],
+      [175, N.A3, N.C4],
+      [N.E3, 208, N.B3]
+    ] : [
       [N.A3, N.C4, N.E4],
       [175, N.A3, N.C4],
       [N.C4, N.E4, N.G4],
@@ -949,9 +979,10 @@ const AudioMan = {
   }
 };
 function musicRefresh(){
-  // prioritet: balettglid (vals) > mixtape (euroX) > vanlig euro
+  // prioritet: balettglid (vals) > JÄTTEMÖTET > mixtape (euroX) > vanlig euro
   if (G.mode !== 'playing'){ return; }
   if (G.pw.glide > 0) AudioMan.startMusic('waltz');
+  else if (G.boss) AudioMan.startMusic('boss');
   else if (G.pw.tape > 0) AudioMan.startMusic('euroX');
   else AudioMan.startMusic('euro');
 }
@@ -1012,6 +1043,9 @@ const MISSIONS = [
   { id: 'd1500',  s: 1, txt: 'Spring 1500 m i en runda',             scope: 'run', key: 'dist',        t: 1500 },
   { id: 'ko',     s: 1, txt: 'Rädda Olof',                           scope: 'tot', key: 'kid_olof',    t: 1 },
   { id: 'sl',     s: 1, txt: 'Bli räddad av Lillen',                 scope: 'tot', key: 'saveL',       t: 1 },
+  { id: 'ch2',    s: 1, txt: 'Dubbelstuds — 2 studsar utan att landa', scope: 'tot', key: 'chain2',    t: 1 },
+  { id: 'dry3',   s: 1, txt: 'Ta dig torrskodd över 3 vatten',       scope: 'tot', key: 'dry',         t: 3 },
+  { id: 'boss1',  s: 2, txt: 'Häv JÄTTEMÖTET',                       scope: 'tot', key: 'boss',        t: 1 },
   { id: 'ks',     s: 1, txt: 'Rädda Siri',                           scope: 'tot', key: 'kid_siri',    t: 1 },
   { id: 'gang',   s: 2, txt: 'HELA GÄNGET — alla sex i samma runda', scope: 'run', key: 'rescues',     t: 6 },
   { id: 'd2500',  s: 2, txt: 'Spring 2500 m i en runda',             scope: 'run', key: 'dist',        t: 2500 },
@@ -1047,9 +1081,10 @@ const G = {
   timeScale: 1, slowT: 0,
   erik: null,
   pw: { magnet: 0, knack: 0, glide: 0, tape: 0 },
-  obs: [], picks: [], stops: [], plats: [], parts: [], floats: [],
+  obs: [], picks: [], stops: [], plats: [], waters: [], parts: [], floats: [],
   obsT: 1.2, puT: 8, heartT: 45, nutT: 12, platT: 5, nextRescue: 300,
   sup: 0, tut: { phase: 4, t: 0 }, tutJump: false, tutSlide: false,
+  stompChain: 0, nextWater: 250, boss: null, bossRound: 0, nextBoss: 1000,
   rescued: {},
   run: null,
   dogs: [],
@@ -1079,11 +1114,14 @@ function resetRound(){
   G.timeScale = 1; G.slowT = 0;
   G.erik = newErik();
   G.pw = { magnet: 0, knack: 0, glide: 0, tape: 0 };
-  G.obs = []; G.picks = []; G.stops = []; G.plats = []; G.floats = [];
+  G.obs = []; G.picks = []; G.stops = []; G.plats = []; G.waters = []; G.floats = [];
   G.obsT = 1.4; G.puT = 9; G.heartT = 55; G.nutT = 10; G.platT = rnd(4, 7); G.nextRescue = rnd(260, 340);
   G.sup = 0;
   G.tut = { phase: 0, t: 0 };
   G.tutJump = false; G.tutSlide = false;
+  G.stompChain = 0;
+  G.nextWater = rnd(240, 320);
+  G.boss = null; G.bossRound = 0; G.nextBoss = 1000;
   G.rescued = {};
   G.run = { dist: 0, screws: 0, rescues: 0, crush: 0, glide: 0, mixtape: 0, stomp: 0 };
   G.dogs = [newDog('Bernard'), newDog('Lillen')];
@@ -1478,9 +1516,11 @@ const seedOf = idx => (((idx * 2654435761) >>> 0) % 997) / 997;
 
 let px1 = 0, px2 = 0, pxG = 0;              // parallaxoffsets
 
+function inWater(x){ return G.waters.some(w => x > w.x && x < w.x + w.w); }
+function waterAt(x){ return G.waters.find(w => x > w.x && x < w.x + w.w); }
 function supportAt(x, refY){
-  // högsta yta (mark eller byggplank) i eller under fotnivån refY
-  let s = groundY;
+  // högsta yta (mark eller byggplank) i eller under fotnivån refY — vatten bär inte!
+  let s = inWater(x) ? H + U * 3 : groundY;
   for (const p of G.plats){
     if (x > p.x - p.w / 2 - U * 0.05 && x < p.x + p.w / 2 + U * 0.05 &&
         p.y < s && p.y >= refY - U * 0.12){
@@ -1516,11 +1556,17 @@ function updateErikRun(dt){
     e.vy = Math.min(e.vy + g * dt, (G.pw.glide > 0 && e.holding) ? U * 2.1 : U * 16);
     const prevY = e.y;
     e.y += e.vy * dt;
+    // plask?
+    if (e.y > groundY + U * 0.35 && inWater(ERIK_X)){
+      splash();
+      return;
+    }
     const sup = supportAt(ERIK_X, prevY);
     if (e.vy > 0 && prevY <= sup + 1 && e.y >= sup){
       e.y = sup;
       e.vy = 0;
       e.onGround = true;
+      G.stompChain = 0;
       AudioMan.sfxLand();
       dust(ERIK_X, sup, 4);
       if (sup < groundY - 2){
@@ -1588,16 +1634,50 @@ function spawnObstacle(){
   if (kind === 'wasp'){ o.w = U * 0.95; o.h = U * 0.5; o.mid = groundY - U * 1.05; o.vx = G.v * 0.14; }
   if (kind === 'walker'){ o.w = U * 0.58; o.h = U * 0.68; o.vx = G.v * 0.22; }
   G.obs.push(o);
+  // mötespar — bjuder på dubbelstuds!
+  if (kind === 'walker' && obstacleTier() >= 3 && Math.random() < 0.35){
+    G.obs.push({ kind: 'walker', x: o.x + U * 1.25, w: U * 0.58, h: U * 0.68, vx: o.vx, ph: rnd(TAU), passed: false });
+  }
+}
+function addPlat(cx, w, y){
+  const p = { x: cx, w, y, stepped: false };
+  G.plats.push(p);
+  return p;
+}
+function splash(){
+  const e = G.erik;
+  const w = waterAt(ERIK_X);
+  if (w) w.splashed = true;
+  splashFX(ERIK_X, groundY + U * 0.25);
+  if (e.invuln > 0){
+    // smörgåsjärnsmackan skimrar vidare över ytan
+    e.y = groundY + U * 0.2;
+    e.vy = -U * 7;
+    AudioMan.sfxSkip();
+    addFloat(ERIK_X + U * 0.4, groundY - U * 0.5, 'PLASK!', '#3E8FC0', 0.8);
+    return;
+  }
+  AudioMan.sfxSplash();
+  hitErik('PLASK!');
+  e.y = groundY + U * 0.2;
+  e.vy = -U * 9;
+  e.onGround = false;
+}
+function spawnWater(){
+  const w = { x: W + U * 2, w: U * rnd(3.6, 5.4), splashed: false, counted: false, ph: rnd(TAU) };
+  G.waters.push(w);
+  // garanterat torrskodd väg: plankor över vattnet
+  const p1 = addPlat(w.x + w.w * 0.27, w.w * 0.4, groundY - U * 1.15);
+  if (w.w > U * 4.4){
+    addPlat(w.x + w.w * 0.73, w.w * 0.36, groundY - U * 1.05);
+  }
+  platGoodies(p1, Math.random() < 0.4);
 }
 function spawnPlats(kind){
   const tier = obstacleTier();
   kind = kind || (tier >= 3 && Math.random() < 0.45 ? 'stair' : 'low');
   const x0 = W + U * 2;
-  const mk = (cx, w, y) => {
-    const p = { x: cx, w, y, stepped: false };
-    G.plats.push(p);
-    return p;
-  };
+  const mk = addPlat;
   if (kind === 'stair'){
     const w1 = U * rnd(2.0, 2.6), w2 = U * rnd(2.2, 3.2);
     mk(x0 + w1 / 2, w1, groundY - U * 1.1);
@@ -1661,28 +1741,41 @@ function updateWorld(dt){
   pxG += G.v * dt;
 
   const tutDone = G.tut.phase >= 3;
-  // hinder
   const stopNear = G.stops.some(s => s.x > W * 0.4);
-  if (tutDone){
+  const waterNear = G.waters.some(w => w.x + w.w > W * 0.3);
+  const bossOn = !!G.boss;
+  // JÄTTEMÖTET närmar sig!
+  if (tutDone && !bossOn && G.dist >= G.nextBoss && !waterNear && !stopNear){
+    startBoss();
+  }
+  if (tutDone && !bossOn){
+    // hinder
     G.obsT -= dt;
-    if (G.obsT <= 0 && !stopNear){
+    if (G.obsT <= 0 && !stopNear && !waterNear){
       spawnObstacle();
       G.obsT = rnd(0.78, 1.3) * lerp(1.3, 0.66, Math.min(G.dist / 2200, 1));
     }
     // byggplank
     G.platT -= dt;
-    if (G.platT <= 0 && !stopNear && G.dist > 120){
+    if (G.platT <= 0 && !stopNear && !waterNear && G.dist > 120){
       spawnPlats();
       G.platT = rnd(6.5, 10.5);
     }
+    // vatten med planka-till-planka
+    if (G.dist >= G.nextWater && !stopNear && !waterNear && G.dist > 220){
+      spawnWater();
+      G.nextWater = G.dist + rnd(380, 560);
+    }
   }
   // skruvar
-  G.scrT = (G.scrT === undefined ? 0.8 : G.scrT) - dt;
-  if (G.scrT <= 0){
-    spawnScrews();
-    G.scrT = rnd(1.5, 2.5);
+  if (!bossOn){
+    G.scrT = (G.scrT === undefined ? 0.8 : G.scrT) - dt;
+    if (G.scrT <= 0){
+      spawnScrews();
+      G.scrT = rnd(1.5, 2.5);
+    }
   }
-  if (tutDone){
+  if (tutDone && !bossOn){
     // powerups
     G.puT -= dt;
     if (G.puT <= 0){
@@ -1757,6 +1850,18 @@ function moveEntities(dt){
     p.x -= vv * dt;
     if (p.x + p.w / 2 < -U) G.plats.splice(i, 1);
   }
+  for (let i = G.waters.length - 1; i >= 0; i--){
+    const w = G.waters[i];
+    w.x -= vv * dt;
+    if (!w.counted && w.x + w.w < ERIK_X - U * 0.3){
+      w.counted = true;
+      if (!w.splashed){
+        prof.tot.dry++;
+        addFloat(ERIK_X, groundY - U * 2.1, 'TORRSKODD!', '#3E8FC0', 0.9);
+      }
+    }
+    if (w.x + w.w < -U) G.waters.splice(i, 1);
+  }
 }
 
 /* ---------- kollisioner ---------- */
@@ -1773,6 +1878,7 @@ function obsBox(o){
   let bx, by, bw, bh;
   if (o.kind === 'sign'){ bw = o.w; bh = o.h; bx = o.x - bw / 2; by = o.bottom - bh; }
   else if (o.kind === 'wasp'){ bw = o.w; bh = o.h; bx = o.x - bw / 2; by = (o.mid + Math.sin(G.t * 3 + o.ph) * U * 0.16) - bh / 2; }
+  else if (o.kind === 'plane'){ bw = o.w; bh = o.h; bx = o.x - bw / 2; by = (o.y + Math.sin(G.t * 5 + o.ph) * U * 0.08) - bh / 2; }
   else { bw = o.w; bh = o.h; bx = o.x - bw / 2; by = groundY - bh; }
   const dx = bw * (1 - shrink) / 2, dy = bh * (1 - shrink) / 2;
   return { x: bx + dx, y: by + dy, w: bw - dx * 2, h: bh - dy * 2 };
@@ -1796,20 +1902,66 @@ function collide(dt){
         addFloat(o.x, groundY - U * 1.6, 'KNAK!', '#2FB7A6', 1.1);
         G.shake = Math.max(G.shake, 0.18);
       } else if (stompable && e.vy > U * 0.6 && e.y < oTop + o.h * 0.55){
-        // HOPPA PÅ! Mario-studs på tråkiga möten och stressmoln
+        // HOPPA PÅ! Mario-studs — kedja utan att landa = dubblade poäng
         G.obs.splice(i, 1);
-        G.score += 150;
+        G.stompChain++;
+        const pts = 150 * Math.pow(2, Math.min(G.stompChain - 1, 3));
+        G.score += pts;
         G.run.stomp++;
         prof.tot.stomp++;
-        e.vy = -U * 6.4;
+        if (G.stompChain === 2) prof.tot.chain2++;
+        e.vy = -U * 6.6;
         e.onGround = false;
         AudioMan.sfxStomp();
+        if (G.stompChain > 1) AudioMan.sfxCoin(G.stompChain + 6);
         debris(o.x, oTop + o.h * 0.4, o.kind);
         dust(o.x, groundY, 6);
-        addFloat(o.x, oTop - U * 0.5, o.kind === 'walker' ? 'PLATT MÖTE! +150' : 'POFF! +150', '#33261D', 1.05);
+        const label = G.stompChain > 1
+          ? 'STUDS ×' + G.stompChain + '! +' + pts
+          : (o.kind === 'walker' ? 'PLATT MÖTE! +' + pts : 'POFF! +' + pts);
+        addFloat(o.x, oTop - U * 0.5, label, G.stompChain > 1 ? '#B07BE0' : '#33261D', 1.05 + G.stompChain * 0.06);
         G.shake = Math.max(G.shake, 0.12);
       } else {
         hitErik();
+      }
+    }
+  }
+  // JÄTTEMÖTET — knak på huvudet eller aj i sidan
+  if (G.boss && G.boss.mode === 'fight'){
+    const b = G.boss;
+    const headTop = bossHeadTop();
+    const bb = { x: b.x - U * 0.78, y: headTop, w: U * 1.56, h: b.y - headTop };
+    if (overlap(hb, bb)){
+      if (e.vy > U * 0.5 && e.y < headTop + U * 0.78){
+        if (b.lean > 0){
+          // KNAK mitt i rusningen!
+          b.hp--;
+          b.flash = 0.3;
+          b.stun = 1.15;
+          b.tele = 0;
+          b.lean = 0;
+          e.vy = -U * 7.8;
+          e.onGround = false;
+          G.stompChain++;
+          G.score += 150;
+          AudioMan.sfxBossHit();
+          debris(b.x, headTop + U * 0.3, 'walker');
+          addFloat(b.x, headTop - U * 0.5, b.hp > 0 ? 'MÖTET VACKLAR!' : 'SISTA PUNKTEN!', '#2FB7A6', 1.25);
+          G.shake = Math.max(G.shake, 0.28);
+          if (b.hp <= 0){
+            b.mode = 'dying';
+            b.t2 = 0;
+            AudioMan.sfxBossDie();
+          }
+        } else {
+          // hårt huvud utanför rusningen — ofarlig studs
+          e.vy = -U * 6.2;
+          e.onGround = false;
+          AudioMan.sfxStomp();
+          addFloat(b.x, headTop - U * 0.4, 'HÅRT HUVUD!', '#8A6E5B', 0.9);
+        }
+      } else {
+        hitErik('MÖTESKROCK!');
       }
     }
   }
@@ -1903,9 +2055,10 @@ function rescueKid(kid){
     addFloat(W / 2, H * 0.3, 'HELA GÄNGET! +5000', '#FF6FA0', 1.6, true);
   }
 }
-function hitErik(){
+function hitErik(label){
   const e = G.erik;
   if (e.invuln > 0) return;
+  G.stompChain = 0;
   if (e.rider){
     kidFlyAway(e.rider);
     e.rider = null;
@@ -1939,13 +2092,127 @@ function hitErik(){
   G.shake = REDUCED ? 0 : 0.4;
   G.flash = 0.5;
   AudioMan.sfxHit();
-  addFloat(ERIK_X, e.y - U * 2, 'AJ!', '#3E415C', 1.1);
+  addFloat(ERIK_X, e.y - U * 2, label || 'AJ!', '#3E415C', 1.1);
 }
 function beginDeath(){
   G.mode = 'dying';
   G.dieT = 0;
   G.timeScale = 1;
   AudioMan.stopMusic();
+}
+
+/* ============================================================
+   9b. JÄTTEMÖTET — bossen
+   ============================================================ */
+function startBoss(){
+  const round = G.bossRound + 1;
+  G.boss = {
+    round,
+    max: Math.min(3 + G.bossRound, 6),
+    hp: Math.min(3 + G.bossRound, 6),
+    t: 0, t2: 0,
+    mode: 'enter',
+    x: W + U * 1.8, y: groundY, vy: 0,
+    attackT: 2.4, lean: 0, tele: 0, stun: 0, flash: 0, charge: 0
+  };
+  AudioMan.sfxBossIn();
+  musicRefresh();
+  G.missionToastQ.unshift(['JÄTTEMÖTET ' + (round > 1 ? '×' + round : '') + '!', 'Hoppa på huvudet när det lutar sig fram!']);
+}
+function bossHeadTop(){
+  const b = G.boss;
+  return b.y - (b.lean > 0 ? U * 1.2 : U * 2.3);
+}
+function updateBoss(dt){
+  const b = G.boss;
+  if (!b) return;
+  b.t += dt;
+  if (b.flash > 0) b.flash -= dt;
+  const targetX = Math.min(W * 0.74, W - U * 1.6);
+  if (b.mode === 'enter'){
+    b.x += (targetX - b.x) * Math.min(1, dt * 2.2);
+    if (b.t > 1.4){ b.mode = 'fight'; b.t = 0; }
+    return;
+  }
+  if (b.mode === 'dying'){
+    b.t2 += dt;
+    if (Math.random() < dt * 20) debris(b.x + rnd(-U, U), b.y - rnd(0, U * 2), 'plane');
+    if (b.t2 > 1.0) defeatBoss();
+    return;
+  }
+  // slam-hopp i luften?
+  if (b.vy !== 0 || b.y < groundY){
+    b.vy += U * 20 * dt;
+    b.y += b.vy * dt;
+    if (b.y >= groundY){
+      b.y = groundY;
+      b.vy = 0;
+      AudioMan.sfxSlam();
+      G.shake = Math.max(G.shake, 0.35);
+      G.obs.push({ kind: 'wave', x: b.x - U * 0.9, w: U * 0.8, h: U * 0.42, vx: G.v * 0.85, ph: 0, passed: false });
+      dust(b.x, groundY, 12);
+    }
+    return;
+  }
+  if (b.stun > 0){
+    b.stun -= dt;
+    if (b.stun <= 0 && b.charge === 1) b.charge = 2;  // avbruten rusning → backa
+    return;
+  }
+  if (b.charge === 1){
+    // RUSNING! framåtlutad — hoppa på huvudet eller undan!
+    b.lean = 1;
+    b.x -= U * 4.6 * dt;
+    if (b.x < ERIK_X - U * 1.7) b.charge = 2;
+    return;
+  }
+  if (b.charge === 2){
+    b.lean = 0;
+    b.x += U * 3.6 * dt;
+    if (b.x >= targetX){ b.x = targetX; b.charge = 0; }
+    return;
+  }
+  if (b.tele > 0){
+    b.tele -= dt;
+    if (b.tele <= 0) b.charge = 1;
+    return;
+  }
+  b.x = targetX + Math.sin(G.t * 1.1) * U * 0.18;
+  b.attackT -= dt;
+  if (b.attackT <= 0){
+    const r = Math.random();
+    if (r < 0.34){
+      AudioMan.sfxPlane();
+      for (let i = 0; i < 2; i++){
+        G.obs.push({ kind: 'plane', x: b.x - U * 0.5, w: U * 0.6, h: U * 0.3,
+          y: groundY - U * (0.55 + Math.random() * 1.05), vx: G.v * (0.5 + i * 0.25), ph: rnd(TAU), passed: false });
+      }
+    } else if (r < 0.6){
+      b.vy = -U * 7.6;   // slam!
+    } else {
+      b.tele = 0.7;      // telegraferar RUSNINGEN — stompfönstret!
+      AudioMan.sfxAlert();
+    }
+    b.attackT = rnd(2.0, 3.2) - Math.min(b.round * 0.2, 0.8);
+  }
+}
+function defeatBoss(){
+  const b = G.boss;
+  const pts = 2000 * b.round;
+  G.score += pts;
+  prof.tot.boss++;
+  G.bossRound++;
+  G.nextBoss = G.dist + 1000;
+  confetti(b.x, groundY - U * 1.5, 60);
+  debris(b.x, groundY - U, 'walker');
+  debris(b.x, groundY - U * 1.6, 'plane');
+  addFloat(W / 2, H * 0.35, 'MÖTET ÄR HÄVT! +' + pts, '#E2A426', 1.5, true);
+  for (let i = 0; i < 10; i++){
+    G.picks.push({ kind: 'screw', x: b.x - U * 1.3 + i * U * 0.3, y: groundY - U * (0.9 + Math.abs(Math.sin(i)) * 0.8), r: U * 0.17, ph: rnd(TAU) });
+  }
+  G.picks.push({ kind: 'heart', x: b.x, y: groundY - U * 1.7, r: U * 0.2, ph: 0 });
+  G.boss = null;
+  musicRefresh();
 }
 
 /* ============================================================
@@ -1972,10 +2239,22 @@ function burst(x, y, color, n){
       life: rnd(0.4, 0.8), age: 0, r: rnd(2.5, 5.5), color });
   }
 }
+function splashFX(x, y){
+  for (let i = 0; i < 14; i++){
+    const a = rnd(-Math.PI * 0.9, -Math.PI * 0.1);
+    G.parts.push({ kind: 'dot', x: x + rnd(-U * 0.3, U * 0.3), y, vx: Math.cos(a) * rnd(U, U * 2.6), vy: Math.sin(a) * rnd(U * 1.5, U * 3.6), g: 1,
+      life: rnd(0.4, 0.7), age: 0, r: rnd(2.5, 5), color: pick(['#6BC6F0', '#9FD9F6', '#FFFFFF', '#3E8FC0']) });
+  }
+  for (let i = 0; i < 4; i++){
+    G.parts.push({ kind: 'puff', x: x + rnd(-U * 0.4, U * 0.4), y: y - 4, vx: rnd(-U * .3, U * .3), vy: -rnd(U * .1, U * .4), g: 0.05,
+      life: rnd(0.3, 0.5), age: 0, r: rnd(5, 10), color: 'rgba(200,235,255,0.8)' });
+  }
+}
 function debris(x, y, kind){
   const cols = kind === 'sign' ? ['#A0402F', '#7E2F22', '#FFF4E4']
     : kind === 'cloud' ? ['#57607A', '#6B7590']
     : kind === 'walker' ? ['#7B6B58', '#C9A84C', '#FFFDF6']
+    : kind === 'plane' ? ['#FFFDF6', '#EDE6D6', '#D9D2C2']
     : ['#C89B66', '#B98A55', '#E8DCC7'];
   for (let i = 0; i < 12; i++){
     const a = rnd(-Math.PI, 0);
@@ -2258,6 +2537,47 @@ function drawGroundBand(){
   ctx.fillRect(0, groundY, W, H - groundY);
   ctx.fillStyle = dying ? '#403D2E' : '#5DAF54';
   ctx.fillRect(0, groundY, W, Math.max(6, U * 0.07));
+  // vatten — planka till planka!
+  for (const w of G.waters){
+    const x0 = Math.max(-4, w.x), x1 = Math.min(W + 4, w.x + w.w);
+    if (x1 < 0 || x0 > W) continue;
+    const g2 = ctx.createLinearGradient(0, groundY, 0, H);
+    g2.addColorStop(0, '#5FB7E8');
+    g2.addColorStop(1, '#2E7DB5');
+    ctx.fillStyle = g2;
+    ctx.fillRect(x0, groundY, x1 - x0, H - groundY);
+    // vågor
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = Math.max(2, U * 0.03);
+    ctx.lineCap = 'round';
+    for (let vx = x0 + U * 0.2; vx < x1 - U * 0.2; vx += U * 0.55){
+      const wy = groundY + U * 0.14 + Math.sin(G.t * 2.4 + vx * 0.03 + w.ph) * U * 0.03;
+      ctx.beginPath();
+      ctx.arc(vx, wy, U * 0.12, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.stroke();
+    }
+    // mässingsgul badanka!
+    const dx = w.x + w.w * 0.5 + Math.sin(G.t * 0.8 + w.ph) * w.w * 0.18;
+    if (dx > x0 + U * 0.3 && dx < x1 - U * 0.3){
+      const dy = groundY + U * 0.22 + Math.sin(G.t * 2.6 + w.ph) * U * 0.035;
+      ctx.save();
+      ctx.translate(dx, dy);
+      ctx.fillStyle = '#E2B33C';
+      ctx.beginPath(); ctx.ellipse(0, 0, U * 0.14, U * 0.1, 0, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.arc(-U * 0.1, -U * 0.11, U * 0.07, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#E8842B';
+      ctx.beginPath();
+      ctx.moveTo(-U * 0.17, -U * 0.11); ctx.lineTo(-U * 0.23, -U * 0.09); ctx.lineTo(-U * 0.16, -U * 0.07);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#2E2A26';
+      ctx.beginPath(); ctx.arc(-U * 0.115, -U * 0.125, U * 0.014, 0, TAU); ctx.fill();
+      ctx.restore();
+    }
+    // gräskanter
+    ctx.fillStyle = dying ? '#403D2E' : '#5DAF54';
+    ctx.fillRect(x0 - 3, groundY, 6, U * 0.2);
+    ctx.fillRect(x1 - 3, groundY, 6, U * 0.2);
+  }
   // grusstig som rusar förbi
   ctx.fillStyle = dying ? 'rgba(255,255,255,0.06)' : 'rgba(255,252,244,0.4)';
   const S = U * 1.4;
@@ -2388,8 +2708,145 @@ function drawPlats(){
     }
   }
 }
+function drawBoss(){
+  const b = G.boss;
+  if (!b) return;
+  const lean = b.lean > 0;
+  const dyingB = b.mode === 'dying';
+  const s = U / 100 * 2.5;
+  ctx.save();
+  ctx.translate(b.x, b.y);
+  // skugga
+  ctx.save();
+  ctx.globalAlpha = 0.2;
+  ctx.fillStyle = '#1E2340';
+  ctx.beginPath(); ctx.ellipse(0, 2, U * 0.95, U * 0.16, 0, 0, TAU); ctx.fill();
+  ctx.restore();
+  if (dyingB){
+    ctx.rotate(Math.sin(b.t2 * 30) * 0.1);
+    ctx.globalAlpha = Math.max(0, 1 - b.t2 * 0.9);
+  }
+  // stampande ben
+  const trot = Math.sin(G.t * 10) * (b.stun > 0 ? 0.2 : 1);
+  ctx.strokeStyle = '#2E3346';
+  ctx.lineWidth = U * 0.11;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-U * 0.42, -U * 0.34); ctx.lineTo(-U * 0.42 - trot * U * 0.08, 0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(U * 0.42, -U * 0.34); ctx.lineTo(U * 0.42 + trot * U * 0.08, 0); ctx.stroke();
+  ctx.fillStyle = '#2E3346';
+  ctx.beginPath(); ctx.arc(-U * 0.42 - trot * U * 0.08, 0, U * 0.09, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(U * 0.42 + trot * U * 0.08, 0, U * 0.09, 0, TAU); ctx.fill();
+  // kropp — jätteportföljen (lutar sig fram = stompfönster!)
+  ctx.save();
+  if (lean){
+    ctx.rotate(-0.3);
+    ctx.scale(1, 0.78);
+  }
+  drawSpr('brief', 0, -U * 1.28, 100 * s, 0);
+  // slips
+  ctx.fillStyle = '#9E3F2F';
+  ctx.beginPath();
+  ctx.moveTo(-U * 0.09, -U * 1.0);
+  ctx.lineTo(U * 0.09, -U * 1.0);
+  ctx.lineTo(U * 0.05, -U * 0.45);
+  ctx.lineTo(0, -U * 0.32);
+  ctx.lineTo(-U * 0.05, -U * 0.45);
+  ctx.closePath(); ctx.fill();
+  // argare ögonbryn ovanpå spritens ansikte
+  ctx.strokeStyle = '#2E3346';
+  ctx.lineWidth = U * 0.07;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-U * 0.42, -U * 1.42); ctx.lineTo(-U * 0.12, -U * 1.3); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(U * 0.42, -U * 1.42); ctx.lineTo(U * 0.12, -U * 1.3); ctx.stroke();
+  if (b.flash > 0){
+    ctx.globalAlpha = b.flash * 2.4;
+    ctx.fillStyle = '#FFF';
+    rrCtx(-U * 0.72, -U * 2.05, U * 1.44, U * 1.6, U * 0.18);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  ctx.restore();
+  // yr-stjärnor vid stun
+  if (b.stun > 0){
+    for (let i = 0; i < 3; i++){
+      const a = G.t * 5 + i * TAU / 3;
+      ctx.save();
+      ctx.translate(Math.cos(a) * U * 0.7, -U * 2.35 + Math.sin(a) * U * 0.14);
+      ctx.rotate(a);
+      ctx.fillStyle = '#FFC94B';
+      starPath(U * 0.12);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+  // telegraf: utropstecken
+  if (b.tele > 0){
+    const pop = 1 + Math.sin(G.t * 16) * 0.1;
+    ctx.save();
+    ctx.translate(0, -U * 2.75);
+    ctx.scale(pop, pop);
+    ctx.fillStyle = '#E8544A';
+    rrCtx(-U * 0.07, -U * 0.3, U * 0.14, U * 0.36, U * 0.07); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, U * 0.18, U * 0.08, 0, TAU); ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
+  // namnskylt
+  ctx.font = '800 ' + Math.round(U * 0.17) + 'px "Baloo 2",sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = U * 0.045;
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+  ctx.strokeText('JÄTTEMÖTET', b.x, b.y - U * 2.85);
+  ctx.fillStyle = '#3E415C';
+  ctx.fillText('JÄTTEMÖTET', b.x, b.y - U * 2.85);
+}
 function drawObstacles(){
   for (const o of G.obs){
+    if (o.kind === 'plane'){
+      // pappersflygplan från JÄTTEMÖTET
+      const py = o.y + Math.sin(G.t * 5 + o.ph) * U * 0.08;
+      ctx.save();
+      ctx.translate(o.x, py);
+      ctx.rotate(-0.12 + Math.sin(G.t * 7 + o.ph) * 0.06);
+      ctx.fillStyle = '#FFFDF6';
+      ctx.strokeStyle = OUTLINE;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(-U * 0.3, U * 0.02);
+      ctx.lineTo(U * 0.3, -U * 0.12);
+      ctx.lineTo(-U * 0.1, U * 0.14);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#EDE6D6';
+      ctx.beginPath();
+      ctx.moveTo(-U * 0.3, U * 0.02);
+      ctx.lineTo(U * 0.3, -U * 0.12);
+      ctx.lineTo(-U * 0.02, U * 0.0);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.restore();
+      continue;
+    }
+    if (o.kind === 'wave'){
+      // markskalv från slammen — hoppa!
+      ctx.save();
+      ctx.translate(o.x, groundY);
+      ctx.fillStyle = 'rgba(122,74,46,0.75)';
+      for (let i = 0; i < 3; i++){
+        const bx2 = (i - 1) * U * 0.24;
+        const bh2 = o.h * (1 - Math.abs(i - 1) * 0.3);
+        ctx.beginPath();
+        ctx.arc(bx2, 0, bh2 * 0.62, Math.PI, 0);
+        ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(255,252,244,0.5)';
+      ctx.lineWidth = U * 0.04;
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(U * 0.5, -o.h * 0.4); ctx.lineTo(U * 0.85, -o.h * 0.4); ctx.stroke();
+      ctx.restore();
+      if (Math.random() < 0.3) dust(o.x + U * 0.3, groundY, 1);
+      continue;
+    }
     if (o.kind === 'walker'){
       // det tråkiga mötet har fått ben — hoppa på det!
       const wob = Math.sin(G.t * 13 + o.ph) * 1;
@@ -2937,9 +3394,16 @@ function drawDog(d){
   const saving = d.saving > 0;
   const hop = d.cel > 0 ? Math.abs(Math.sin(d.cel * 9)) * 8 : 0;
   const dx = ERIK_X + d.off + Math.sin(G.t * 0.9 + (big ? 0 : 2)) * U * 0.12 + (saving ? (1.3 - d.saving) * U * 1.2 : 0);
+  // hundarna skuttar över vattnet på egen hand
+  let waterHop = 0;
+  const wtr = waterAt(dx);
+  if (wtr){
+    const frac = clamp((dx - wtr.x) / wtr.w, 0, 1);
+    waterHop = Math.sin(frac * Math.PI) * U * 0.85;
+  }
 
   ctx.save();
-  ctx.translate(dx, groundY - hop * s - (saving ? Math.sin((1.3 - d.saving) / 1.3 * Math.PI) * U * 0.7 : 0));
+  ctx.translate(dx, groundY - waterHop - hop * s - (saving ? Math.sin((1.3 - d.saving) / 1.3 * Math.PI) * U * 0.7 : 0));
   ctx.save();
   ctx.globalAlpha = 0.16;
   ctx.fillStyle = '#1E2340';
@@ -3095,14 +3559,30 @@ function drawHUD(){
     drawSpr(i < G.lives ? 'heart' : 'heart_off', hx0 + U * 0.23 + i * U * 0.3, hy0 + U * 0.2, U * 0.25);
   }
 
-  // aktiva krafter — under distansen
+  // JÄTTEMÖTETS hälsa
+  if (G.boss && G.boss.mode !== 'enter'){
+    const b = G.boss;
+    const pw2 = U * 0.3, gap2 = U * 0.07;
+    const tot2 = b.max * pw2 + (b.max - 1) * gap2;
+    let bx0 = W / 2 - tot2 / 2 + pw2 / 2;
+    const by0 = topSafe + U * 0.48 + U * 0.28;
+    for (let i = 0; i < b.max; i++){
+      ctx.save();
+      ctx.globalAlpha = i < b.hp ? 1 : 0.22;
+      drawSpr('brief', bx0, by0, pw2);
+      ctx.restore();
+      bx0 += pw2 + gap2;
+    }
+  }
+  // aktiva krafter — under distansen (och under bossmätaren vid bossstrid)
+  const puY = topSafe + U * 0.48 + U * 0.3 + (G.boss && G.boss.mode !== 'enter' ? U * 0.52 : 0);
   const active = [['magnet', 8, '#D94F3D', 'magnet'], ['knack', 5, '#2FB7A6', 'spine'], ['glide', 6, '#B07BE0', 'shoe'], ['tape', 10, '#FF5E9C', 'tape']]
     .filter(([k]) => G.pw[k] > 0);
   let px = W / 2 - active.length * U * 0.62 / 2 + U * 0.31;
   for (const [k, max, col, spr] of active){
     const frac = G.pw[k] / max;
     ctx.save();
-    ctx.translate(px, topSafe + U * 0.48 + U * 0.3);
+    ctx.translate(px, puY);
     ctx.fillStyle = 'rgba(255,252,244,0.92)';
     rrCtx(-U * 0.27, -U * 0.2, U * 0.54, U * 0.48, U * 0.13);
     ctx.fill();
@@ -3241,6 +3721,7 @@ function updatePlaying(dtReal){
 
   updateErikRun(dt);
   updateWorld(dt);
+  updateBoss(dt);
   for (const d of G.dogs){
     d.ph += dt * (G.v / U) * 1.15;
     if (d.saving > 0) d.saving -= dtReal;
@@ -3313,6 +3794,7 @@ function render(){
   drawStops();
   drawPicks();
   drawObstacles();
+  drawBoss();
   for (const d of G.dogs) drawDog(d);
   if (G.erik) drawErik();
   drawPartsAll();
@@ -3750,6 +4232,8 @@ window.__erik = {
     G.obs.push({ kind: 'walker', x: x || W * 0.6, w: U * 0.58, h: U * 0.68, vx: G.v * 0.22, ph: 0, passed: false });
   },
   skipTut(){ G.tut.phase = 4; G.timeScale = 1; },
+  startBoss, spawnWater,
+  splashNow(){ G.erik.y = groundY + U * 0.5; G.erik.onGround = false; G.waters.push({ x: ERIK_X - U, w: U * 2, splashed: false, counted: false, ph: 0 }); },
   jump: queueJump, slide: startSlide,
   hit: hitErik,
   addDist(m){ G.dist += m; G.run.dist = Math.floor(G.dist); },
