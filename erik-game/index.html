@@ -549,7 +549,7 @@ kbd{
           <button id="btn-board" class="btn btn-ghost"><svg class="ic"><use href="#i-trophy"/></svg> Topplista</button>
         </div>
         <p class="quote" id="title-quote">Jag fixar det där sen!</p>
-        <div class="foot">Med <svg class="ic"><use href="#i-heart"/></svg> från familjen · Turborusningen v3.0 · Klassikern finns i <b>fangaren.html</b></div>
+        <div class="foot">Med <svg class="ic"><use href="#i-heart"/></svg> från familjen · Turborusningen v3.1 · Klassikern finns i <b>fangaren.html</b></div>
       </div>
 
       <div id="title-board" style="display:none">
@@ -710,6 +710,7 @@ function newProfile(){
     stars: 0,
     done: {},                       // mission-id -> 1
     tot: { screws: 0, crush: 0, glide: 0, mixtape: 0, knack: 0, rescues: 0, saveB: 0, saveL: 0,
+           stomp: 0, plats: 0,
            kid_ruben: 0, kid_juniper: 0, kid_emmalo: 0, kid_irma: 0, kid_olof: 0, kid_siri: 0 },
     best: { dist: 0, score: 0, screws: 0, rescues: 0 },
     name: ''
@@ -842,6 +843,11 @@ const AudioMan = {
     this.noise({ dur: 0.5, vol: 0.14, freq: 3800, delay: 0.6 });
   },
   sfxHeart(){ this.tone({ f: 523, f2: 784, dur: 0.25, type: 'sine', vol: 0.2 }); this.tone({ f: 784, dur: 0.3, type: 'sine', vol: 0.14, delay: 0.16 }); },
+  sfxStomp(){
+    this.noise({ dur: 0.05, vol: 0.3, freq: 600, ftype: 'lowpass' });
+    this.tone({ f: 160, f2: 540, dur: 0.18, type: 'sine', vol: 0.24, delay: 0.03 });
+  },
+  sfxTut(){ this.tone({ f: 620, f2: 880, dur: 0.12, type: 'triangle', vol: 0.14 }); },
   sfxFanfare(){
     const seq = [[523, 0], [659, 0.12], [784, 0.24], [1047, 0.38], [784, 0.56], [1047, 0.68]];
     seq.forEach(([f, d]) => this.tone({ f, dur: 0.28, type: 'triangle', vol: 0.22, delay: d }));
@@ -990,7 +996,9 @@ const MISSIONS = [
   { id: 'k1',     s: 1, txt: 'Aktivera en KNÄCK‑RUSCH',              scope: 'tot', key: 'knack',       t: 1 },
   { id: 'd600',   s: 1, txt: 'Spring 600 m i en runda',              scope: 'run', key: 'dist',        t: 600 },
   { id: 'c5',     s: 1, txt: 'Krossa 5 hinder (totalt)',             scope: 'tot', key: 'crush',       t: 5 },
+  { id: 'st3',    s: 1, txt: 'Platta till 3 tråkiga möten',          scope: 'tot', key: 'stomp',       t: 3 },
   { id: 'ts500',  s: 1, txt: 'Samla 500 skruvar (totalt)',           scope: 'tot', key: 'screws',      t: 500 },
+  { id: 'pl5',    s: 1, txt: 'Landa på 5 byggplank',                 scope: 'tot', key: 'plats',       t: 5 },
   { id: 'kr',     s: 1, txt: 'Rädda Ruben',                          scope: 'tot', key: 'kid_ruben',   t: 1 },
   { id: 'g150',   s: 1, txt: 'Sväva 150 m med balettglid (totalt)',  scope: 'tot', key: 'glide',       t: 150 },
   { id: 'm1',     s: 1, txt: 'Spela en MIXTAPE',                     scope: 'tot', key: 'mixtape',     t: 1 },
@@ -1039,8 +1047,9 @@ const G = {
   timeScale: 1, slowT: 0,
   erik: null,
   pw: { magnet: 0, knack: 0, glide: 0, tape: 0 },
-  obs: [], picks: [], stops: [], parts: [], floats: [],
-  obsT: 1.2, puT: 8, heartT: 45, nutT: 12, nextRescue: 300,
+  obs: [], picks: [], stops: [], plats: [], parts: [], floats: [],
+  obsT: 1.2, puT: 8, heartT: 45, nutT: 12, platT: 5, nextRescue: 300,
+  sup: 0, tut: { phase: 4, t: 0 }, tutJump: false, tutSlide: false,
   rescued: {},
   run: null,
   dogs: [],
@@ -1070,10 +1079,13 @@ function resetRound(){
   G.timeScale = 1; G.slowT = 0;
   G.erik = newErik();
   G.pw = { magnet: 0, knack: 0, glide: 0, tape: 0 };
-  G.obs = []; G.picks = []; G.stops = []; G.floats = [];
-  G.obsT = 1.4; G.puT = 7; G.heartT = 55; G.nutT = 10; G.nextRescue = rnd(260, 340);
+  G.obs = []; G.picks = []; G.stops = []; G.plats = []; G.floats = [];
+  G.obsT = 1.4; G.puT = 9; G.heartT = 55; G.nutT = 10; G.platT = rnd(4, 7); G.nextRescue = rnd(260, 340);
+  G.sup = 0;
+  G.tut = { phase: 0, t: 0 };
+  G.tutJump = false; G.tutSlide = false;
   G.rescued = {};
-  G.run = { dist: 0, screws: 0, rescues: 0, crush: 0, glide: 0, mixtape: 0 };
+  G.run = { dist: 0, screws: 0, rescues: 0, crush: 0, glide: 0, mixtape: 0, stomp: 0 };
   G.dogs = [newDog('Bernard'), newDog('Lillen')];
   G.shake = 0; G.flash = 0; G.dieT = 0; G.curtain = 0; G.skyHot = 0;
   G.savedThisRound = false;
@@ -1406,8 +1418,9 @@ function startSlide(){
   if (e.onGround && !e.sliding){
     e.sliding = true;
     e.slideT = 0.62;
+    G.tutSlide = true;
     AudioMan.sfxSlide();
-    dust(ERIK_X - U * 0.2, groundY, 5);
+    dust(ERIK_X - U * 0.2, e.y, 5);
   } else if (!e.onGround){
     e.vy = Math.max(e.vy, U * 9); // snabbdyk
   }
@@ -1465,6 +1478,17 @@ const seedOf = idx => (((idx * 2654435761) >>> 0) % 997) / 997;
 
 let px1 = 0, px2 = 0, pxG = 0;              // parallaxoffsets
 
+function supportAt(x, refY){
+  // högsta yta (mark eller byggplank) i eller under fotnivån refY
+  let s = groundY;
+  for (const p of G.plats){
+    if (x > p.x - p.w / 2 - U * 0.05 && x < p.x + p.w / 2 + U * 0.05 &&
+        p.y < s && p.y >= refY - U * 0.12){
+      s = p.y;
+    }
+  }
+  return s;
+}
 function updateErikRun(dt){
   const e = G.erik;
   if (e.jbuf > 0) e.jbuf -= dt;
@@ -1478,8 +1502,9 @@ function updateErikRun(dt){
     e.sliding = false;
     e.coyote = 0;
     e.jbuf = 0;
+    if (G.tut.phase === 1) G.tutJump = true;
     AudioMan.sfxJump();
-    dust(ERIK_X, groundY, 5);
+    dust(ERIK_X, e.y, 5);
   }
 
   if (!e.onGround){
@@ -1489,14 +1514,26 @@ function updateErikRun(dt){
     else if (e.vy < 0) g = U * 30;
     else g = U * 26;
     e.vy = Math.min(e.vy + g * dt, (G.pw.glide > 0 && e.holding) ? U * 2.1 : U * 16);
+    const prevY = e.y;
     e.y += e.vy * dt;
-    if (e.y >= groundY){
-      e.y = groundY;
+    const sup = supportAt(ERIK_X, prevY);
+    if (e.vy > 0 && prevY <= sup + 1 && e.y >= sup){
+      e.y = sup;
       e.vy = 0;
       e.onGround = true;
       AudioMan.sfxLand();
-      dust(ERIK_X, groundY, 4);
+      dust(ERIK_X, sup, 4);
+      if (sup < groundY - 2){
+        const p = G.plats.find(pp => Math.abs(pp.y - sup) < 2 &&
+          ERIK_X > pp.x - pp.w / 2 - U * 0.05 && ERIK_X < pp.x + pp.w / 2 + U * 0.05);
+        if (p && !p.stepped){
+          p.stepped = true;
+          prof.tot.plats++;
+          addFloat(ERIK_X, sup - U * 1.7, 'UPPE PÅ PLANKAN!', '#8A6437', 0.85);
+        }
+      }
     }
+    G.sup = supportAt(ERIK_X, e.y);
     if (G.pw.glide > 0){
       const dm = G.v * dt / MPX();
       G.run.glide += dm;
@@ -1504,8 +1541,17 @@ function updateErikRun(dt){
       if (Math.random() < dt * 30) sparkle(ERIK_X - rnd(0, U * 0.8), e.y - rnd(0.2, 1.4) * U);
     }
   } else {
-    e.y = groundY;
-    e.coyote = 0.09;
+    const sup = supportAt(ERIK_X, e.y);
+    G.sup = sup;
+    if (sup > e.y + U * 0.1){
+      // plankan tog slut under fötterna — börja falla (med coyote-nåd)
+      e.onGround = false;
+      e.vy = 0;
+      e.coyote = 0.09;
+    } else {
+      e.y = sup;
+      e.coyote = 0.09;
+    }
   }
 
   if (e.sliding){
@@ -1530,9 +1576,9 @@ function obstacleTier(){
 function spawnObstacle(){
   const tier = obstacleTier();
   const pool = ['box1', 'cloud'];
-  if (tier >= 2) pool.push('sign', 'box2', 'box1');
-  if (tier >= 3) pool.push('wasp', 'sign');
-  if (tier >= 4) pool.push('wasp', 'box2', 'cloud');
+  if (tier >= 2) pool.push('sign', 'box2', 'walker', 'box1');
+  if (tier >= 3) pool.push('wasp', 'sign', 'walker');
+  if (tier >= 4) pool.push('wasp', 'box2', 'cloud', 'walker');
   const kind = pick(pool);
   const o = { kind, x: W + U * 1.5, passed: false, vx: 0, ph: rnd(TAU) };
   if (kind === 'box1'){ o.w = U * 0.62; o.h = U * 0.72; }
@@ -1540,7 +1586,41 @@ function spawnObstacle(){
   if (kind === 'cloud'){ o.w = U * 0.68; o.h = U * 0.6; o.vx = G.v * 0.32; }
   if (kind === 'sign'){ o.w = U * 0.92; o.h = U * 0.95; o.bottom = groundY - U * 0.8; }
   if (kind === 'wasp'){ o.w = U * 0.95; o.h = U * 0.5; o.mid = groundY - U * 1.05; o.vx = G.v * 0.14; }
+  if (kind === 'walker'){ o.w = U * 0.58; o.h = U * 0.68; o.vx = G.v * 0.22; }
   G.obs.push(o);
+}
+function spawnPlats(kind){
+  const tier = obstacleTier();
+  kind = kind || (tier >= 3 && Math.random() < 0.45 ? 'stair' : 'low');
+  const x0 = W + U * 2;
+  const mk = (cx, w, y) => {
+    const p = { x: cx, w, y, stepped: false };
+    G.plats.push(p);
+    return p;
+  };
+  if (kind === 'stair'){
+    const w1 = U * rnd(2.0, 2.6), w2 = U * rnd(2.2, 3.2);
+    mk(x0 + w1 / 2, w1, groundY - U * 1.1);
+    const p2 = mk(x0 + w1 * 0.8 + w2 / 2, w2, groundY - U * 1.95);
+    platGoodies(p2, true);
+  } else {
+    const w = U * rnd(2.4, 3.6);
+    const p = mk(x0 + w / 2, w, groundY - U * 1.15);
+    platGoodies(p, Math.random() < 0.35);
+  }
+}
+function platGoodies(p, rich){
+  const n = Math.max(3, Math.floor(p.w / (U * 0.55)));
+  for (let i = 0; i < n; i++){
+    G.picks.push({ kind: 'screw', x: p.x - p.w / 2 + (i + 0.5) * (p.w / n), y: p.y - U * 0.5, r: U * 0.17, ph: rnd(TAU) });
+  }
+  if (rich){
+    if (Math.random() < 0.5){
+      G.picks.push({ kind: 'nut', x: p.x, y: p.y - U * 1.05, r: U * 0.2, ph: rnd(TAU) });
+    } else {
+      G.picks.push({ kind: 'pu', pu: pick(['magnet', 'knack', 'shoe', 'tape']), x: p.x, y: p.y - U * 1.1, r: U * 0.26, ph: rnd(TAU) });
+    }
+  }
 }
 function spawnScrews(){
   const shape = pick(['row', 'arc', 'wave']);
@@ -1580,12 +1660,21 @@ function updateWorld(dt){
   px2 += G.v * 0.55 * dt;
   pxG += G.v * dt;
 
+  const tutDone = G.tut.phase >= 3;
   // hinder
-  G.obsT -= dt;
   const stopNear = G.stops.some(s => s.x > W * 0.4);
-  if (G.obsT <= 0 && !stopNear){
-    spawnObstacle();
-    G.obsT = rnd(0.78, 1.3) * lerp(1.3, 0.66, Math.min(G.dist / 2200, 1));
+  if (tutDone){
+    G.obsT -= dt;
+    if (G.obsT <= 0 && !stopNear){
+      spawnObstacle();
+      G.obsT = rnd(0.78, 1.3) * lerp(1.3, 0.66, Math.min(G.dist / 2200, 1));
+    }
+    // byggplank
+    G.platT -= dt;
+    if (G.platT <= 0 && !stopNear && G.dist > 120){
+      spawnPlats();
+      G.platT = rnd(6.5, 10.5);
+    }
   }
   // skruvar
   G.scrT = (G.scrT === undefined ? 0.8 : G.scrT) - dt;
@@ -1593,24 +1682,26 @@ function updateWorld(dt){
     spawnScrews();
     G.scrT = rnd(1.5, 2.5);
   }
-  // powerups
-  G.puT -= dt;
-  if (G.puT <= 0){
-    const r = Math.random();
-    spawnPickup('pu', r < 0.28 ? 'tape' : r < 0.52 ? 'magnet' : r < 0.76 ? 'knack' : 'shoe');
-    G.puT = rnd(11, 17);
-  }
-  G.nutT -= dt;
-  if (G.nutT <= 0){ spawnPickup('nut'); G.nutT = rnd(9, 15); }
-  G.heartT -= dt;
-  if (G.heartT <= 0){
-    if (G.lives < 3) spawnPickup('heart');
-    G.heartT = rnd(45, 70);
-  }
-  // räddningsstopp
-  if (G.dist >= G.nextRescue){
-    spawnStop();
-    G.nextRescue = G.dist + rnd(340, 520);
+  if (tutDone){
+    // powerups
+    G.puT -= dt;
+    if (G.puT <= 0){
+      const r = Math.random();
+      spawnPickup('pu', r < 0.28 ? 'tape' : r < 0.52 ? 'magnet' : r < 0.76 ? 'knack' : 'shoe');
+      G.puT = rnd(11, 17);
+    }
+    G.nutT -= dt;
+    if (G.nutT <= 0){ spawnPickup('nut'); G.nutT = rnd(9, 15); }
+    G.heartT -= dt;
+    if (G.heartT <= 0){
+      if (G.lives < 3) spawnPickup('heart');
+      G.heartT = rnd(45, 70);
+    }
+    // räddningsstopp
+    if (G.dist >= G.nextRescue){
+      spawnStop();
+      G.nextRescue = G.dist + rnd(340, 520);
+    }
   }
 
   // krafter tickar ner
@@ -1661,6 +1752,11 @@ function moveEntities(dt){
     s.x -= vv * dt;
     if (s.x < -U * 3) G.stops.splice(i, 1);
   }
+  for (let i = G.plats.length - 1; i >= 0; i--){
+    const p = G.plats[i];
+    p.x -= vv * dt;
+    if (p.x + p.w / 2 < -U) G.plats.splice(i, 1);
+  }
 }
 
 /* ---------- kollisioner ---------- */
@@ -1688,6 +1784,8 @@ function collide(dt){
     const o = G.obs[i];
     if (Math.abs(o.x - ERIK_X) > U * 2) continue;
     if (overlap(hb, obsBox(o))){
+      const stompable = o.kind === 'walker' || o.kind === 'cloud';
+      const oTop = groundY - o.h;
       if (G.pw.knack > 0){
         G.obs.splice(i, 1);
         G.score += 100;
@@ -1697,6 +1795,19 @@ function collide(dt){
         debris(o.x, o.kind === 'sign' ? o.bottom - o.h / 2 : groundY - o.h / 2, o.kind);
         addFloat(o.x, groundY - U * 1.6, 'KNAK!', '#2FB7A6', 1.1);
         G.shake = Math.max(G.shake, 0.18);
+      } else if (stompable && e.vy > U * 0.6 && e.y < oTop + o.h * 0.55){
+        // HOPPA PÅ! Mario-studs på tråkiga möten och stressmoln
+        G.obs.splice(i, 1);
+        G.score += 150;
+        G.run.stomp++;
+        prof.tot.stomp++;
+        e.vy = -U * 6.4;
+        e.onGround = false;
+        AudioMan.sfxStomp();
+        debris(o.x, oTop + o.h * 0.4, o.kind);
+        dust(o.x, groundY, 6);
+        addFloat(o.x, oTop - U * 0.5, o.kind === 'walker' ? 'PLATT MÖTE! +150' : 'POFF! +150', '#33261D', 1.05);
+        G.shake = Math.max(G.shake, 0.12);
       } else {
         hitErik();
       }
@@ -1862,7 +1973,10 @@ function burst(x, y, color, n){
   }
 }
 function debris(x, y, kind){
-  const cols = kind === 'sign' ? ['#A0402F', '#7E2F22', '#FFF4E4'] : kind === 'cloud' ? ['#57607A', '#6B7590'] : ['#C89B66', '#B98A55', '#E8DCC7'];
+  const cols = kind === 'sign' ? ['#A0402F', '#7E2F22', '#FFF4E4']
+    : kind === 'cloud' ? ['#57607A', '#6B7590']
+    : kind === 'walker' ? ['#7B6B58', '#C9A84C', '#FFFDF6']
+    : ['#C89B66', '#B98A55', '#E8DCC7'];
   for (let i = 0; i < 12; i++){
     const a = rnd(-Math.PI, 0);
     G.parts.push({ kind: 'conf', x, y, vx: Math.cos(a) * rnd(U, U * 3), vy: Math.sin(a) * rnd(U, U * 3.4), g: 0.8,
@@ -2201,6 +2315,32 @@ ICONS.shoe = function(g){
   g.strokeStyle = '#C76E96'; g.lineWidth = 3.2; g.lineCap = 'round';
   g.beginPath(); g.moveTo(-27, 8); g.quadraticCurveTo(0, 16, 31, 5); g.stroke();
 };
+ICONS.brief = function(g){
+  out(g);
+  g.strokeStyle = OUTLINE; g.lineWidth = 5;
+  g.beginPath(); g.moveTo(42, 36); g.quadraticCurveTo(42, 27, 50, 27); g.quadraticCurveTo(58, 27, 58, 36); g.stroke();
+  g.fillStyle = '#FFFDF6';
+  g.beginPath(); g.moveTo(28, 34); g.lineTo(44, 30); g.lineTo(43, 40); g.closePath(); g.fill();
+  out(g);
+  g.fillStyle = '#7B6B58';
+  rr(g, 22, 36, 56, 40, 7); g.fill(); g.stroke();
+  g.strokeStyle = 'rgba(61,43,31,0.5)'; g.lineWidth = 3;
+  g.beginPath(); g.moveTo(22, 50); g.lineTo(78, 50); g.stroke();
+  g.fillStyle = '#C9A84C';
+  rr(g, 34, 46, 8, 8, 2); g.fill();
+  rr(g, 58, 46, 8, 8, 2); g.fill();
+  g.fillStyle = '#FFF';
+  g.beginPath(); g.ellipse(42, 62, 5, 4.2, 0, 0, TAU); g.fill();
+  g.beginPath(); g.ellipse(58, 62, 5, 4.2, 0, 0, TAU); g.fill();
+  g.fillStyle = '#7B6B58';
+  rr(g, 36, 56, 12, 4.5, 2); g.fill();
+  rr(g, 52, 56, 12, 4.5, 2); g.fill();
+  g.fillStyle = '#2E3346';
+  g.beginPath(); g.arc(42, 63, 2.2, 0, TAU); g.fill();
+  g.beginPath(); g.arc(58, 63, 2.2, 0, TAU); g.fill();
+  g.strokeStyle = '#2E3346'; g.lineWidth = 3; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(44, 71); g.lineTo(56, 71); g.stroke();
+};
 ICONS.spine = function(g){
   out(g);
   g.fillStyle = '#2FB7A6';
@@ -2216,8 +2356,55 @@ ICONS.spine = function(g){
 /* ============================================================
    13. RITNING — hinder, plock, hållplatser
    ============================================================ */
+function drawPlats(){
+  for (const p of G.plats){
+    const x0 = p.x - p.w / 2, y = p.y;
+    // ställningsben med snedsträva
+    ctx.strokeStyle = '#8A6437';
+    ctx.lineWidth = Math.max(4, U * 0.07);
+    ctx.lineCap = 'round';
+    for (const lx of [x0 + U * 0.25, x0 + p.w - U * 0.25]){
+      ctx.beginPath(); ctx.moveTo(lx, y + U * 0.05); ctx.lineTo(lx, groundY); ctx.stroke();
+    }
+    ctx.lineWidth = Math.max(3, U * 0.045);
+    ctx.beginPath();
+    ctx.moveTo(x0 + U * 0.25, groundY - U * 0.12);
+    ctx.lineTo(x0 + p.w - U * 0.25, y + U * 0.2);
+    ctx.stroke();
+    // planka
+    ctx.fillStyle = '#C89B66';
+    rrCtx(x0, y, p.w, U * 0.16, U * 0.06);
+    ctx.fill();
+    ctx.strokeStyle = OUTLINE;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.fillStyle = '#B98A55';
+    rrCtx(x0, y + U * 0.1, p.w, U * 0.06, U * 0.03);
+    ctx.fill();
+    // spikar
+    ctx.fillStyle = '#6B564A';
+    for (let nx = x0 + U * 0.3; nx < x0 + p.w - U * 0.2; nx += U * 0.55){
+      ctx.beginPath(); ctx.arc(nx, y + U * 0.08, Math.max(1.5, U * 0.018), 0, TAU); ctx.fill();
+    }
+  }
+}
 function drawObstacles(){
   for (const o of G.obs){
+    if (o.kind === 'walker'){
+      // det tråkiga mötet har fått ben — hoppa på det!
+      const wob = Math.sin(G.t * 13 + o.ph) * 1;
+      ctx.strokeStyle = '#2E3346';
+      ctx.lineWidth = Math.max(4, U * 0.055);
+      ctx.lineCap = 'round';
+      const ly = groundY;
+      ctx.beginPath(); ctx.moveTo(o.x - U * 0.14, ly - U * 0.16); ctx.lineTo(o.x - U * 0.14 - wob * U * 0.06, ly); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(o.x + U * 0.14, ly - U * 0.16); ctx.lineTo(o.x + U * 0.14 + wob * U * 0.06, ly); ctx.stroke();
+      ctx.fillStyle = '#2E3346';
+      ctx.beginPath(); ctx.arc(o.x - U * 0.14 - wob * U * 0.06, ly, U * 0.045, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.arc(o.x + U * 0.14 + wob * U * 0.06, ly, U * 0.045, 0, TAU); ctx.fill();
+      drawSpr('brief', o.x, groundY - U * 0.44, U * 0.92, Math.sin(G.t * 13 + o.ph) * 0.07);
+      continue;
+    }
     if (o.kind === 'box1'){
       drawSpr('box', o.x, groundY - U * 0.36, U * 0.95, Math.sin(o.ph) * 0.03);
     } else if (o.kind === 'box2'){
@@ -2404,12 +2591,13 @@ function drawErik(){
   ctx.save();
   ctx.translate(ERIK_X, e.y + bob);
 
-  // skugga
+  // skugga (på marken ELLER plankan under)
+  const supY = G.sup || groundY;
   ctx.save();
   ctx.globalAlpha = 0.18;
   ctx.fillStyle = '#1E2340';
-  const shR = U * 0.42 * lerp(1, 0.6, clamp((groundY - e.y) / (U * 2), 0, 1));
-  ctx.beginPath(); ctx.ellipse(0, groundY - e.y + 2, shR, shR * 0.24, 0, 0, TAU); ctx.fill();
+  const shR = U * 0.42 * lerp(1, 0.6, clamp((supY - e.y) / (U * 2), 0, 1));
+  ctx.beginPath(); ctx.ellipse(0, supY - e.y + 2, shR, shR * 0.24, 0, 0, TAU); ctx.fill();
   ctx.restore();
 
   const slide = e.sliding;
@@ -2958,6 +3146,86 @@ function processToasts(dt){
 }
 
 /* ============================================================
+   16b. TUTORIAL — spring fem steg, semipaus, lär genom att göra
+   ============================================================ */
+let TOUCHY = false;
+function runTutorial(dtReal){
+  const tut = G.tut;
+  tut.t += dtReal;
+  if (tut.phase === 0){
+    if (tut.t > 0.9){ tut.phase = 1; tut.t = 0; tut.pt = 0; G.tutJump = false; AudioMan.sfxTut(); }
+  } else if (tut.phase === 1){
+    tut.pt = (tut.pt || 0) + dtReal;
+    G.timeScale = G.tutJump ? 1 : 0.1;
+    if (G.tutJump || tut.t > 9){
+      tut.phase = 2; tut.t = 0; tut.pt = 0; tut.paused = false;
+      G.tutSlide = false;
+      G.timeScale = 1;
+    }
+  } else if (tut.phase === 2){
+    if (!tut.paused){
+      G.timeScale = 1;
+      if (G.erik.onGround && tut.t > 0.45){ tut.paused = true; tut.pt = 0; AudioMan.sfxTut(); }
+    } else {
+      tut.pt = (tut.pt || 0) + dtReal;
+      G.timeScale = G.tutSlide ? 1 : 0.1;
+    }
+    if (G.tutSlide || tut.t > 10){
+      tut.phase = 3; tut.t = 0;
+      G.timeScale = 1;
+      G.missionToastQ.unshift(['SAMLA SKRUVAR!', 'Rädda barnen vid H‑hållplatsen · hoppa PÅ tråkiga möten!']);
+    }
+  } else if (tut.phase === 3){
+    if (tut.t > 2.4) tut.phase = 4;
+  }
+}
+function drawTutorial(){
+  if (G.mode !== 'playing') return;
+  const tut = G.tut;
+  const showCard = (tut.phase === 1) || (tut.phase === 2 && tut.paused);
+  if (!showCard) return;
+  const pop = Math.min(1, (tut.pt || 0) / 0.25);
+  const scl = 0.7 + 0.3 * (1 - Math.pow(1 - pop, 3));
+  ctx.fillStyle = 'rgba(24,30,55,0.32)';
+  ctx.fillRect(0, 0, W, H);
+  const cw = Math.min(W * 0.9, 440), ch = U * 1.55;
+  const cx = W / 2, cy = Math.min(H * 0.3, groundY - U * 3.1);
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(scl, scl);
+  ctx.fillStyle = 'rgba(80,45,25,0.25)';
+  rrCtx(-cw / 2 + 4, -ch / 2 + 8, cw, ch, 22); ctx.fill();
+  ctx.fillStyle = '#FFFDF6';
+  rrCtx(-cw / 2, -ch / 2, cw, ch, 22); ctx.fill();
+  ctx.strokeStyle = '#E8DCC7'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.fillStyle = '#FFFDF6';
+  ctx.beginPath();
+  ctx.moveTo(-14, ch / 2 - 1); ctx.lineTo(14, ch / 2 - 1); ctx.lineTo(0, ch / 2 + 16);
+  ctx.closePath(); ctx.fill();
+  const p1 = tut.phase === 1;
+  drawSpr(p1 ? 'box' : 'sign', -cw / 2 + U * 0.52, -U * 0.12, U * 0.66);
+  if (p1) drawSpr('cloud', -cw / 2 + U * 0.9, U * 0.2, U * 0.46);
+  else drawSpr('brief', -cw / 2 + U * 0.9, U * 0.24, U * 0.42);
+  const tx = -cw / 2 + U * 1.22;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#9E3F2F';
+  ctx.font = '800 ' + Math.round(U * 0.19) + 'px "Baloo 2",sans-serif';
+  ctx.fillText(p1 ? 'AKTA LÅDOR & MOLN!' : 'SKYLTAR TAR MAN UNDER!', tx, -ch / 2 + U * 0.34);
+  ctx.fillStyle = '#6B564A';
+  ctx.font = '700 ' + Math.round(U * 0.135) + 'px "Nunito",sans-serif';
+  ctx.fillText(p1 ? 'Hoppa över allt som står i vägen.' : 'Glid under skyltar — och getingar!', tx, -ch / 2 + U * 0.62);
+  const hint = p1 ? (TOUCHY ? 'TRYCK = HOPPA  ·  håll = högre' : 'MELLANSLAG = HOPPA  ·  håll = högre')
+                  : (TOUCHY ? 'SVEP NERÅT = GLID' : 'PIL NER = GLID');
+  ctx.font = '800 ' + Math.round(U * 0.14) + 'px "Baloo 2",sans-serif';
+  const hw2 = ctx.measureText(hint).width;
+  ctx.fillStyle = '#FFC94B';
+  rrCtx(tx - U * 0.02, -ch / 2 + U * 0.82, hw2 + U * 0.26, U * 0.32, U * 0.16); ctx.fill();
+  ctx.fillStyle = '#33261D';
+  ctx.fillText(hint, tx + U * 0.11, -ch / 2 + U * 0.99);
+  ctx.restore();
+}
+
+/* ============================================================
    17. HUVUDLOOPAR
    ============================================================ */
 function updatePlaying(dtReal){
@@ -2965,6 +3233,7 @@ function updatePlaying(dtReal){
     G.slowT -= dtReal;
     if (G.slowT <= 0) G.timeScale = 1;
   }
+  if (G.tut.phase < 4) runTutorial(dtReal);
   const dt = dtReal * G.timeScale;
   G.t += dt;
   if (G.shake > 0) G.shake -= dtReal;
@@ -3040,6 +3309,7 @@ function render(){
   drawFarLayer();
   drawMidLayer();
   drawGroundBand();
+  drawPlats();
   drawStops();
   drawPicks();
   drawObstacles();
@@ -3049,7 +3319,8 @@ function render(){
   drawFloats();
   ctx.restore();
   drawHUD();
-  if (G.timeScale < 1){
+  drawTutorial();
+  if (G.timeScale < 1 && G.tut.phase >= 4){
     ctx.fillStyle = 'rgba(255,255,255,0.1)';
     ctx.fillRect(0, 0, W, H);
   }
@@ -3450,6 +3721,7 @@ function boot(){
   resetRound();
   G.erik.y = groundY;
   const isTouch = matchMedia('(pointer: coarse)').matches;
+  TOUCHY = isTouch;
   $('hint-controls').innerHTML = isTouch
     ? '<b>Tryck</b> för att hoppa (håll = högre) · <b>svep neråt</b> för att glida'
     : '<kbd>mellanslag</kbd> hoppa (håll = högre) &nbsp; <kbd>↓</kbd> glid &nbsp; <kbd>P</kbd> paus &nbsp; <kbd>M</kbd> ljud';
@@ -3473,7 +3745,11 @@ window.__erik = {
   start: startGame,
   power: activatePower,
   rescue(key){ rescueKid(kidByKey(key || 'ruben')); },
-  spawnObstacle, spawnScrews, spawnStop,
+  spawnObstacle, spawnScrews, spawnStop, spawnPlats,
+  spawnWalker(x){
+    G.obs.push({ kind: 'walker', x: x || W * 0.6, w: U * 0.58, h: U * 0.68, vx: G.v * 0.22, ph: 0, passed: false });
+  },
+  skipTut(){ G.tut.phase = 4; G.timeScale = 1; },
   jump: queueJump, slide: startSlide,
   hit: hitErik,
   addDist(m){ G.dist += m; G.run.dist = Math.floor(G.dist); },

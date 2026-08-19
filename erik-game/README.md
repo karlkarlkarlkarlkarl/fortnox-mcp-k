@@ -14,7 +14,13 @@ Endless runner genom svensk 90-talssommar (Erik är född 1990 — därav
 eurodance-loopen på 126 BPM, Volvo 245:an, glasskiosken och midsommarstången).
 
 - **Styrning:** tryck/mellanslag = hoppa (håll = högre) · svep neråt/pil ner = glida.
-  Coyote-time och hoppbuffert gör att det känns proffsigt tajt.
+  Coyote-time och hoppbuffert gör att det känns proffsigt tajt. Varje runda
+  börjar med en snabb inbyggd skola: Erik tar fem steg, spelet semipausar och
+  du lär dig hoppa och glida genom att göra det.
+- **Byggplank i höjdled:** hoppa upp på STAYHOT-ställningarna — skruvrader,
+  muttrar och krafter väntar på övervåningen. Trappmönster i senare skede.
+- **Hoppa PÅ fienderna:** det tråkiga mötet har fått ben — platta till det
+  med ett hopp uppifrån (+150 och studs). Stressmolnen går också att poffa.
 - **Samla skruvar** i banor och bågar. Undvik STAYHOT-kartonger, hängande
   mötesskyltar, rullande stressmoln och getingsvärmar.
 - **Fyra krafter:** Magnetbältet (drar skruvar) · **KNÄCK-RUSCHEN** (krossa

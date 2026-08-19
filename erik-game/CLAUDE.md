@@ -14,7 +14,13 @@ svenska (åäö). Publiceras som Claude-artifact och som fristående fil.
   balettglid=vals ×2, MIXTAPE 1990 = euroX + neonhimmel + keps/brillor),
   hållplatsräddningar av brorsbarnen (axelridning, ballong-hem vid träff,
   HELA GÄNGET +5000), hundräddning av sista hjärtat (en per hund, slow-mo),
-  24 uppdrag → stjärnor → 8 albumkort (komponeras av sprites i `cardImg`).
+  26 uppdrag → stjärnor → 8 albumkort (komponeras av sprites i `cardImg`).
+  Rundstart-tutorial (fas 0–4 i `G.tut`): semipaus 0.1× med instruktionskort,
+  avfärdas genom att UTFÖRA momentet (hopp → glid); spawns gated tills fas 3.
+  Byggplank (`G.plats`, envägsplattformar via `supportAt`, låg 1.15U/hög 1.95U,
+  trappmönster, skruvar+krafter på toppen). Stompbara fiender: portfölj-
+  vandraren `walker` och stressmolnet — hopp uppifrån = +150 & studs
+  (`prof.tot.stomp`); sidokollision skadar.
   Parallax: stugor/björkar/granar (0.18×), buskar/Volvo 245/glasskiosk/
   midsommarstång (0.55×, mindre + upphöjda = bakgrundskänsla), grusstig (1×).
 - **`fangaren.html` — FÅNGAREN (v2, klassikern):** fångarspelet med
