@@ -34,6 +34,15 @@ svenska (åäö). Publiceras som Claude-artifact och som fristående fil.
   midsommarstång (0.55×, mindre + upphöjda = bakgrundskänsla), grusstig (1×).
 - **`fangaren.html` — FÅNGAREN (v2, klassikern):** fångarspelet med
   balettfeber, vågor och getingar. Rör den inte i onödan — den är klar.
+- **`api/worker.js` — familjens topplista:** Cloudflare Worker (KV-binding
+  `TOPPLISTA`), `GET/POST /topplista?spel=runner`, poster `{n,s,d,t}`,
+  validering (s ≤ 500 000, d ≤ 50 000, namn ≤ 14), spam-broms 30/min/IP,
+  topp 200 sparas / 100 returneras. Klienten: konstanten **API_BAS** i
+  index.html (sök på API_BAS; tom = lokalt läge), `window.ERIK_API`
+  överstyr för test, `NET.hamta/spara` + `refreshGlobal()`; global lista
+  visas med statusrad ("SYNKAD"/"OFFLINE"), lokal localStorage är alltid
+  fallback. E2E-testas i `test-sync.mjs` som kör RIKTIGA worker.js bakom
+  en lokal HTTP-server med fejk-KV — två klientkontexter + offline-fall.
 - **Filer är enskilda och offline:** typsnitt (Baloo 2 + Nunito, latin) är
   inbäddade som base64-`@font-face`. Inga beroenden, ingen backend.
 - **Branch:** `claude/eric-character-game-8rqfjs`

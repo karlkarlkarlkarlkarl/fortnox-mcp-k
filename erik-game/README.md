@@ -56,7 +56,27 @@ och getingar. Balettfeber med ridå och strålkastare. Egen topplista.
 - **Publicera:** ladda upp båda filerna var som helst (Netlify Drop,
   itch.io, eget webbhotell). `index.html` blir startsidan.
 
-All sparad data (topplistor, stjärnor, album) ligger i localStorage —
-per enhet, som på ett riktigt arkadspel.
+## Synka topplistan för hela familjen (~5 min)
+
+Utan server sparas topplistan per enhet. Med den lilla gratisservern i
+`api/worker.js` blir Turborusningens topplista **gemensam för alla, för alltid**:
+
+1. Skapa gratis konto på **dash.cloudflare.com**.
+2. *Workers & Pages → Create → Worker* — döp den t.ex. `supererik-topplista`,
+   klicka *Deploy*, sedan *Edit code* och ersätt allt med innehållet i
+   `api/worker.js` (`topplista-worker.js` i zippen). *Deploy*.
+3. *Storage & Databases → KV → Create namespace* — döp den `TOPPLISTA`.
+4. På workern: *Settings → Bindings → Add → KV namespace* —
+   Variable name `TOPPLISTA`, välj ditt namespace. *Save*.
+5. Kopiera worker-adressen (`https://supererik-topplista.DITTNAMN.workers.dev`)
+   och klistra in den i `index.html` på raden märkt **API_BAS** (sök på API_BAS).
+   Ladda upp den uppdaterade filen igen.
+
+Klart! Spelet visar "HELA FAMILJENS LISTA — SYNKAD" när servern nås och
+faller automatiskt tillbaka till enhetens lokala lista offline. Servern har
+rimlighetskontroller och spam-broms; gratisnivån räcker till tusentals
+rundor om dagen.
+
+Stjärnor och album ligger kvar i localStorage per enhet.
 
 *Med ❤ från familjen.*
