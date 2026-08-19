@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Super-Erik</title>
 <style>
-/* Inbäddade typsnitt (Baloo 2 + Nunito, latin) — spelet funkar helt offline */
 @font-face {
   font-family: 'Baloo 2';
   font-style: normal;
@@ -44,9 +43,9 @@
 </style>
 <style>
 /* ============================================================
-   SUPER-ERIK — Superstjärnan · ett födelsedagsspel
-   Ett enda fil-arkadspel: vektor-Erik, syntetiserat ljud,
-   svensk sommaräng, balettfeber och topplista.
+   SUPER-ERIK v2 — Superstjärnan · ett födelsedagsspel
+   Vektorgrafik hela vägen: Erik, Lillen & Bernard, sex brorsbarn,
+   handritade ikoner, vågor med getingar, balettfeber och topplista.
    ============================================================ */
 :root{
   --sky:#6BC6F0;
@@ -62,7 +61,7 @@
   --kid:#FF6FA0;
   --osteo:#2FB7A6;
   --ballet:#B07BE0;
-  --storm:#5A5A73;
+  --dogbrown:#7A4A2E;
   --card-shadow: 0 10px 0 rgba(80,45,25,.16), 0 30px 70px rgba(25,20,60,.38);
 }
 *{ box-sizing:border-box; }
@@ -81,6 +80,9 @@ body{
 #wrap{ position:fixed; inset:0; }
 #game{ position:absolute; inset:0; touch-action:none; display:block; }
 
+.ic{ width:1em; height:1em; fill:currentColor; vertical-align:-0.12em; display:inline-block; }
+.ic-lg{ width:30px; height:30px; }
+
 /* ---------- overlays ---------- */
 .ovl{
   position:absolute; inset:0; z-index:20;
@@ -93,8 +95,8 @@ body{
   background:linear-gradient(180deg,#FFFDF6 0%, var(--cream) 55%, var(--cream-deep) 100%);
   border-radius:30px;
   box-shadow:var(--card-shadow);
-  padding:clamp(18px, 4vw, 36px) clamp(18px, 4.5vw, 42px);
-  width:min(560px, 96vw);
+  padding:clamp(18px, 3.5vw, 34px) clamp(18px, 4.5vw, 42px);
+  width:min(580px, 96vw);
   max-height:min(94vh, 94svh);
   overflow-y:auto; overflow-x:hidden;
   text-align:center;
@@ -112,7 +114,7 @@ body{
   margin:2px 0 10px;
 }
 .logo{
-  font:800 clamp(46px, 11vw, 86px)/0.95 "Baloo 2", "Nunito", sans-serif;
+  font:800 clamp(44px, 10.5vw, 82px)/0.95 "Baloo 2", "Nunito", sans-serif;
   color:var(--falu);
   margin:0;
   transform:rotate(-2deg);
@@ -122,20 +124,18 @@ body{
     0 9px 0 rgba(80,45,25,.18);
   text-wrap:balance;
 }
-.logo .star{ display:inline-block; animation:star-spin 6s linear infinite; }
-@keyframes star-spin{ to{ transform:rotate(360deg); } }
 .sub{
-  font:800 clamp(15px, 3.6vw, 20px)/1.3 "Baloo 2", sans-serif;
+  font:800 clamp(14px, 3.4vw, 19px)/1.3 "Baloo 2", sans-serif;
   color:var(--ink-soft);
   margin:10px 0 2px;
 }
 .bday{
   display:inline-block;
-  margin:12px 0 4px;
+  margin:10px 0 2px;
   padding:8px 18px;
   background:var(--gold);
   border-radius:999px;
-  font:800 clamp(14px,3.4vw,17px)/1.2 "Baloo 2", sans-serif;
+  font:800 clamp(13px,3.2vw,16px)/1.2 "Baloo 2", sans-serif;
   color:var(--ink);
   box-shadow:0 4px 0 var(--gold-deep);
   transform:rotate(1.5deg);
@@ -145,28 +145,42 @@ body{
 
 .stickers{
   display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
-  margin:18px 0 6px;
+  margin:14px 0 4px;
 }
 .st{
-  display:flex; flex-direction:column; align-items:center; gap:2px;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
   padding:10px 12px 8px;
   border-radius:18px;
   font:800 12px/1.1 "Baloo 2", sans-serif;
   letter-spacing:.04em;
-  min-width:86px;
+  min-width:84px;
   box-shadow:0 4px 0 rgba(80,45,25,.15);
   border:3px solid #fff;
 }
-.st .em{ font-size:26px; line-height:1.2; }
 .st-fix{ background:#FFE3C7; color:#8A4A12; transform:rotate(-3deg); }
 .st-kid{ background:#FFDCE8; color:#A0295B; transform:rotate(2deg); }
 .st-ost{ background:#CFF3EE; color:#0E6E63; transform:rotate(-2deg); }
 .st-bal{ background:#EBDCFA; color:#5F3193; transform:rotate(3deg); }
 
+.crewline{
+  margin:10px auto 0;
+  max-width:46ch;
+  font:800 clamp(12.5px,3.1vw,14.5px)/1.45 "Nunito", sans-serif;
+  color:var(--dogbrown);
+}
+.crewline .ic{ font-size:17px; }
+.kidsline{
+  margin:8px auto 0;
+  max-width:46ch;
+  font:700 clamp(12.5px,3.1vw,14px)/1.5 "Nunito", sans-serif;
+  color:var(--ink-soft);
+}
+.kidsline b{ color:var(--kid); }
+
 .howto{
-  margin:14px auto 4px;
-  max-width:44ch;
-  font:700 clamp(13px,3.3vw,15px)/1.55 "Nunito", sans-serif;
+  margin:12px auto 2px;
+  max-width:46ch;
+  font:700 clamp(12.5px,3.2vw,14.5px)/1.55 "Nunito", sans-serif;
   color:var(--ink-soft);
 }
 .howto b{ color:var(--ink); }
@@ -195,7 +209,7 @@ kbd{
   padding:16px 34px 17px;
   box-shadow:0 7px 0 var(--gold-deep), 0 14px 26px rgba(80,45,25,.25);
   transition:transform .08s ease, box-shadow .08s ease;
-  margin-top:16px;
+  margin-top:14px;
 }
 .btn:active{ transform:translateY(5px); box-shadow:0 2px 0 var(--gold-deep), 0 6px 14px rgba(80,45,25,.2); }
 .btn-primary{ animation:btn-pulse 1.6s ease-in-out infinite; }
@@ -213,14 +227,15 @@ kbd{
 .btn-row{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
 
 .foot{
-  margin-top:16px;
+  margin-top:14px;
   font:700 11.5px/1.5 "Nunito", sans-serif;
   color:#A8917C;
 }
+.foot .ic{ color:#E85D4A; }
 
 /* ---------- game over ---------- */
 .over-title{
-  font:800 clamp(30px,7.5vw,46px)/1 "Baloo 2", sans-serif;
+  font:800 clamp(28px,7vw,44px)/1 "Baloo 2", sans-serif;
   color:var(--falu);
   margin:4px 0 2px;
   text-wrap:balance;
@@ -229,10 +244,10 @@ kbd{
   font:800 12px/1 "Baloo 2", sans-serif;
   letter-spacing:.2em; text-transform:uppercase;
   color:var(--ink-soft);
-  margin-top:14px;
+  margin-top:12px;
 }
 .score-big{
-  font:800 clamp(52px,13vw,84px)/1.05 "Baloo 2", sans-serif;
+  font:800 clamp(48px,12vw,80px)/1.05 "Baloo 2", sans-serif;
   color:var(--ink);
   font-variant-numeric:tabular-nums;
   letter-spacing:.01em;
@@ -261,9 +276,10 @@ kbd{
 }
 .stats{
   display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
-  margin:14px 0 4px;
+  margin:12px 0 2px;
 }
 .stat{
+  display:flex; align-items:center; gap:5px;
   background:#fff;
   border-radius:14px;
   padding:8px 12px;
@@ -273,10 +289,37 @@ kbd{
   font-variant-numeric:tabular-nums;
 }
 .stat b{ color:var(--ink); font-size:15px; }
+.stat .ic{ font-size:16px; color:var(--falu); }
+
+.kidrow{
+  display:flex; gap:8px; justify-content:center; align-items:flex-end;
+  margin:12px 0 2px;
+  flex-wrap:wrap;
+}
+.kidrow .kp{
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  font:800 10px/1.1 "Nunito", sans-serif;
+  color:var(--ink-soft);
+}
+.kidrow img{
+  width:44px; height:44px;
+  border-radius:50%;
+  background:#fff;
+  border:3px solid #E3D5BC;
+  display:block;
+}
+.kidrow .kp.got img{ border-color:var(--gold); box-shadow:0 0 0 2px #fff, 0 3px 8px rgba(226,164,38,.5); }
+.kidrow .kp.miss{ opacity:.38; filter:grayscale(1); }
+.kidrow-label{
+  font:800 12px/1 "Baloo 2", sans-serif;
+  letter-spacing:.18em; text-transform:uppercase;
+  color:var(--ink-soft);
+  margin-top:12px;
+}
 
 .namerow{
   display:flex; gap:10px; justify-content:center; align-items:stretch;
-  margin:16px 0 4px;
+  margin:14px 0 4px;
   flex-wrap:wrap;
 }
 #inp-name{
@@ -305,27 +348,36 @@ kbd{
 .btn-save[disabled]{ opacity:.55; pointer-events:none; }
 
 .board{
-  margin:14px auto 2px;
+  margin:12px auto 2px;
   max-width:400px;
   text-align:left;
 }
 .board h3{
+  display:flex; align-items:center; justify-content:center; gap:6px;
   font:800 15px/1 "Baloo 2", sans-serif;
   letter-spacing:.14em; text-transform:uppercase;
   color:var(--falu);
-  text-align:center;
   margin:6px 0 10px;
 }
 .brow{
   display:flex; align-items:center; gap:10px;
   background:#fff;
   border-radius:14px;
-  padding:8px 14px;
+  padding:7px 12px;
   margin-bottom:6px;
   box-shadow:0 3px 0 #EDE1CB;
   font:800 15px/1.2 "Nunito", sans-serif;
 }
-.brow .pos{ width:30px; text-align:center; font-size:16px; flex:none; }
+.brow .pos{
+  width:26px; height:26px; flex:none;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font:800 13px/1 "Baloo 2", sans-serif;
+  background:#EFE6D4; color:var(--ink-soft);
+}
+.brow .pos-1{ background:linear-gradient(180deg,#FFE08A,#E2A426); color:#5F3F00; }
+.brow .pos-2{ background:linear-gradient(180deg,#E8E8EE,#B9BCC9); color:#4A4E5C; }
+.brow .pos-3{ background:linear-gradient(180deg,#EFC29B,#C07A45); color:#5C2F0E; }
 .brow .nm{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink); }
 .brow .sc{ font-variant-numeric:tabular-nums; color:var(--ink-soft); }
 .brow.me{
@@ -344,7 +396,7 @@ kbd{
   box-shadow:0 3px 0 #EDE1CB;
 }
 
-/* ---------- corner buttons ---------- */
+/* ---------- hörnknappar ---------- */
 .corner{
   position:absolute; z-index:15;
   width:52px; height:52px;
@@ -352,11 +404,12 @@ kbd{
   border:0; cursor:pointer;
   background:rgba(255,252,244,.92);
   box-shadow:0 4px 0 rgba(80,45,25,.18), 0 8px 20px rgba(25,20,60,.2);
-  font-size:24px; line-height:1;
+  color:var(--ink-soft);
   display:flex; align-items:center; justify-content:center;
   transition:transform .08s ease;
   padding:0;
 }
+.corner .ic{ width:24px; height:24px; }
 .corner:active{ transform:translateY(3px); }
 .corner.hidden{ display:none; }
 #btn-pause{ top:calc(env(safe-area-inset-top, 0px) + 12px); right:calc(env(safe-area-inset-right, 0px) + 12px); }
@@ -375,11 +428,27 @@ kbd{
 </style>
 </head>
 <body>
+<svg style="display:none" aria-hidden="true"><defs>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M21.6 6.1a5.6 5.6 0 0 1-7.4 6.9L7 20.2a2.3 2.3 0 0 1-3.2-3.2l7.2-7.2a5.6 5.6 0 0 1 6.9-7.4l-3.4 3.4.6 2.9 2.9.6 3.6-3.2z"/></symbol>
+  <symbol id="i-kid" viewBox="0 0 24 24"><circle cx="12" cy="10.5" r="7"/><path d="M5.5 8.5C6.5 5 9 3.5 12 3.5s5.5 1.5 6.5 5c-2-.8-4-2.6-4-2.6s-.6 1.2-3 1.9-6 .7-6 .7z" opacity=".45"/><circle cx="9.4" cy="10.4" r="1.1" fill="#fff"/><circle cx="14.6" cy="10.4" r="1.1" fill="#fff"/><path d="M9 13.2c1.8 1.8 4.2 1.8 6 0" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M4 21c1.2-3.4 4.4-4.6 8-4.6s6.8 1.2 8 4.6z"/></symbol>
+  <symbol id="i-spine" viewBox="0 0 24 24"><rect x="8.5" y="2" width="7" height="4" rx="2"/><rect x="8.5" y="7.3" width="7" height="4" rx="2"/><rect x="8.5" y="12.6" width="7" height="4" rx="2"/><rect x="8.5" y="17.9" width="7" height="4" rx="2"/><circle cx="4.8" cy="4" r="1.4"/><circle cx="19.2" cy="9.3" r="1.4"/><circle cx="4.8" cy="14.6" r="1.4"/></symbol>
+  <symbol id="i-shoe" viewBox="0 0 24 24"><path d="M15.5 1.5 9 8M8.5 1.5 15 8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"/><path d="M12 23c-3.2 0-5.5-3.6-5.1-8l.7-7.5h8.8l.7 7.5c.4 4.4-1.9 8-5.1 8z"/><ellipse cx="12" cy="8.4" rx="3" ry="1.3" fill="#fff" opacity=".4"/></symbol>
+  <symbol id="i-paw" viewBox="0 0 24 24"><ellipse cx="12" cy="15.5" rx="5.6" ry="4.6"/><circle cx="5.4" cy="11" r="2.2"/><circle cx="9.4" cy="7.4" r="2.4"/><circle cx="14.6" cy="7.4" r="2.4"/><circle cx="18.6" cy="11" r="2.2"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 3h12v6a6 6 0 0 1-12 0zM4 5H2v2a4 4 0 0 0 4 4zM20 5h2v2a4 4 0 0 1-4 4z"/><path d="M10.5 14h3v3h-3z"/><path d="M7 21c0-2 2.2-3 5-3s5 1 5 3z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="5.5" y="4" width="5" height="16" rx="2"/><rect x="13.5" y="4" width="5" height="16" rx="2"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9h4l6-5v16l-6-5H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a9 9 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9h4l6-5v16l-6-5H4z"/><path d="m16.5 9 5 6m0-6-5 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-replay" viewBox="0 0 24 24"><path d="M12 5V1L6.5 6 12 11V7a6 6 0 1 1-6 6H3a9 9 0 1 0 9-8z"/></symbol>
+  <symbol id="i-cake" viewBox="0 0 24 24"><rect x="4" y="12" width="16" height="8" rx="2"/><path d="M5 12c1.5 2 3 2 4.5 0s3-2 4.5 0 3 2 4.5 0V10a3 3 0 0 0-3-3H8a3 3 0 0 0-3 3z" opacity=".55"/><rect x="11" y="3" width="2" height="4" rx="1"/><circle cx="12" cy="2" r="1.4"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 1.8 3 6.2 6.8 1-4.9 4.7 1.2 6.8-6.1-3.2-6.1 3.2 1.2-6.8L2.2 9l6.8-1z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 21S3 14.8 3 8.8A4.8 4.8 0 0 1 12 6a4.8 4.8 0 0 1 9 2.8c0 6-9 12.2-9 12.2z"/></symbol>
+</defs></svg>
+
 <div id="wrap">
   <canvas id="game"></canvas>
 
-  <button id="btn-mute" class="corner hidden" aria-label="Ljud av/på">🔊</button>
-  <button id="btn-pause" class="corner hidden" aria-label="Paus">⏸️</button>
+  <button id="btn-mute" class="corner hidden" aria-label="Ljud av/på"><svg class="ic"><use href="#i-sound"/></svg></button>
+  <button id="btn-pause" class="corner hidden" aria-label="Paus"><svg class="ic"><use href="#i-pause"/></svg></button>
 
   <!-- ============ TITELSKÄRM ============ -->
   <div id="ovl-title" class="ovl">
@@ -388,37 +457,39 @@ kbd{
         <div class="eyebrow">Familjen presenterar</div>
         <h1 class="logo">SUPER‑ERIK</h1>
         <div class="sub">Fixaren · Lekproffset · Osteopaten · Balettdansören</div>
-        <div class="bday">🎂 Grattis på födelsedagen, Erik! 🎂</div>
+        <div class="bday"><svg class="ic"><use href="#i-cake"/></svg> Grattis på födelsedagen, Erik!</div>
 
         <div class="stickers" aria-hidden="true">
-          <div class="st st-fix"><span class="em">🔧</span>FIXA</div>
-          <div class="st st-kid"><span class="em">🧒</span>LEKA</div>
-          <div class="st st-ost"><span class="em">💆</span>KNÄCKA</div>
-          <div class="st st-bal"><span class="em">🩰</span>DANSA</div>
+          <div class="st st-fix"><svg class="ic ic-lg"><use href="#i-wrench"/></svg>FIXA</div>
+          <div class="st st-kid"><svg class="ic ic-lg"><use href="#i-kid"/></svg>LEKA</div>
+          <div class="st st-ost"><svg class="ic ic-lg"><use href="#i-spine"/></svg>KNÄCKA</div>
+          <div class="st st-bal"><svg class="ic ic-lg"><use href="#i-shoe"/></svg>DANSA</div>
         </div>
 
+        <div class="crewline"><svg class="ic"><use href="#i-paw"/></svg> <b>Lillen &amp; Bernard</b> springer med och räddar det du tappar!</div>
+        <div class="kidsline">Samla alla sex brorsbarnen — <b>Ruben, Juniper, Emma‑Lo, Irma, Olof &amp; Siri</b> — för HELA GÄNGET‑bonusen!</div>
+
         <p class="howto">
-          Var Erik! Fånga allt han älskar och samla poäng.
-          <b>Undvik stressmoln ⛈️ och tråkiga möten 💼.</b>
-          Fånga en balettsko för <b>BALETTFEBER</b> med dubbla poäng!
+          Fånga allt Erik älskar. <b>Undvik stressmoln, tråkiga möten och getingarna</b> som dyker upp i senare vågor.
+          Balettskon startar <b>BALETTFEBER</b> med dubbla poäng!
         </p>
         <p class="controls-hint" id="hint-controls"></p>
 
         <div class="btn-row">
-          <button id="btn-start" class="btn btn-primary">STARTA SHOWEN! 🎭</button>
+          <button id="btn-start" class="btn btn-primary">STARTA SHOWEN!</button>
         </div>
         <div class="btn-row">
-          <button id="btn-board" class="btn btn-ghost">🏆 Topplista</button>
+          <button id="btn-board" class="btn btn-ghost"><svg class="ic"><use href="#i-trophy"/></svg> Topplista</button>
         </div>
         <p class="quote" id="title-quote">Jag fixar det där sen!</p>
-        <div class="foot">Med ❤️ från familjen · Super‑Erik v1.0</div>
+        <div class="foot">Med <svg class="ic"><use href="#i-heart"/></svg> från familjen · Super‑Erik v2.0</div>
       </div>
 
       <div id="title-board" style="display:none">
         <div class="eyebrow">Stjärnorna hittills</div>
-        <h2 class="over-title" style="font-size:clamp(26px,6vw,36px)">🏆 Topplista</h2>
+        <h2 class="over-title" style="font-size:clamp(26px,6vw,36px)">Topplista</h2>
         <div class="board"><div id="title-board-list"></div></div>
-        <button id="btn-back" class="btn btn-ghost">⬅️ Tillbaka</button>
+        <button id="btn-back" class="btn btn-ghost">Tillbaka</button>
       </div>
     </div>
   </div>
@@ -427,10 +498,10 @@ kbd{
   <div id="ovl-pause" class="ovl hidden">
     <div class="card">
       <div class="eyebrow">Paus</div>
-      <h2 class="over-title">☕ Fikapaus!</h2>
-      <p class="howto">Även superstjärnor behöver kanelbullar.</p>
+      <h2 class="over-title">Fikapaus!</h2>
+      <p class="howto">Även superstjärnor behöver kanelbullar. Lillen och Bernard vaktar planen.</p>
       <div class="btn-row">
-        <button id="btn-resume" class="btn btn-primary">FORTSÄTT! 💪</button>
+        <button id="btn-resume" class="btn btn-primary">FORTSÄTT!</button>
       </div>
       <div class="btn-row">
         <button id="btn-quit" class="btn btn-ghost">Avsluta showen</button>
@@ -447,7 +518,10 @@ kbd{
       <div class="score-label">Dina poäng</div>
       <div class="score-big" id="over-score">0</div>
       <div><span class="rank-chip" id="over-rank">Nybörjar‑Erik</span></div>
-      <div id="over-newrec" class="newrec" style="display:none">🎉 NYTT REKORD! 🎉</div>
+      <div id="over-newrec" class="newrec" style="display:none">NYTT REKORD!</div>
+
+      <div class="kidrow-label">Brorsbarnen</div>
+      <div class="kidrow" id="over-kids"></div>
 
       <div class="stats" id="over-stats"></div>
 
@@ -455,17 +529,17 @@ kbd{
         <div class="score-label" style="margin-top:10px">Skriv in dig i topplistan</div>
         <div class="namerow">
           <input id="inp-name" maxlength="14" placeholder="Ditt namn" autocomplete="off" enterkeyhint="done">
-          <button id="btn-save" class="btn btn-save">SPARA ⭐</button>
+          <button id="btn-save" class="btn btn-save">SPARA</button>
         </div>
       </div>
 
       <div class="board">
-        <h3>🏆 Topplista</h3>
+        <h3><svg class="ic"><use href="#i-trophy"/></svg> Topplista</h3>
         <div id="over-board-list"></div>
       </div>
 
       <div class="btn-row">
-        <button id="btn-again" class="btn btn-primary">EN GÅNG TILL! 🔁</button>
+        <button id="btn-again" class="btn btn-primary"><svg class="ic"><use href="#i-replay"/></svg> EN GÅNG TILL!</button>
       </div>
       <div class="btn-row">
         <button id="btn-menu" class="btn btn-ghost">Till menyn</button>
@@ -484,7 +558,6 @@ const TAU = Math.PI * 2;
 const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
 const rnd = (a = 1, b) => b === undefined ? Math.random() * a : a + Math.random() * (b - a);
-const rndi = (a, b) => Math.floor(rnd(a, b + 1));
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 const $ = id => document.getElementById(id);
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -501,7 +574,9 @@ function resize(){
   W = wrap.clientWidth;
   H = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
   H = Math.max(H, 200);
-  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const newDPR = Math.min(window.devicePixelRatio || 1, 2);
+  const dprChanged = newDPR !== DPR;
+  DPR = newDPR;
   cv.width = Math.round(W * DPR);
   cv.height = Math.round(H * DPR);
   cv.style.width = W + 'px';
@@ -509,6 +584,7 @@ function resize(){
   U = clamp(Math.min(W, H) * 0.155, 78, 148);
   groundY = H - Math.max(H * 0.09, 54);
   if (G.erik) G.erik.x = clamp(G.erik.x, U * 0.6, W - U * 0.6);
+  if (dprChanged && window.__sprReady) buildSprites();
 }
 window.addEventListener('resize', resize);
 if (window.visualViewport) window.visualViewport.addEventListener('resize', resize);
@@ -541,7 +617,7 @@ function addToBoard(name, score){
   board.sort((a, b) => b.s - a.s || a.t - b.t);
   const top = board.slice(0, 10);
   store.set(BOARD_KEY, top);
-  return top.indexOf(entry); // -1 om utanför topp 10
+  return top.indexOf(entry);
 }
 
 /* ============================================================
@@ -550,8 +626,7 @@ function addToBoard(name, score){
 const AudioMan = {
   ac: null, master: null, musicGain: null, sfxGain: null,
   muted: store.get('erikMuted', false),
-  mode: 'none',            // 'pop' | 'waltz' | 'none'
-  step: 0, nextT: 0, timer: null,
+  mode: 'none', step: 0, nextT: 0, timer: null,
 
   ensure(){
     if (this.ac) { if (this.ac.state === 'suspended') this.ac.resume(); return; }
@@ -572,7 +647,7 @@ const AudioMan = {
     this.muted = m;
     store.set('erikMuted', m);
     if (this.master) this.master.gain.value = m ? 0 : 1;
-    $('btn-mute').textContent = m ? '🔇' : '🔊';
+    $('btn-mute').innerHTML = '<svg class="ic"><use href="#i-' + (m ? 'mute' : 'sound') + '"/></svg>';
   },
   tone(o){
     if (!this.ac) return;
@@ -648,6 +723,26 @@ const AudioMan = {
     seq.forEach(([f, d]) => this.tone({ f, dur: 0.28, type: 'triangle', vol: 0.22, delay: d }));
     this.noise({ dur: 0.4, vol: 0.12, freq: 4000, delay: 0.68 });
   },
+  sfxWoof(big){
+    const f = big ? 220 : 330;
+    this.tone({ f: f, f2: f * 0.45, dur: 0.09, type: 'square', vol: 0.2 });
+    this.noise({ dur: 0.06, vol: 0.14, freq: 800, ftype: 'lowpass' });
+    this.tone({ f: f * 1.1, f2: f * 0.5, dur: 0.1, type: 'square', vol: 0.18, delay: 0.12 });
+  },
+  sfxDash(){ this.noise({ dur: 0.16, vol: 0.12, freq: 900, ftype: 'lowpass' }); },
+  sfxBuzz(){
+    this.tone({ f: 110, f2: 96, dur: 0.28, type: 'sawtooth', vol: 0.055 });
+    this.tone({ f: 222, f2: 190, dur: 0.28, type: 'sawtooth', vol: 0.03 });
+  },
+  sfxHorn(){
+    this.tone({ f: 392, dur: 0.22, type: 'square', vol: 0.16 });
+    this.tone({ f: 523, dur: 0.4, type: 'square', vol: 0.16, delay: 0.22 });
+  },
+  sfxGang(){
+    [523, 659, 784, 1047, 1319, 1047, 1568].forEach((f, i) =>
+      this.tone({ f, dur: 0.32, type: 'triangle', vol: 0.22, delay: i * 0.09 }));
+    this.noise({ dur: 0.5, vol: 0.14, freq: 3800, delay: 0.6 });
+  },
 
   /* --- musik-sequencer --- */
   N: { C3:131, D3:147, E3:165, F3:175, G3:196, A3:220, B3:247,
@@ -715,24 +810,28 @@ const AudioMan = {
 };
 
 /* ============================================================
-   5. FÖREMÅL — typer, färger, poäng, repliker
+   5. SPELDATA — föremål, brorsbarn, hundar, vågor, repliker
    ============================================================ */
 const TYPES = {
-  tool:    { good: true, ring: '#E8842B', base: 100, emo: ['🔧','🔨','🪛','💡','🪑'],
-             pops: ['FIXAT!','SÅ DÄR JA!','SOM NY!','SKRUVAT!'] },
-  kid:     { good: true, ring: '#FF6FA0', base: 150, emo: ['🧒','👶','👧'],
-             pops: ['HURRA!','JIPPI!','AXELRIDNING!','HÖGST UPP!'] },
-  patient: { good: true, ring: '#2FB7A6', base: 200, emo: ['🧓','👵','👴'],
-             pops: ['KNAK!','RAK RYGG!','KNÄCKT & KLAR!','SOM EN 20‑ÅRING!'] },
-  shoe:    { good: true, ring: '#B07BE0', base: 300, emo: ['🩰'],
-             pops: ['BALETTFEBER!'] },
-  cake:    { good: true, ring: '#FFC94B', base: 500, emo: ['🎂'],
-             pops: ['GRATTIS ERIK!'] },
-  cloud:   { good: false, ring: '#3E415C', base: 0, emo: ['⛈️'],
-             pops: ['STRESS! AJ!'] },
-  brief:   { good: false, ring: '#3E415C', base: 0, emo: ['💼'],
-             pops: ['TRÅKIGT MÖTE!'] }
+  tool:    { good: true, ring: '#E8842B', base: 100, sprs: ['wrench', 'hammer', 'screw', 'bulb', 'chair'],
+             pops: ['FIXAT!', 'SÅ DÄR JA!', 'SOM NY!', 'SKRUVAT!'] },
+  kid:     { good: true, ring: '#FF6FA0', base: 150, pops: ['HURRA!', 'AXELRIDNING!'] },
+  patient: { good: true, ring: '#2FB7A6', base: 200, sprs: ['pat_m', 'pat_w'],
+             pops: ['KNAK!', 'RAK RYGG!', 'KNÄCKT & KLAR!', 'SOM EN 20‑ÅRING!'] },
+  shoe:    { good: true, ring: '#B07BE0', base: 300, sprs: ['shoe'], pops: ['BALETTFEBER!'] },
+  cake:    { good: true, ring: '#FFC94B', base: 500, sprs: ['cake'], pops: ['GRATTIS ERIK!'] },
+  cloud:   { good: false, ring: '#3E415C', base: 0, sprs: ['cloud'], pops: ['STRESS! AJ!'] },
+  brief:   { good: false, ring: '#3E415C', base: 0, sprs: ['brief'], pops: ['TRÅKIGT MÖTE!'] }
 };
+const KIDS = [
+  { key: 'ruben',   name: 'RUBEN',    sc: 0.80, skin: '#F2C49B', hair: '#E9C97C', shirt: '#E85D4A', style: 'tuft' },
+  { key: 'juniper', name: 'JUNIPER',  sc: 0.88, skin: '#EDB88E', hair: '#B8863F', shirt: '#5FA75F', style: 'pigtails' },
+  { key: 'emmalo',  name: 'EMMA‑LO',  sc: 0.95, skin: '#F2C49B', hair: '#EFD9A0', shirt: '#FF6FA0', style: 'fringe' },
+  { key: 'irma',    name: 'IRMA',     sc: 1.00, skin: '#E9B584', hair: '#8A5A33', shirt: '#FFC22E', style: 'bob' },
+  { key: 'olof',    name: 'OLOF',     sc: 1.10, skin: '#F2C49B', hair: '#6E4A2C', shirt: '#3E6FB0', style: 'short' },
+  { key: 'siri',    name: 'SIRI',     sc: 1.18, skin: '#EFC094', hair: '#C7A05C', shirt: '#2FB7A6', style: 'ponytail' }
+];
+const kidByKey = k => KIDS.find(x => x.key === k);
 const QUOTES = [
   'Jag fixar det där sen!',
   'Har du testat att knäcka ryggen?',
@@ -740,63 +839,509 @@ const QUOTES = [
   'En kotknäckare om dagen…',
   'Vem vill rida på axlarna?',
   'Det där löser jag med en insexnyckel.',
-  'Femte positionen, alltid.'
+  'Femte positionen, alltid.',
+  'Lillen! Bernard! Apportera!',
+  'Hela gänget på en gång? Inga problem.'
 ];
 const RANKS = [
-  [800,   'Nybörjar‑Erik 🐣'],
-  [2500,  'Hemmafixare 🔧'],
-  [5000,  'Kalasfarbror 🎈'],
-  [9000,  'Ryggknäckarmästare 💆'],
-  [14000, 'Piruettproffs 🩰'],
-  [20000, 'Superstjärna ⭐'],
-  [Infinity, 'DEN ÄKTA ERIK 👑']
+  [1000,  'Nybörjar‑Erik'],
+  [3000,  'Hemmafixare'],
+  [6000,  'Kalasfarbror'],
+  [10500, 'Ryggknäckarmästare'],
+  [16000, 'Piruettproffs'],
+  [23000, 'Superstjärna'],
+  [Infinity, 'DEN ÄKTA ERIK']
 ];
 const rankFor = s => { for (const [lim, name] of RANKS) if (s < lim) return name; return RANKS[RANKS.length - 1][1]; };
+const WAVES = [
+  { t: 25,  txt: 'VÅG 2 — HÖGRE TEMPO!' },
+  { t: 55,  txt: 'VÅG 3 — GETINGARNA KOMMER!' },
+  { t: 85,  txt: 'VÅG 4 — FULL RULLE!' },
+  { t: 115, txt: 'SISTA VÅGEN — MAXFART!' }
+];
+const WASP_START = 55;
 
 /* ============================================================
    6. SPELTILLSTÅND
    ============================================================ */
 const G = {
-  mode: 'title',        // title | playing | paused | dying | over
-  t: 0,                 // global klocka (attract + spel)
-  elapsed: 0,           // tid i pågående runda
-  score: 0, combo: 0, best: 0,
+  mode: 'title',
+  t: 0, elapsed: 0,
+  score: 0, combo: 0,
   lives: 3,
-  items: [], parts: [], floats: [],
-  spawnT: 1.2,
+  items: [], wasps: [], parts: [], floats: [],
+  spawnT: 1.2, waspT: 0, buzzT: 0,
   fever: 0, feverSince: 99, spins: 0, spinAcc: 0,
-  curtain: 0,           // 0=öppen, 1=stängd
-  shake: 0, flash: 0,
-  invuln: 0,
-  dieT: 0,
+  curtain: 0, shake: 0, flash: 0, invuln: 0, dieT: 0,
+  wave: 0,
+  caught: {}, gangDone: false,
   stats: null,
   erik: null,
-  aiT: 0,               // attract-läge
+  dogs: [],
+  aiT: 0,
   savedThisRound: false
 };
 function newErik(){
   return {
     x: W / 2, y: 0, vy: 0, onGround: true,
-    tx: W / 2, keyDir: 0, usePointer: false,
+    tx: W / 2, usePointer: false,
     face: 1, runPhase: 0, moving: 0,
     blink: 0, blinkT: rnd(1.5, 4),
-    hatT: 0, kidT: 0, glowT: 0,
+    hatT: 0, kidT: 0, rider: null, glowT: 0,
     spin: 0, bow: 0
+  };
+}
+function newDog(name, side){
+  const big = name === 'Bernard';
+  return {
+    name, side, big,
+    x: W / 2 + side * U * 2, y: 0,
+    state: 'follow', cd: 0, cel: 0, item: null,
+    face: 1, ph: rnd(TAU), sp: 0,
+    range: big ? 0.44 : 0.28,       // × W
+    dashSp: big ? 1.75 : 1.55,      // × W /s
+    cdMax: big ? 10 : 7.5
   };
 }
 function resetRound(){
   G.elapsed = 0; G.score = 0; G.combo = 0; G.lives = 3;
-  G.items = []; G.floats = [];
-  G.spawnT = 0.9;
+  G.items = []; G.wasps = []; G.floats = [];
+  G.spawnT = 0.9; G.waspT = 6; G.buzzT = 0;
   G.fever = 0; G.feverSince = 99; G.spins = 0; G.spinAcc = 0;
   G.curtain = 0; G.shake = 0; G.flash = 0; G.invuln = 0; G.dieT = 0;
-  G.stats = { tool: 0, kid: 0, patient: 0, cake: 0, air: 0, maxCombo: 0 };
+  G.wave = 0;
+  G.caught = {}; G.gangDone = false;
+  G.stats = { tool: 0, patient: 0, cake: 0, air: 0, maxCombo: 0, saves: 0, kidCatches: 0 };
   G.erik = newErik();
+  G.dogs = [newDog('Bernard', 1), newDog('Lillen', -1)];
   G.savedThisRound = false;
 }
 
 /* ============================================================
-   7. INMATNING
+   7. SPRITEFABRIK — handritade vektorikoner (inga emojis)
+   Alla ritas i en 100×100-rymd och cachas som canvas-sprites.
+   ============================================================ */
+const SPR = {};
+const OUTLINE = 'rgba(61,43,31,0.85)';
+
+function rr(g, x, y, w2, h2, r){
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.arcTo(x + w2, y, x + w2, y + h2, r);
+  g.arcTo(x + w2, y + h2, x, y + h2, r);
+  g.arcTo(x, y + h2, x, y, r);
+  g.arcTo(x, y, x + w2, y, r);
+  g.closePath();
+}
+function out(g, w){
+  g.strokeStyle = OUTLINE;
+  g.lineWidth = w || 4.5;
+  g.lineJoin = 'round';
+  g.lineCap = 'round';
+}
+function starG(g, cx, cy, r){
+  g.beginPath();
+  for (let i = 0; i < 10; i++){
+    const rr2 = i % 2 === 0 ? r : r * 0.45;
+    const a = -Math.PI / 2 + i * Math.PI / 5;
+    if (i === 0) g.moveTo(cx + Math.cos(a) * rr2, cy + Math.sin(a) * rr2);
+    else g.lineTo(cx + Math.cos(a) * rr2, cy + Math.sin(a) * rr2);
+  }
+  g.closePath();
+}
+
+function sprite(key, draw){
+  const px = 170;
+  const c = document.createElement('canvas');
+  const s = Math.ceil(px * DPR);
+  c.width = c.height = s;
+  const g = c.getContext('2d');
+  g.scale(s / 100, s / 100);
+  draw(g);
+  SPR[key] = c;
+}
+function drawSpr(key, x, y, size, rot){
+  const c = SPR[key];
+  if (!c) return;
+  ctx.save();
+  ctx.translate(x, y);
+  if (rot) ctx.rotate(rot);
+  ctx.drawImage(c, -size / 2, -size / 2, size, size);
+  ctx.restore();
+}
+
+const ICONS = {
+  wrench(g){
+    g.translate(50, 54); g.rotate(-0.785);
+    out(g);
+    g.fillStyle = '#A9B6C6';
+    rr(g, -8, -12, 16, 50, 8); g.fill(); g.stroke();
+    g.beginPath();
+    g.arc(0, -26, 19, 0.62, TAU - 0.62);
+    g.arc(0, -26, 8.5, TAU - 0.62, 0.62, true);
+    g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,0.35)';
+    rr(g, -7, -8, 5, 42, 2.5); g.fill();
+  },
+  hammer(g){
+    g.translate(50, 52); g.rotate(-0.55);
+    out(g);
+    g.fillStyle = '#C89B66';
+    rr(g, -5.5, -14, 11, 54, 5.5); g.fill(); g.stroke();
+    g.fillStyle = '#A9B6C6';
+    rr(g, -25, -32, 50, 18, 7); g.fill(); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,0.3)';
+    rr(g, -22, -29, 44, 5, 2.5); g.fill();
+    g.fillStyle = '#A87F4E';
+    rr(g, -5.5, -12, 11, 7, 3); g.fill();
+  },
+  screw(g){
+    g.translate(50, 50); g.rotate(-0.72);
+    out(g);
+    g.fillStyle = '#A9B6C6';
+    rr(g, -3, -36, 6, 46, 2.5); g.fill(); g.stroke();
+    rr(g, -5, -40, 10, 7, 2); g.fill(); g.stroke();
+    g.fillStyle = '#D94F3D';
+    rr(g, -8, 8, 16, 32, 7); g.fill(); g.stroke();
+    g.strokeStyle = '#A93325'; g.lineWidth = 2.5;
+    for (let i = 0; i < 3; i++){
+      g.beginPath(); g.moveTo(-8, 15 + i * 8); g.lineTo(8, 15 + i * 8); g.stroke();
+    }
+  },
+  bulb(g){
+    out(g);
+    g.fillStyle = '#FFF9E3';
+    g.beginPath(); g.arc(50, 42, 24, 0, TAU); g.fill(); g.stroke();
+    g.strokeStyle = '#E8842B'; g.lineWidth = 3; g.lineJoin = 'round';
+    g.beginPath();
+    g.moveTo(43, 54); g.lineTo(46, 47); g.lineTo(50, 54); g.lineTo(54, 47); g.lineTo(57, 54);
+    g.stroke();
+    out(g);
+    g.fillStyle = '#C9A84C';
+    rr(g, 40, 64, 20, 6, 2.5); g.fill(); g.stroke();
+    rr(g, 42, 71, 16, 5, 2.5); g.fill(); g.stroke();
+    rr(g, 44, 77, 12, 5, 2.5); g.fill(); g.stroke();
+    g.strokeStyle = '#FFC94B'; g.lineWidth = 4; g.lineCap = 'round';
+    const rays = [[-0.9, 0], [-0.45, 0], [0, -1], [0.45, 0], [0.9, 0]];
+    for (const [a] of rays){
+      const ang = -Math.PI / 2 + a;
+      g.beginPath();
+      g.moveTo(50 + Math.cos(ang) * 30, 42 + Math.sin(ang) * 30);
+      g.lineTo(50 + Math.cos(ang) * 38, 42 + Math.sin(ang) * 38);
+      g.stroke();
+    }
+    g.fillStyle = 'rgba(255,255,255,0.8)';
+    g.beginPath(); g.arc(42, 34, 6, 0, TAU); g.fill();
+  },
+  chair(g){
+    g.translate(46, 50); g.rotate(0.1);
+    out(g);
+    g.fillStyle = '#A0402F';
+    rr(g, -20, -36, 8, 44, 3.5); g.fill(); g.stroke();     // ryggstolpe
+    rr(g, -18, -32, 30, 6, 3); g.fill(); g.stroke();       // slat 1
+    rr(g, -18, -19, 30, 6, 3); g.fill(); g.stroke();       // slat 2
+    g.fillStyle = '#B5543F';
+    rr(g, -24, 6, 48, 9, 4); g.fill(); g.stroke();         // sits
+    g.fillStyle = '#A0402F';
+    rr(g, -21, 15, 7, 26, 3); g.fill(); g.stroke();        // ben v
+    rr(g, 8, 15, 7, 26, 3); g.fill(); g.stroke();          // ben h
+    g.rotate(-0.1);
+    g.save();
+    g.translate(32, 26); g.rotate(0.6);                     // löst ben!
+    g.fillStyle = '#A0402F';
+    rr(g, -3.5, -12, 7, 26, 3); g.fill(); g.stroke();
+    g.restore();
+    g.strokeStyle = 'rgba(61,43,31,0.4)'; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(24, 12); g.lineTo(29, 8); g.stroke();
+    g.beginPath(); g.moveTo(27, 19); g.lineTo(33, 16); g.stroke();
+  },
+  shoe(g){
+    g.translate(50, 58);
+    // korsade band uppåt (som knutna runt vristen)
+    g.strokeStyle = '#E98FB4'; g.lineWidth = 4.5; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-14, -10); g.lineTo(4, -34); g.stroke();
+    g.beginPath(); g.moveTo(-2, -10); g.lineTo(-16, -34); g.stroke();
+    g.beginPath(); g.moveTo(4, -34); g.quadraticCurveTo(7, -40, 4, -44); g.stroke();
+    g.beginPath(); g.moveTo(-16, -34); g.quadraticCurveTo(-20, -40, -17, -44); g.stroke();
+    // tåspetsskon i profil — spetsig tå åt höger
+    out(g);
+    g.fillStyle = '#F4A7C3';
+    g.beginPath();
+    g.moveTo(-31, -6);
+    g.quadraticCurveTo(-33, 6, -24, 10);
+    g.quadraticCurveTo(-6, 15, 14, 12);
+    g.quadraticCurveTo(28, 10, 33, 3);   // spetsig tå
+    g.quadraticCurveTo(30, -4, 18, -6);
+    g.quadraticCurveTo(2, -13, -12, -12);
+    g.quadraticCurveTo(-26, -12, -31, -6);
+    g.closePath(); g.fill(); g.stroke();
+    // öppning (mörkare inuti)
+    g.fillStyle = '#C76E96';
+    g.beginPath(); g.ellipse(-11, -6, 13, 5, -0.08, 0, TAU); g.fill();
+    g.fillStyle = '#B25E85';
+    g.beginPath(); g.ellipse(-11, -5, 9.5, 3.2, -0.08, 0, TAU); g.fill();
+    // tåbox-skugga + sula
+    g.fillStyle = 'rgba(199,110,150,0.45)';
+    g.beginPath(); g.ellipse(24, 3, 8, 6.5, 0.25, 0, TAU); g.fill();
+    g.strokeStyle = '#C76E96'; g.lineWidth = 3.2; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-27, 8); g.quadraticCurveTo(0, 16, 31, 5); g.stroke();
+    // liten glans
+    g.strokeStyle = 'rgba(255,255,255,0.7)'; g.lineWidth = 2.5;
+    g.beginPath(); g.moveTo(-22, -8); g.quadraticCurveTo(-14, -10, -6, -9); g.stroke();
+  },
+  cake(g){
+    out(g);
+    g.fillStyle = '#A0402F';
+    g.beginPath(); g.ellipse(50, 82, 32, 7, 0, 0, TAU); g.fill(); g.stroke();
+    g.fillStyle = '#F7D9B0';
+    rr(g, 26, 60, 48, 22, 6); g.fill(); g.stroke();
+    g.fillStyle = '#F4A7C3';
+    rr(g, 33, 42, 34, 18, 6); g.fill(); g.stroke();
+    g.fillStyle = '#FFFDF6';
+    for (let i = 0; i < 5; i++){ g.beginPath(); g.arc(30 + i * 10, 61, 5, 0, TAU); g.fill(); }
+    for (let i = 0; i < 4; i++){ g.beginPath(); g.arc(37 + i * 9, 43, 4.2, 0, TAU); g.fill(); }
+    g.fillStyle = '#6BC6F0';
+    rr(g, 47, 26, 6, 16, 2.5); g.fill(); g.stroke();
+    g.fillStyle = '#FFFDF6';
+    rr(g, 47, 30, 6, 3, 1); g.fill();
+    rr(g, 47, 37, 6, 3, 1); g.fill();
+    g.fillStyle = '#FFC94B';
+    g.beginPath(); g.ellipse(50, 18, 4.5, 7.5, 0, 0, TAU); g.fill();
+    g.fillStyle = '#FFF3B8';
+    g.beginPath(); g.ellipse(50, 20, 2, 3.5, 0, 0, TAU); g.fill();
+  },
+  cloud(g){
+    out(g);
+    g.fillStyle = '#57607A';
+    g.beginPath();
+    g.arc(34, 44, 15, 0, TAU);
+    g.arc(52, 36, 19, 0, TAU);
+    g.arc(68, 46, 13, 0, TAU);
+    g.arc(50, 50, 17, 0, TAU);
+    g.fill(); g.stroke();
+    g.fillStyle = '#FFF';
+    g.beginPath(); g.ellipse(43, 44, 5, 6, 0, 0, TAU); g.fill();
+    g.beginPath(); g.ellipse(59, 44, 5, 6, 0, 0, TAU); g.fill();
+    g.fillStyle = '#2E3346';
+    g.beginPath(); g.arc(43.5, 46, 2.6, 0, TAU); g.fill();
+    g.beginPath(); g.arc(58.5, 46, 2.6, 0, TAU); g.fill();
+    g.strokeStyle = '#2E3346'; g.lineWidth = 3.5; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(36, 35); g.lineTo(48, 39); g.stroke();
+    g.beginPath(); g.moveTo(66, 35); g.lineTo(54, 39); g.stroke();
+    g.beginPath(); g.arc(51, 60, 6, Math.PI * 1.15, Math.PI * 1.85, true); g.stroke();
+    g.fillStyle = '#FFC94B';
+    g.strokeStyle = '#C98F1B'; g.lineWidth = 3;
+    g.beginPath();
+    g.moveTo(50, 64); g.lineTo(42, 78); g.lineTo(48, 78); g.lineTo(43, 92);
+    g.lineTo(57, 74); g.lineTo(51, 74); g.lineTo(56, 64);
+    g.closePath(); g.fill(); g.stroke();
+  },
+  brief(g){
+    out(g);
+    g.strokeStyle = OUTLINE; g.lineWidth = 5;
+    g.beginPath(); g.moveTo(42, 36); g.quadraticCurveTo(42, 27, 50, 27); g.quadraticCurveTo(58, 27, 58, 36); g.stroke();
+    g.fillStyle = '#FFFDF6';
+    g.beginPath(); g.moveTo(28, 34); g.lineTo(44, 30); g.lineTo(43, 40); g.closePath(); g.fill();
+    g.strokeStyle = '#9C8E7A'; g.lineWidth = 1.8;
+    g.beginPath(); g.moveTo(32, 34.5); g.lineTo(40, 32.5); g.stroke();
+    out(g);
+    g.fillStyle = '#7B6B58';
+    rr(g, 22, 36, 56, 40, 7); g.fill(); g.stroke();
+    g.strokeStyle = 'rgba(61,43,31,0.5)'; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(22, 50); g.lineTo(78, 50); g.stroke();
+    g.fillStyle = '#C9A84C';
+    rr(g, 34, 46, 8, 8, 2); g.fill();
+    rr(g, 58, 46, 8, 8, 2); g.fill();
+    g.fillStyle = '#FFF';
+    g.beginPath(); g.ellipse(42, 62, 5, 4.2, 0, 0, TAU); g.fill();
+    g.beginPath(); g.ellipse(58, 62, 5, 4.2, 0, 0, TAU); g.fill();
+    g.fillStyle = '#7B6B58';
+    rr(g, 36, 56, 12, 4.5, 2); g.fill();
+    rr(g, 52, 56, 12, 4.5, 2); g.fill();
+    g.fillStyle = '#2E3346';
+    g.beginPath(); g.arc(42, 63, 2.2, 0, TAU); g.fill();
+    g.beginPath(); g.arc(58, 63, 2.2, 0, TAU); g.fill();
+    g.strokeStyle = '#2E3346'; g.lineWidth = 3; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(44, 71); g.lineTo(56, 71); g.stroke();
+  },
+  pat_m(g){
+    out(g);
+    g.strokeStyle = '#6E8F5E'; g.lineWidth = 17; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(36, 74); g.quadraticCurveTo(38, 44, 60, 40); g.stroke();
+    out(g);
+    g.fillStyle = '#55524E';
+    rr(g, 27, 68, 20, 22, 5); g.fill(); g.stroke();
+    g.strokeStyle = '#EFC6A0'; g.lineWidth = 7; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(58, 48); g.lineTo(70, 64); g.stroke();
+    g.strokeStyle = '#8A5A33'; g.lineWidth = 4.5;
+    g.beginPath(); g.moveTo(70, 62); g.lineTo(70, 88); g.stroke();
+    g.beginPath(); g.arc(67, 62, 3.5, -0.5, Math.PI - 0.5, true); g.stroke();
+    g.fillStyle = '#EFC6A0';
+    g.beginPath(); g.arc(66, 32, 13.5, 0, TAU); g.fill();
+    out(g); g.stroke();
+    g.fillStyle = '#D8D8D8';
+    g.beginPath(); g.arc(60, 28, 6, 0, TAU); g.fill();
+    g.beginPath(); g.arc(56, 34, 4.5, 0, TAU); g.fill();
+    g.fillStyle = '#2E3346';
+    g.beginPath(); g.arc(70, 30, 2, 0, TAU); g.fill();
+    g.fillStyle = '#E5A87C';
+    g.beginPath(); g.arc(76, 34, 3.5, 0, TAU); g.fill();
+    g.strokeStyle = '#2E3346'; g.lineWidth = 2.5; g.lineCap = 'round';
+    g.beginPath(); g.arc(71, 41, 3, Math.PI * 1.2, Math.PI * 1.9); g.stroke();
+    g.strokeStyle = '#E85D4A'; g.lineWidth = 3.5;
+    g.beginPath(); g.moveTo(40, 52); g.lineTo(46, 47); g.lineTo(41, 43); g.lineTo(47, 38); g.stroke();
+  },
+  pat_w(g){
+    out(g);
+    g.strokeStyle = '#B07BE0'; g.lineWidth = 17; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(36, 74); g.quadraticCurveTo(38, 44, 60, 40); g.stroke();
+    g.fillStyle = '#B07BE0';
+    g.beginPath(); g.moveTo(26, 88); g.lineTo(46, 88); g.lineTo(44, 66); g.lineTo(30, 66); g.closePath(); g.fill();
+    out(g); g.stroke();
+    g.fillStyle = '#FFFDF6';
+    g.beginPath(); g.arc(33, 76, 2, 0, TAU); g.fill();
+    g.beginPath(); g.arc(40, 82, 2, 0, TAU); g.fill();
+    g.strokeStyle = '#EFC6A0'; g.lineWidth = 7; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(58, 48); g.lineTo(68, 63); g.stroke();
+    out(g);
+    g.fillStyle = '#C98F1B';
+    rr(g, 62, 64, 13, 11, 3); g.fill(); g.stroke();
+    g.fillStyle = '#EFC6A0';
+    g.beginPath(); g.arc(66, 32, 13.5, 0, TAU); g.fill();
+    out(g); g.stroke();
+    g.fillStyle = '#E8E8EE';
+    g.beginPath(); g.arc(57, 26, 7.5, 0, TAU); g.fill();
+    g.beginPath(); g.arc(52, 30, 5, 0, TAU); g.fill();
+    g.fillStyle = '#2E3346';
+    g.beginPath(); g.arc(70, 30, 2, 0, TAU); g.fill();
+    g.fillStyle = '#F2917E';
+    g.beginPath(); g.arc(74, 36, 3, 0, TAU); g.fill();
+    g.strokeStyle = '#2E3346'; g.lineWidth = 2.5; g.lineCap = 'round';
+    g.beginPath(); g.arc(71, 41, 3, Math.PI * 1.2, Math.PI * 1.9); g.stroke();
+    g.strokeStyle = '#E85D4A'; g.lineWidth = 3.5;
+    g.beginPath(); g.moveTo(40, 52); g.lineTo(46, 47); g.lineTo(41, 43); g.lineTo(47, 38); g.stroke();
+  },
+  heart(g){
+    out(g);
+    g.fillStyle = '#E8544A';
+    g.beginPath();
+    g.moveTo(50, 84);
+    g.bezierCurveTo(14, 58, 18, 24, 42, 26);
+    g.bezierCurveTo(48, 26.5, 50, 32, 50, 34);
+    g.bezierCurveTo(50, 32, 52, 26.5, 58, 26);
+    g.bezierCurveTo(82, 24, 86, 58, 50, 84);
+    g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,0.5)';
+    g.beginPath(); g.ellipse(36, 38, 6, 8, -0.5, 0, TAU); g.fill();
+  },
+  heart_off(g){
+    g.fillStyle = 'rgba(255,255,255,0.35)';
+    g.strokeStyle = 'rgba(61,43,31,0.35)';
+    g.lineWidth = 4.5; g.lineJoin = 'round';
+    g.beginPath();
+    g.moveTo(50, 84);
+    g.bezierCurveTo(14, 58, 18, 24, 42, 26);
+    g.bezierCurveTo(48, 26.5, 50, 32, 50, 34);
+    g.bezierCurveTo(50, 32, 52, 26.5, 58, 26);
+    g.bezierCurveTo(82, 24, 86, 58, 50, 84);
+    g.closePath(); g.fill(); g.stroke();
+  },
+  star(g){
+    g.fillStyle = '#FFC94B';
+    g.strokeStyle = '#C98F1B';
+    g.lineWidth = 5; g.lineJoin = 'round';
+    starG(g, 50, 54, 40);
+    g.fill(); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,0.55)';
+    g.beginPath(); g.ellipse(41, 42, 6, 9, -0.6, 0, TAU); g.fill();
+  },
+  paw(g){
+    g.fillStyle = '#7A4A2E';
+    g.strokeStyle = 'rgba(61,43,31,0.5)';
+    g.lineWidth = 3;
+    g.beginPath(); g.ellipse(50, 62, 21, 17, 0, 0, TAU); g.fill(); g.stroke();
+    for (const [x, y, r] of [[27, 40, 9.5], [43, 31, 10.5], [59, 31, 10.5], [74, 40, 9.5]]){
+      g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); g.stroke();
+    }
+  }
+};
+
+function kidSprite(g, k){
+  out(g);
+  // hårkalott bakom huvudet
+  g.fillStyle = k.hair;
+  g.beginPath(); g.arc(50, 37, 26, 0, TAU); g.fill(); g.stroke();
+  // extra frisyrer bakom ansiktet
+  if (k.style === 'pigtails'){
+    g.beginPath(); g.arc(23, 36, 11, 0, TAU); g.fill(); g.stroke();
+    g.beginPath(); g.arc(77, 36, 11, 0, TAU); g.fill(); g.stroke();
+  }
+  if (k.style === 'bob'){
+    rr(g, 21, 30, 11, 28, 5); g.fill(); g.stroke();
+    rr(g, 68, 30, 11, 28, 5); g.fill(); g.stroke();
+  }
+  if (k.style === 'fringe'){
+    rr(g, 22, 30, 9, 34, 4); g.fill(); g.stroke();
+    rr(g, 69, 30, 9, 34, 4); g.fill(); g.stroke();
+  }
+  if (k.style === 'ponytail'){
+    g.beginPath(); g.moveTo(72, 26);
+    g.quadraticCurveTo(86, 36, 80, 58);
+    g.quadraticCurveTo(74, 66, 71, 56);
+    g.quadraticCurveTo(74, 42, 66, 32);
+    g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#FFC94B';
+    rr(g, 70, 34, 10, 5, 2.5); g.fill();
+    g.fillStyle = k.hair;
+  }
+  // tröja
+  g.fillStyle = k.shirt;
+  rr(g, 23, 72, 54, 28, 11); g.fill(); g.stroke();
+  g.fillStyle = 'rgba(255,255,255,0.35)';
+  rr(g, 28, 76, 44, 6, 3); g.fill();
+  // hals + ansikte
+  g.fillStyle = k.skin;
+  rr(g, 44, 62, 12, 12, 4); g.fill();
+  g.beginPath(); g.arc(50, 42, 22, 0, TAU); g.fill();
+  out(g); g.beginPath(); g.arc(50, 42, 22, 0, TAU); g.stroke();
+  // frisyr framför ansiktet
+  g.fillStyle = k.hair;
+  if (k.style === 'tuft'){
+    for (const [x, y, r] of [[42, 20, 6], [50, 17, 7], [58, 20, 6]]){
+      g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); g.stroke();
+    }
+  } else if (k.style === 'fringe'){
+    rr(g, 30, 21, 40, 11, 5); g.fill(); g.stroke();
+  } else if (k.style === 'short'){
+    g.beginPath(); g.arc(50, 34, 22.5, Math.PI * 1.03, Math.PI * 1.97); g.quadraticCurveTo(50, 30, 28, 33.5); g.closePath(); g.fill(); g.stroke();
+  } else {
+    g.beginPath(); g.arc(50, 36, 22.5, Math.PI * 1.05, Math.PI * 1.95); g.quadraticCurveTo(50, 26, 28.5, 34); g.closePath(); g.fill();
+  }
+  // ögon + leende + kinder
+  g.fillStyle = '#2E3346';
+  g.beginPath(); g.arc(42, 42, 2.7, 0, TAU); g.fill();
+  g.beginPath(); g.arc(58, 42, 2.7, 0, TAU); g.fill();
+  g.strokeStyle = '#2E3346'; g.lineWidth = 2.8; g.lineCap = 'round';
+  g.beginPath(); g.arc(50, 45, 7.5, 0.25, Math.PI - 0.25); g.stroke();
+  g.fillStyle = 'rgba(242,145,126,0.5)';
+  g.beginPath(); g.arc(36, 49, 4, 0, TAU); g.fill();
+  g.beginPath(); g.arc(64, 49, 4, 0, TAU); g.fill();
+  if (k.style === 'bob'){ // Irmas fräknar
+    g.fillStyle = '#C98F63';
+    for (const [x, y] of [[42, 48], [46, 50], [54, 50], [58, 48]]){
+      g.beginPath(); g.arc(x, y, 1.1, 0, TAU); g.fill();
+    }
+  }
+}
+
+function buildSprites(){
+  for (const key of Object.keys(ICONS)) sprite(key, ICONS[key]);
+  for (const k of KIDS) sprite('kid_' + k.key, g => kidSprite(g, k));
+  window.__sprReady = true;
+}
+
+/* ============================================================
+   8. INMATNING
    ============================================================ */
 const keys = {};
 window.addEventListener('keydown', e => {
@@ -826,7 +1371,7 @@ cv.addEventListener('pointermove', e => {
   ptr.x = e.clientX;
   if (G.mode === 'playing'){ G.erik.usePointer = true; G.erik.tx = e.clientX; }
 });
-cv.addEventListener('pointerup', e => {
+cv.addEventListener('pointerup', () => {
   if (!ptr.down) return;
   const quick = performance.now() - ptr.t < 230 && ptr.moved < 14;
   ptr.down = false;
@@ -848,22 +1393,31 @@ function jump(){
 const gravity = () => H * 3.4;
 
 /* ============================================================
-   8. SPAWN & FYSIK
+   9. SPAWN & FYSIK — föremål, getingar, hundräddningar
    ============================================================ */
-function ramp(){ return clamp(G.elapsed / 150, 0, 1); }
+function ramp(){ return clamp(G.elapsed / 115, 0, 1); }
+
+function pickKid(){
+  const pool = [];
+  for (const k of KIDS){
+    const w = G.caught[k.key] ? 1 : 3;
+    for (let i = 0; i < w; i++) pool.push(k.key);
+  }
+  return pick(pool);
+}
 
 function spawnItem(forceType){
   let type = forceType;
   if (!type){
     const el = G.elapsed, r = ramp();
-    const wBad = el < 12 ? 0 : lerp(0.13, 0.27, r);
-    const wShoe = (G.fever <= 0 && G.feverSince > 13 && el > 16) ? 0.075 : 0;
-    const wCake = el > 40 ? 0.018 : 0;
+    const wBad = el < 10 ? 0 : lerp(0.15, 0.30, r);
+    const wShoe = (G.fever <= 0 && G.feverSince > 13 && el > 14) ? 0.07 : 0;
+    const wCake = el > 35 ? 0.02 : 0;
     const rest = 1 - wBad - wShoe - wCake;
     const roll = Math.random();
     let acc = 0;
     const table = [
-      ['tool', rest * 0.36], ['kid', rest * 0.33], ['patient', rest * 0.31],
+      ['tool', rest * 0.34], ['kid', rest * 0.36], ['patient', rest * 0.30],
       ['shoe', wShoe], ['cake', wCake],
       ['cloud', wBad * 0.55], ['brief', wBad * 0.45]
     ];
@@ -872,16 +1426,28 @@ function spawnItem(forceType){
   }
   const T = TYPES[type];
   const m = U * 0.55;
-  G.items.push({
+  const it = {
     type,
-    emo: pick(T.emo),
     x: rnd(m, W - m),
     y: -U * 0.5,
-    vy: H * (0.20 + 0.17 * ramp()) * rnd(0.85, 1.22) * (G.fever > 0 ? 0.92 : 1),
+    vy: H * (0.21 + 0.20 * ramp()) * rnd(0.85, 1.22) * (G.fever > 0 ? 0.92 : 1),
     sway: rnd(0.4, 1.2) * (Math.random() < 0.5 ? -1 : 1),
     seed: rnd(TAU),
-    r: U * 0.30
-  });
+    r: U * 0.30,
+    dogged: false, dead: false
+  };
+  if (type === 'kid'){
+    it.kid = pickKid();
+    it.spr = 'kid_' + it.kid;
+  } else {
+    it.spr = pick(T.sprs);
+  }
+  G.items.push(it);
+}
+
+function removeItem(i){
+  G.items[i].dead = true;
+  G.items.splice(i, 1);
 }
 
 function updateItems(dt){
@@ -891,7 +1457,6 @@ function updateItems(dt){
     const it = G.items[i];
     it.y += it.vy * dt;
     it.x += Math.sin(G.t * it.sway + it.seed) * dt * U * 0.35;
-    // magnet i balettfeber
     if (G.fever > 0 && TYPES[it.type].good){
       const dx = e.x - it.x, dy = chestY - it.y;
       const d = Math.hypot(dx, dy);
@@ -902,23 +1467,126 @@ function updateItems(dt){
       }
     }
     it.x = clamp(it.x, it.r, W - it.r);
-    // fångst?
+    // hundlarm: bra sak på väg att missas?
+    if (!it.dogged && G.fever <= 0 && TYPES[it.type].good &&
+        it.y > groundY - U * 1.55 && it.y < groundY){
+      let best = null, bestD = 1e9;
+      for (const d of G.dogs){
+        if (d.cd > 0 || d.state !== 'follow') continue;
+        const dist = Math.abs(it.x - d.x);
+        if (dist < d.range * W && dist < bestD){ best = d; bestD = dist; }
+      }
+      if (best){
+        best.state = 'dash';
+        best.item = it;
+        it.dogged = true;
+        AudioMan.sfxDash();
+      }
+    }
+    // fångst av Erik?
     const dx = it.x - e.x, dy = it.y - chestY;
     if (Math.hypot(dx, dy) < it.r + U * 0.46 && (G.invuln <= 0 || TYPES[it.type].good)){
-      G.items.splice(i, 1);
+      removeItem(i);
       onCatch(it);
       continue;
     }
-    // missad → marken
+    // marken
     if (it.y > groundY + it.r * 0.4){
-      G.items.splice(i, 1);
+      removeItem(i);
       onMiss(it);
     }
   }
 }
 
+function spawnWasp(){
+  const dir = Math.random() < 0.5 ? 1 : -1;
+  G.wasps.push({
+    x: dir > 0 ? -U * 0.6 : W + U * 0.6,
+    dir,
+    sp: W * (0.24 + 0.15 * ramp()),
+    baseY: groundY - U * rnd(0.7, 2.1),
+    amp: U * rnd(0.25, 0.7),
+    ph: rnd(TAU),
+    t: 0, y: 0
+  });
+  addFloat(dir > 0 ? U : W - U, groundY - U * 2.4, 'BZZZZ!', '#C98F1B', 0.9);
+}
+function updateWasps(dt){
+  const e = G.erik;
+  for (let i = G.wasps.length - 1; i >= 0; i--){
+    const w = G.wasps[i];
+    w.t += dt;
+    w.x += w.dir * w.sp * dt;
+    w.y = w.baseY + Math.sin(w.t * 3 + w.ph) * w.amp;
+    if ((w.dir > 0 && w.x > W + U) || (w.dir < 0 && w.x < -U)){
+      G.wasps.splice(i, 1);
+      continue;
+    }
+    if (G.invuln <= 0 && G.mode === 'playing'){
+      const d = Math.hypot(w.x - e.x, w.y - (e.y - U * 0.75));
+      if (d < U * 0.55){
+        G.wasps.splice(i, 1);
+        hurt('GETING! AJ!');
+      }
+    }
+  }
+}
+
+function updateDogs(dt){
+  for (const d of G.dogs){
+    if (d.cd > 0) d.cd -= dt;
+    if (d.cel > 0) d.cel -= dt;
+    d.ph += dt * (6 + Math.abs(d.sp) / (W * 0.08));
+    if (d.item && d.item.dead){ d.item = null; if (d.state === 'dash') d.state = 'follow'; }
+
+    let tx;
+    if (d.state === 'dash' && d.item){
+      tx = d.item.x;
+      const step = clamp(tx - d.x, -W * d.dashSp * dt, W * d.dashSp * dt);
+      d.x += step;
+      d.sp = step / dt;
+      // fångst med munnen
+      if (Math.abs(d.x - d.item.x) < U * 0.4 && d.item.y > groundY - U * 1.0){
+        const it = d.item;
+        const idx = G.items.indexOf(it);
+        if (idx >= 0){
+          removeItem(idx);
+          onDogSave(d, it);
+        }
+        d.item = null;
+        d.state = 'follow';
+      }
+    } else {
+      const e = G.erik;
+      if (G.fever > 0){
+        tx = W / 2 + d.side * Math.min(W * 0.38, U * 3.6);
+      } else if (G.mode === 'title'){
+        tx = e.x + d.side * U * (d.big ? 1.7 : 1.3) + Math.sin(G.t * 0.7 + d.side) * U * 0.5;
+      } else {
+        tx = e.x + d.side * U * (d.big ? 1.5 : 1.15);
+      }
+      const step = (tx - d.x) * Math.min(1, dt * 5);
+      d.x += step;
+      d.sp = step / dt;
+    }
+    d.x = clamp(d.x, U * 0.35, W - U * 0.35);
+    if (Math.abs(d.sp) > W * 0.02) d.face = d.sp > 0 ? 1 : -1;
+  }
+}
+
+function onDogSave(d, it){
+  G.stats.saves++;
+  G.score += 50;
+  d.cd = d.cdMax;
+  d.cel = 1.0;
+  AudioMan.sfxWoof(d.big);
+  burst(it.x, groundY - U * 0.5, '#7A4A2E', 10);
+  addFloat(it.x, groundY - U * 1.1, d.name.toUpperCase() + ' RÄDDAR!', '#7A4A2E', 1.0);
+  addFloat(it.x, groundY - U * 0.6, 'Kombon lever! +50', '#33261D', 0.75);
+}
+
 /* ============================================================
-   9. FÅNGST, POÄNG, LIV
+   10. FÅNGST, POÄNG, LIV, SAMLING
    ============================================================ */
 const multOf = () => Math.min(1 + Math.floor(G.combo / 6), 5);
 
@@ -929,38 +1597,60 @@ function onCatch(it){
     G.combo++;
     G.stats.maxCombo = Math.max(G.stats.maxCombo, G.combo);
     const air = !e.onGround;
-    let pts = T.base * multOf();
+    let base = T.base;
+    let label = pick(T.pops);
+    let ringCol = T.ring;
+
+    if (it.type === 'kid'){
+      const meta = kidByKey(it.kid);
+      const first = !G.caught[it.kid];
+      if (first){ G.caught[it.kid] = G.t; base += 300; label = meta.name + ' ÄR MED!'; }
+      else label = meta.name + '!';
+      G.stats.kidCatches++;
+      e.rider = meta;
+      e.kidT = 6;
+      AudioMan.sfxGiggle();
+      if (first && Object.keys(G.caught).length === KIDS.length && !G.gangDone){
+        G.gangDone = true;
+        G.score += 1500;
+        AudioMan.sfxGang();
+        confetti(W / 2, H * 0.32, 70);
+        addFloat(W / 2, H * 0.3, 'HELA GÄNGET! +1500', '#FF6FA0', 1.5, true);
+      }
+    }
+    let pts = base * multOf();
     if (G.fever > 0) pts *= 2;
     if (air) pts = Math.round(pts * 1.5 / 10) * 10;
     G.score += pts;
-    burst(it.x, it.y, T.ring, air ? 22 : 14);
-    let label = pick(T.pops);
+    burst(it.x, it.y, ringCol, air ? 22 : 14);
     if (it.type === 'tool'){ G.stats.tool++; e.hatT = 0.8; AudioMan.sfxRatchet(); }
-    if (it.type === 'kid'){ G.stats.kid++; e.kidT = 6; AudioMan.sfxGiggle(); }
     if (it.type === 'patient'){ G.stats.patient++; e.glowT = 0.5; AudioMan.sfxCrack(); crackStar(it.x, it.y); }
     if (it.type === 'cake'){ G.stats.cake++; AudioMan.sfxCake(); confetti(it.x, it.y, 40); }
     if (it.type === 'shoe'){ startFever(); }
-    else AudioMan.sfxPop(G.combo);
-    addFloat(it.x, it.y - U * 0.3, label, T.ring, 1);
+    else if (it.type !== 'kid') AudioMan.sfxPop(G.combo);
+    addFloat(it.x, it.y - U * 0.3, label, ringCol, 1);
     addFloat(it.x, it.y + U * 0.16, '+' + pts + (multOf() > 1 ? '  ×' + multOf() : ''), '#33261D', 0.8);
-    if (air){ G.stats.air++; addFloat(e.x, e.y - U * 1.9, 'LUFTFÅNGST! ✨', '#B07BE0', 0.9); }
+    if (air){ G.stats.air++; addFloat(e.x, e.y - U * 1.9, 'LUFTFÅNGST!', '#B07BE0', 0.9); }
   } else {
-    if (G.invuln > 0) return;
-    G.lives--;
-    G.combo = 0;
-    G.invuln = 1.3;
-    G.shake = REDUCED ? 0 : 0.45;
-    G.flash = 0.5;
-    AudioMan.sfxWomp();
+    hurt(pick(T.pops));
     burst(it.x, it.y, '#5A5A73', 18);
-    addFloat(it.x, it.y - U * 0.3, pick(T.pops), '#3E415C', 1.1);
-    if (G.lives <= 0) beginDeath();
   }
+}
+function hurt(label){
+  if (G.invuln > 0) return;
+  G.lives--;
+  G.combo = 0;
+  G.invuln = 1.3;
+  G.shake = REDUCED ? 0 : 0.45;
+  G.flash = 0.5;
+  AudioMan.sfxWomp();
+  addFloat(G.erik.x, G.erik.y - U * 2, label, '#3E415C', 1.1);
+  if (G.lives <= 0) beginDeath();
 }
 function onMiss(it){
   const T = TYPES[it.type];
   if (T.good){
-    if (G.combo >= 6) addFloat(it.x, groundY - U * 0.3, 'KOMBO BRUTEN! 😅', '#8A6E5B', 0.9);
+    if (G.combo >= 6) addFloat(it.x, groundY - U * 0.3, 'KOMBO BRUTEN!', '#8A6E5B', 0.9);
     G.combo = 0;
     AudioMan.sfxMiss();
     poof(it.x, groundY - it.r * 0.4);
@@ -983,15 +1673,17 @@ function endFever(){
   G.erik.spin = 0;
   AudioMan.startMusic('pop');
 }
-
 function beginDeath(){
   G.mode = 'dying';
   G.dieT = 0;
+  for (const it of G.items) it.dead = true;
+  G.items.length = 0;
+  G.wasps.length = 0;
   AudioMan.stopMusic();
 }
 
 /* ============================================================
-   10. PARTIKLAR & FLYTANDE TEXT
+   11. PARTIKLAR & FLYTANDE TEXT
    ============================================================ */
 function burst(x, y, color, n){
   n = REDUCED ? Math.min(n, 6) : n;
@@ -1036,6 +1728,8 @@ function updateParts(dt){
   if (G.parts.length > 420) G.parts.splice(0, G.parts.length - 420);
 }
 function addFloat(x, y, txt, color, scale, big){
+  if (!big){ x += rnd(-U * 0.28, U * 0.28); y += rnd(-U * 0.12, U * 0.12); } // undvik textstaplar
+  x = clamp(x, U * 0.8, W - U * 0.8);
   G.floats.push({ x, y, txt, color, scale: scale || 1, big: !!big, age: 0, life: big ? 1.6 : 1.05 });
 }
 function updateFloats(dt){
@@ -1047,7 +1741,7 @@ function updateFloats(dt){
 }
 
 /* ============================================================
-   11. RITNING — värld
+   12. RITNING — värld
    ============================================================ */
 function drawSky(){
   const g = ctx.createLinearGradient(0, 0, 0, H);
@@ -1060,8 +1754,7 @@ function drawSky(){
   ctx.fillRect(0, 0, W, H);
 
   if (G.fever <= 0 && G.mode !== 'dying'){
-    // sol med snurrande strålar
-    const sx = W * 0.82, sy = H * 0.16, sr = U * 0.5;
+    const sx = W * 0.84, sy = H * 0.15, sr = U * 0.48;
     ctx.save();
     ctx.translate(sx, sy);
     ctx.rotate(G.t * 0.08);
@@ -1081,7 +1774,6 @@ function drawSky(){
     ctx.fillStyle = sg;
     ctx.beginPath(); ctx.arc(sx, sy, sr, 0, TAU); ctx.fill();
 
-    // moln
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
     drawCloud(((G.t * 12) % (W + 300)) - 150, H * 0.13, U * 0.5);
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
@@ -1098,13 +1790,11 @@ function drawCloud(x, y, s){
   ctx.fill();
 }
 function drawBackdrop(){
-  // röda stugor + björkar på horisonten
   const hy = groundY;
   const dim = (G.fever > 0 || G.mode === 'dying') ? 0.35 : 1;
   ctx.save();
   ctx.globalAlpha = dim;
 
-  // bakre ängskulle
   ctx.fillStyle = '#A9DB8E';
   ctx.beginPath();
   ctx.moveTo(0, hy);
@@ -1147,7 +1837,6 @@ function drawBackdrop(){
   birch(W * 0.31, U * 0.66);
   birch(W * 0.7, U * 0.56);
 
-  // vimplar över himlen
   ctx.strokeStyle = 'rgba(120,90,60,0.5)';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
@@ -1175,7 +1864,6 @@ function drawGround(){
   ctx.fillStyle = dim ? '#403D2E' : '#5DAF54';
   ctx.fillRect(0, groundY, W, Math.max(6, U * 0.07));
   if (!dim){
-    // blommor
     for (let i = 0; i < 9; i++){
       const fx = ((i * 997) % 100) / 100 * W;
       const fy = groundY + ((i * 613) % 100) / 100 * (H - groundY - 14) + 10;
@@ -1201,7 +1889,6 @@ function drawSpotlight(){
   gr.addColorStop(1, 'rgba(14,9,30,0.66)');
   ctx.fillStyle = gr;
   ctx.fillRect(0, 0, W, H);
-  // ljuskägla från ovan
   ctx.save();
   ctx.globalAlpha = 0.16;
   ctx.fillStyle = '#FFF3C0';
@@ -1220,9 +1907,6 @@ function drawCurtains(){
   if (open <= 0.001) return;
   const cw = W * 0.5 * open;
   const fold = (x0, wPx, flip) => {
-    const g = ctx.createLinearGradient(x0, 0, x0 + wPx * (flip ? -1 : 1), 0);
-    g.addColorStop(0, '#7E2F22');
-    g.addColorStop(1, '#B0473317');
     ctx.fillStyle = '#9E3F2F';
     ctx.fillRect(Math.min(x0, x0 + (flip ? -wPx : wPx)), 0, wPx, H);
     ctx.fillStyle = 'rgba(60,18,12,0.35)';
@@ -1233,13 +1917,11 @@ function drawCurtains(){
       ctx.ellipse(fx, H * 0.5, wPx / n * 0.22, H * 0.52, 0, 0, TAU);
       ctx.fill();
     }
-    // guldkant
     ctx.fillStyle = '#FFC94B';
     ctx.fillRect(flip ? x0 - wPx : x0 + wPx - 6, 0, 6, H);
   };
   fold(0, cw, false);
   fold(W, cw, true);
-  // valans upptill
   ctx.fillStyle = '#7E2F22';
   ctx.fillRect(0, 0, W, U * 0.34);
   ctx.fillStyle = '#9E3F2F';
@@ -1254,25 +1936,22 @@ function drawCurtains(){
 }
 
 /* ============================================================
-   12. RITNING — föremål, partiklar, text
+   13. RITNING — föremål, getingar, partiklar, text
    ============================================================ */
-function emoFont(px){ return px + 'px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif'; }
-
 function drawItems(){
   for (const it of G.items){
     const T = TYPES[it.type];
-    const wob = Math.sin(G.t * 3 + it.seed) * 0.14;
+    const ring = it.kid ? kidByKey(it.kid).shirt : T.ring;
+    const wob = Math.sin(G.t * 3 + it.seed) * 0.12;
     ctx.save();
     ctx.translate(it.x, it.y);
-    ctx.rotate(wob + (it.type === 'patient' ? 0.35 : 0));
-    // skugga
+    ctx.rotate(wob);
     ctx.fillStyle = 'rgba(30,20,50,0.14)';
     ctx.beginPath(); ctx.ellipse(0, it.r * 0.22, it.r * 1.02, it.r * 1.02, 0, 0, TAU); ctx.fill();
-    // bricka
     ctx.fillStyle = T.good ? '#FFFDF6' : '#494D68';
     ctx.beginPath(); ctx.arc(0, 0, it.r, 0, TAU); ctx.fill();
     ctx.lineWidth = Math.max(3, it.r * 0.14);
-    ctx.strokeStyle = T.ring;
+    ctx.strokeStyle = ring;
     ctx.stroke();
     if (it.type === 'shoe' || it.type === 'cake'){
       ctx.save();
@@ -1283,10 +1962,52 @@ function drawItems(){
       ctx.beginPath(); ctx.arc(0, 0, it.r + 6, 0, TAU); ctx.stroke();
       ctx.restore();
     }
-    ctx.font = emoFont(Math.round(it.r * 1.22));
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(it.emo, 0, it.r * 0.08);
+    drawSpr(it.spr, 0, 0, it.r * 1.86);
+    ctx.restore();
+  }
+}
+function drawWasps(){
+  for (const w of G.wasps){
+    ctx.save();
+    ctx.translate(w.x, w.y);
+    ctx.scale(w.dir, 1);
+    const flap = Math.sin(G.t * 42 + w.ph) * 0.6;
+    // vingar
+    ctx.fillStyle = 'rgba(255,255,255,0.65)';
+    ctx.strokeStyle = 'rgba(120,130,160,0.6)';
+    ctx.lineWidth = 1.5;
+    for (const s of [-1, 1]){
+      ctx.save();
+      ctx.translate(-U * 0.02, -U * 0.1);
+      ctx.rotate(-0.5 + flap * s * 0.5);
+      ctx.beginPath(); ctx.ellipse(0, -U * 0.09, U * 0.06, U * 0.13, 0, 0, TAU);
+      ctx.fill(); ctx.stroke();
+      ctx.restore();
+    }
+    // kropp med ränder
+    ctx.fillStyle = '#FFD34D';
+    ctx.strokeStyle = OUTLINE;
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(0, 0, U * 0.17, U * 0.115, 0, 0, TAU);
+    ctx.fill(); ctx.stroke();
+    ctx.save();
+    ctx.beginPath(); ctx.ellipse(0, 0, U * 0.17, U * 0.115, 0, 0, TAU); ctx.clip();
+    ctx.fillStyle = '#2E3346';
+    ctx.fillRect(-U * 0.085, -U * 0.14, U * 0.05, U * 0.28);
+    ctx.fillRect(-U * 0.005, -U * 0.14, U * 0.05, U * 0.28);
+    ctx.restore();
+    // stjärt-tagg
+    ctx.fillStyle = '#2E3346';
+    ctx.beginPath();
+    ctx.moveTo(-U * 0.16, 0); ctx.lineTo(-U * 0.24, U * 0.02); ctx.lineTo(-U * 0.16, U * 0.045);
+    ctx.closePath(); ctx.fill();
+    // huvud
+    ctx.beginPath(); ctx.arc(U * 0.19, -U * 0.01, U * 0.065, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#FFF';
+    ctx.beginPath(); ctx.arc(U * 0.21, -U * 0.03, U * 0.018, 0, TAU); ctx.fill();
+    ctx.strokeStyle = '#2E3346'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(U * 0.22, -U * 0.06); ctx.quadraticCurveTo(U * 0.28, -U * 0.12, U * 0.26, -U * 0.15); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(U * 0.19, -U * 0.07); ctx.quadraticCurveTo(U * 0.23, -U * 0.14, U * 0.20, -U * 0.17); ctx.stroke();
     ctx.restore();
   }
 }
@@ -1317,10 +2038,10 @@ function drawParts(){
 function starPath(r){
   ctx.beginPath();
   for (let i = 0; i < 10; i++){
-    const rr = i % 2 === 0 ? r : r * 0.45;
+    const rr2 = i % 2 === 0 ? r : r * 0.45;
     const a = -Math.PI / 2 + i * Math.PI / 5;
-    if (i === 0) ctx.moveTo(Math.cos(a) * rr, Math.sin(a) * rr);
-    else ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+    if (i === 0) ctx.moveTo(Math.cos(a) * rr2, Math.sin(a) * rr2);
+    else ctx.lineTo(Math.cos(a) * rr2, Math.sin(a) * rr2);
   }
   ctx.closePath();
 }
@@ -1348,11 +2069,152 @@ function drawFloats(){
 }
 
 /* ============================================================
-   13. RITNING — ERIK (vektorfigur)
+   14. RITNING — HUNDARNA Lillen & Bernard (bruna aussies)
+   ============================================================ */
+function drawDog(d){
+  const big = d.big;
+  const s = U / 100 * (big ? 1.02 : 0.76);
+  const BODY = big ? '#754526' : '#8F5E3C';
+  const DARK = big ? '#5C3720' : '#6E4429';
+  const CREAM = '#F7EFE2';
+  const COPPER = '#C4874F';
+  const moving = Math.abs(d.sp) > W * 0.02;
+  const trot = moving ? Math.sin(d.ph * 2.2) : 0;
+  const dashPose = d.state === 'dash';
+  const hop = d.cel > 0 ? Math.abs(Math.sin(d.cel * 9)) * 10 : 0;
+
+  ctx.save();
+  ctx.translate(d.x, groundY - hop * s);
+  // skugga
+  ctx.save();
+  ctx.globalAlpha = 0.16;
+  ctx.fillStyle = '#1E2340';
+  ctx.beginPath(); ctx.ellipse(0, 2, 44 * s, 9 * s, 0, 0, TAU); ctx.fill();
+  ctx.restore();
+
+  ctx.scale(d.face * s * (dashPose ? 1.14 : 1), s);
+
+  // bakre ben
+  ctx.strokeStyle = DARK;
+  ctx.lineWidth = 8;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-30, -26); ctx.lineTo(-30 - trot * 9, 0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-21, -26); ctx.lineTo(-21 + trot * 7, 0); ctx.stroke();
+
+  // svansstubb (viftar!)
+  const wag = Math.sin(G.t * (d.cel > 0 ? 26 : 11) + d.ph) * 0.5;
+  ctx.save();
+  ctx.translate(-38, -42);
+  ctx.rotate(wag);
+  ctx.fillStyle = BODY;
+  ctx.beginPath(); ctx.arc(-3, -3, 8, 0, TAU); ctx.fill();
+  ctx.fillStyle = CREAM;
+  ctx.beginPath(); ctx.arc(-6, -6, 4.5, 0, TAU); ctx.fill();
+  ctx.restore();
+
+  // kropp
+  ctx.fillStyle = BODY;
+  ctx.beginPath(); ctx.ellipse(0, -34, 37, 18.5, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  ctx.beginPath(); ctx.ellipse(-18, -32, 17, 14, 0, 0, TAU); ctx.fill();
+  // bringa (vit fluff)
+  ctx.fillStyle = CREAM;
+  ctx.beginPath(); ctx.arc(26, -30, 12, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(30, -22, 8.5, 0, TAU); ctx.fill();
+
+  // främre ben (vita tassar)
+  ctx.strokeStyle = BODY;
+  ctx.lineWidth = 8;
+  ctx.beginPath(); ctx.moveTo(24, -26); ctx.lineTo(24 + trot * 9, -4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(32, -26); ctx.lineTo(32 - trot * 7, -4); ctx.stroke();
+  ctx.fillStyle = CREAM;
+  ctx.beginPath(); ctx.arc(24 + trot * 9, -2.5, 4.6, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(32 - trot * 7, -2.5, 4.6, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(-30 - trot * 9, -2.5, 4.4, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(-21 + trot * 7, -2.5, 4.4, 0, TAU); ctx.fill();
+
+  // huvud
+  ctx.save();
+  ctx.translate(42, -52 + (dashPose ? 4 : 0));
+  ctx.rotate(dashPose ? 0.12 : Math.sin(G.t * 2 + d.ph) * 0.05);
+  // öra bakre (hänger ner längs huvudet)
+  ctx.fillStyle = DARK;
+  ctx.save();
+  ctx.translate(-9, -11);
+  ctx.rotate((dashPose ? 1.5 : 1.05) + trot * 0.1);
+  ctx.beginPath(); ctx.ellipse(-7, 0, 11, 6.5, 0, 0, TAU); ctx.fill();
+  ctx.restore();
+  // skalle
+  ctx.fillStyle = BODY;
+  ctx.beginPath(); ctx.arc(0, 0, 15.5, 0, TAU); ctx.fill();
+  // bläs
+  ctx.fillStyle = CREAM;
+  ctx.beginPath();
+  ctx.moveTo(-2, -14); ctx.quadraticCurveTo(4, -6, 4, 2); ctx.lineTo(-4, 2);
+  ctx.quadraticCurveTo(-7, -8, -2, -14);
+  ctx.closePath(); ctx.fill();
+  // nos
+  ctx.fillStyle = CREAM;
+  ctx.beginPath(); ctx.ellipse(11, 3, 9, 6.5, 0.1, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#2E2A26';
+  ctx.beginPath(); ctx.arc(17.5, 1.5, 3.4, 0, TAU); ctx.fill();
+  ctx.strokeStyle = '#2E2A26'; ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(15, 5); ctx.quadraticCurveTo(11, 8, 7, 6); ctx.stroke();
+  // tunga (glad/firar)
+  if (d.cel > 0 || (!moving && Math.sin(G.t * 0.7 + d.ph) > 0.4)){
+    ctx.fillStyle = '#F2917E';
+    ctx.beginPath(); ctx.ellipse(12, 9, 3.2, 5, 0.2, 0, TAU); ctx.fill();
+  }
+  // öga + kopparbryn
+  ctx.fillStyle = '#2E2A26';
+  ctx.beginPath(); ctx.arc(1, -4, 3.3, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#FFF';
+  ctx.beginPath(); ctx.arc(2, -5, 1.2, 0, TAU); ctx.fill();
+  ctx.fillStyle = COPPER;
+  ctx.beginPath(); ctx.arc(0, -9.5, 2.4, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(-6, 4, 4.5, 3.2, 0, 0, TAU); ctx.fill();
+  if (!big){ // Lillens ögonfransar
+    ctx.strokeStyle = '#2E2A26'; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(3.5, -6.5); ctx.lineTo(5.5, -8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(2, -7.5); ctx.lineTo(3.2, -9.5); ctx.stroke();
+  }
+  // öra främre (hänger och floppar)
+  ctx.fillStyle = DARK;
+  ctx.save();
+  ctx.translate(-1, -13);
+  ctx.rotate((dashPose ? 1.35 : 0.95) + trot * 0.14);
+  ctx.beginPath(); ctx.ellipse(-7, 1, 11.5, 7, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = COPPER;
+  ctx.beginPath(); ctx.ellipse(-8.5, 1.5, 6, 3.5, 0, 0, TAU); ctx.fill();
+  ctx.restore();
+  ctx.restore(); // huvud
+
+  // halsband + bricka
+  ctx.strokeStyle = big ? '#3E6FB0' : '#E8779E';
+  ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(30, -44); ctx.quadraticCurveTo(38, -40, 40, -36); ctx.stroke();
+  const ready = d.cd <= 0;
+  ctx.fillStyle = ready ? '#FFC94B' : '#9C9C9C';
+  ctx.beginPath(); ctx.arc(37, -36, 3.6, 0, TAU); ctx.fill();
+
+  ctx.restore();
+
+  // "redo"-tass över huvudet
+  if (d.cd <= 0 && (G.mode === 'playing') && G.fever <= 0 && d.state === 'follow'){
+    const bobb = Math.sin(G.t * 4 + d.ph) * 4;
+    ctx.save();
+    ctx.globalAlpha = 0.55 + Math.sin(G.t * 6) * 0.2;
+    drawSpr('paw', d.x + d.face * 30 * s, groundY - (big ? 96 : 84) * s + bobb, U * 0.15);
+    ctx.restore();
+  }
+}
+
+/* ============================================================
+   15. RITNING — ERIK (vektorfigur, STAYHOT-stil)
    ============================================================ */
 const SKIN = '#F2C49B', SKIN_D = '#DBA97F',
-      HAIR = '#C99B62', HAIR_D = '#AD7F49',
-      SHIRT = '#3E5C8F', SHIRT_D = '#31497A',
+      HAIR = '#B08A55', HAIR_D = '#93703F', BEARD = '#8A6437',
+      TEE = '#3A4160', TEE_D = '#2E3350', TIE = '#F08CA0',
       PANTS = '#2E3550', SHOE_C = '#7A4A2B';
 
 function drawErik(){
@@ -1364,7 +2226,6 @@ function drawErik(){
   const dizzy = (G.mode === 'playing' && G.invuln > 0.6);
   const bowK = e.bow;
 
-  // piruett: skala i x för snurr-illusion
   let sx = e.face, spinLean = 0;
   if (G.fever > 0){
     const c = Math.cos(e.spin);
@@ -1377,7 +2238,6 @@ function drawErik(){
   ctx.save();
   ctx.translate(e.x, feet + bob);
 
-  // skugga
   ctx.save();
   ctx.globalAlpha = 0.18;
   ctx.fillStyle = '#1E2340';
@@ -1407,10 +2267,8 @@ function drawErik(){
     ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    const kneeX = 0, kneeY = legL * 0.55;
-    ctx.quadraticCurveTo(kneeX + U * 0.03, kneeY, 0, legL * (ballet ? 0.92 : 1) - U * 0.06);
+    ctx.quadraticCurveTo(U * 0.03, legL * 0.55, 0, legL * (ballet ? 0.92 : 1) - U * 0.06);
     ctx.stroke();
-    // sko / tåspets
     ctx.fillStyle = ballet ? '#F48FB1' : SHOE_C;
     if (ballet){
       ctx.save();
@@ -1433,10 +2291,9 @@ function drawErik(){
     ctx.translate(0, hipY + U * 0.02);
     ctx.fillStyle = '#F8BBD9';
     for (let i = 0; i < 9; i++){
-      const a = (i / 9) * Math.PI - Math.PI;
       const flare = 1 + Math.sin(t * 14 + i) * 0.08;
       ctx.beginPath();
-      ctx.ellipse(Math.cos(a + Math.PI / 2) * 0 + (i - 4) * U * 0.085,
+      ctx.ellipse((i - 4) * U * 0.085,
                   Math.sin(t * 10 + i) * U * 0.01,
                   U * 0.14 * flare, U * 0.07 * flare, (i - 4) * 0.12, 0, TAU);
       ctx.fill();
@@ -1446,59 +2303,94 @@ function drawErik(){
     ctx.restore();
   }
 
-  // ---- kropp (jeansskjorta)
-  ctx.fillStyle = SHIRT;
-  ctx.beginPath();
+  // ---- kropp: STAYHOT-t-shirt (marinblå med rosa batikmönster)
   const bw = U * 0.24;
+  ctx.fillStyle = TEE;
+  ctx.beginPath();
   ctx.moveTo(-bw * 0.82, hipY);
   ctx.quadraticCurveTo(-bw * 1.16, (hipY + shoY) / 2, -bw * 0.94, shoY + U * 0.02);
   ctx.quadraticCurveTo(0, shoY - U * 0.10, bw * 0.94, shoY + U * 0.02);
   ctx.quadraticCurveTo(bw * 1.16, (hipY + shoY) / 2, bw * 0.82, hipY);
   ctx.closePath();
   ctx.fill();
-  // knappar + krage
-  ctx.fillStyle = '#D8E2F2';
-  for (let i = 0; i < 3; i++){
+  // batik-strålar (rosa blekmönster runt hela tröjan)
+  ctx.save();
+  ctx.clip();
+  ctx.strokeStyle = TIE;
+  ctx.globalAlpha = 0.5;
+  ctx.lineCap = 'round';
+  const cxT = 0, cyT = shoY + torso * 0.62;
+  for (let i = 0; i < 10; i++){
+    const a = i / 10 * TAU + 0.3;
+    ctx.lineWidth = U * (0.014 + (i % 3) * 0.009);
     ctx.beginPath();
-    ctx.arc(0, shoY + U * 0.12 + i * U * 0.13, U * 0.018, 0, TAU);
-    ctx.fill();
+    ctx.moveTo(cxT + Math.cos(a) * U * 0.05, cyT + Math.sin(a) * U * 0.05);
+    ctx.lineTo(cxT + Math.cos(a) * U * 0.6, cyT + Math.sin(a) * U * 0.6);
+    ctx.stroke();
   }
-  ctx.strokeStyle = SHIRT_D;
+  ctx.globalAlpha = 0.35;
+  ctx.fillStyle = TIE;
+  ctx.beginPath(); ctx.arc(cxT, cyT, U * 0.045, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(-bw * 0.62, hipY - U * 0.05, U * 0.035, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(bw * 0.66, shoY + U * 0.3, U * 0.03, 0, TAU); ctx.fill();
+  ctx.restore();
+  // krage + STAYHOT-tryck (ritas ovanpå mönstret)
+  ctx.strokeStyle = TEE_D;
   ctx.lineWidth = U * 0.03;
   ctx.beginPath();
-  ctx.moveTo(-U * 0.09, shoY + U * 0.01);
-  ctx.lineTo(0, shoY + U * 0.09);
-  ctx.lineTo(U * 0.09, shoY + U * 0.01);
+  ctx.arc(0, shoY + U * 0.02, U * 0.085, 0.15, Math.PI - 0.15);
   ctx.stroke();
+  if (Math.abs(sx) > 0.5){
+    ctx.save();
+    ctx.translate(0, 0);
+    ctx.scale(1 / sx, 1); // neutralisera spegling/spinn så trycket alltid läses rätt
+    ctx.font = '800 ' + Math.max(8, Math.round(U * 0.068)) + 'px "Baloo 2","Nunito",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = U * 0.028;
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = TEE_D;
+    ctx.strokeText('STAYHOT', 0, shoY + U * 0.17);
+    ctx.fillStyle = '#FF8A3D';
+    ctx.fillText('STAYHOT', 0, shoY + U * 0.17);
+    ctx.restore();
+  }
 
-  // ---- armar
+  // ---- armar (t-shirt: kort ärm + bar underarm)
   const arm = (side) => {
-    let a0, a1; // axelvinkel, "böj"
-    if (ballet){ a0 = side * 2.55; a1 = -side * 0.9; }        // uppåt i femte position
+    let a0, a1;
+    if (ballet){ a0 = side * 2.55; a1 = -side * 0.9; }
     else if (!e.onGround){ a0 = side * 2.2 + airK * 0.3; a1 = -side * 0.5; }
     else if (bowK > 0){ a0 = side * (side > 0 ? 0.5 : 1.2); a1 = side * 0.8; }
     else { a0 = side * (0.55 + runA * side * 0.9); a1 = side * 0.5; }
     ctx.save();
     ctx.translate(side * bw * 0.86, shoY + U * 0.06);
     ctx.rotate(a0);
-    ctx.strokeStyle = SHIRT;
-    ctx.lineWidth = U * 0.115;
-    ctx.lineCap = 'round';
     const al = U * 0.30;
+    const ex2 = al * 0.12 + a1 * al * 0.18;
+    // överarm med ärm
+    ctx.strokeStyle = TEE;
+    ctx.lineWidth = U * 0.125;
+    ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.quadraticCurveTo(al * 0.2, al * 0.55, al * 0.12 + a1 * al * 0.18, al);
+    ctx.quadraticCurveTo(al * 0.12, al * 0.3, ex2 * 0.55, al * 0.55);
     ctx.stroke();
-    // hand
+    // underarm (bar hud)
+    ctx.strokeStyle = SKIN;
+    ctx.lineWidth = U * 0.095;
+    ctx.beginPath();
+    ctx.moveTo(ex2 * 0.55, al * 0.52);
+    ctx.quadraticCurveTo(ex2 * 0.8, al * 0.78, ex2, al);
+    ctx.stroke();
     ctx.fillStyle = SKIN;
     ctx.beginPath();
-    ctx.arc(al * 0.12 + a1 * al * 0.18, al + U * 0.015, U * 0.075, 0, TAU);
+    ctx.arc(ex2, al + U * 0.015, U * 0.075, 0, TAU);
     ctx.fill();
     ctx.restore();
   };
   arm(-1); arm(1);
 
-  // glow-händer efter ryggknäck
   if (e.glowT > 0){
     ctx.save();
     ctx.globalAlpha = e.glowT * 1.6;
@@ -1511,46 +2403,29 @@ function drawErik(){
   const hb = Math.sin(t * 6) * U * 0.008 + (e.onGround ? Math.sin(e.runPhase * 2 + 1) * U * 0.012 * e.moving : -airK * U * 0.02);
 
   // ---- barn på axlarna (ritas FÖRE huvudet — sitter bakom)
-  if (e.kidT > 0){
-    const kR = U * 0.115;
+  if (e.kidT > 0 && e.rider){
+    const k = e.rider;
+    const kR = U * 0.115 * k.sc;
     const wave = Math.sin(t * 8) * 0.5;
     ctx.save();
     ctx.globalAlpha = Math.min(1, e.kidT * 2);
-    ctx.translate(0, headY + hb - headR * 1.3);
-    // ben som hänger ner på varsin sida om Eriks huvud
-    ctx.strokeStyle = '#E85D4A';
-    ctx.lineWidth = U * 0.055;
-    ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(-kR * 1.1, kR * 0.6); ctx.quadraticCurveTo(-kR * 3.3, kR * 2.2, -kR * 3.2, kR * 3.9); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(kR * 1.1, kR * 0.6); ctx.quadraticCurveTo(kR * 3.3, kR * 2.2, kR * 3.2, kR * 3.9); ctx.stroke();
-    // fötter
-    ctx.fillStyle = '#FFF';
-    ctx.beginPath(); ctx.arc(-kR * 3.2, kR * 4.1, kR * 0.34, 0, TAU); ctx.fill();
-    ctx.beginPath(); ctx.arc(kR * 3.2, kR * 4.1, kR * 0.34, 0, TAU); ctx.fill();
-    // randig tröja
-    ctx.fillStyle = '#E85D4A';
-    ctx.beginPath(); ctx.ellipse(0, kR * 0.7, kR * 1.05, kR * 0.95, 0, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#FFF';
-    ctx.fillRect(-kR * 1.0, kR * 0.35, kR * 2, kR * 0.22);
-    // viftande armar
-    ctx.strokeStyle = '#F2C49B';
+    ctx.translate(0, headY + hb - headR * 1.28 - kR * 1.2);
+    // ben
+    ctx.strokeStyle = k.shirt;
     ctx.lineWidth = U * 0.05;
-    ctx.beginPath(); ctx.moveTo(-kR, kR * 0.3); ctx.quadraticCurveTo(-kR * 2, -kR * (1 + wave), -kR * 2.2, -kR * (1.6 + wave)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(kR, kR * 0.3); ctx.quadraticCurveTo(kR * 2, -kR * (1 - wave), kR * 2.2, -kR * (1.6 - wave)); ctx.stroke();
-    // huvud + tofsar
-    ctx.fillStyle = '#F2C49B';
-    ctx.beginPath(); ctx.arc(0, -kR * 0.6, kR, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#B8863F';
-    ctx.beginPath(); ctx.arc(0, -kR * 1.1, kR * 0.75, Math.PI * 0.95, Math.PI * 2.05); ctx.fill();
-    ctx.beginPath(); ctx.arc(-kR * 1.05, -kR * 1.0, kR * 0.3, 0, TAU); ctx.fill();
-    ctx.beginPath(); ctx.arc(kR * 1.05, -kR * 1.0, kR * 0.3, 0, TAU); ctx.fill();
-    // min
-    ctx.fillStyle = '#3A2E22';
-    ctx.beginPath(); ctx.arc(-kR * 0.3, -kR * 0.6, kR * 0.09, 0, TAU); ctx.fill();
-    ctx.beginPath(); ctx.arc(kR * 0.3, -kR * 0.6, kR * 0.09, 0, TAU); ctx.fill();
-    ctx.strokeStyle = '#3A2E22';
-    ctx.lineWidth = kR * 0.12;
-    ctx.beginPath(); ctx.arc(0, -kR * 0.5, kR * 0.4, 0.2, Math.PI - 0.2); ctx.stroke();
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-kR * 1.0, kR * 1.2); ctx.quadraticCurveTo(-kR * 3.7, kR * 2.6, -kR * 3.6, kR * 4.4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(kR * 1.0, kR * 1.2); ctx.quadraticCurveTo(kR * 3.7, kR * 2.6, kR * 3.6, kR * 4.4); ctx.stroke();
+    ctx.fillStyle = '#FFF';
+    ctx.beginPath(); ctx.arc(-kR * 3.6, kR * 4.6, kR * 0.36, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(kR * 3.6, kR * 4.6, kR * 0.36, 0, TAU); ctx.fill();
+    // viftande armar
+    ctx.strokeStyle = k.skin;
+    ctx.lineWidth = U * 0.045;
+    ctx.beginPath(); ctx.moveTo(-kR * 1.1, 0); ctx.quadraticCurveTo(-kR * 2.2, -kR * (1.2 + wave), -kR * 2.5, -kR * (2 + wave)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(kR * 1.1, 0); ctx.quadraticCurveTo(kR * 2.2, -kR * (1.2 - wave), kR * 2.5, -kR * (2 - wave)); ctx.stroke();
+    // byst (huvud + tröja) från spriten
+    drawSpr('kid_' + k.key, 0, 0, kR * 5.2);
     ctx.restore();
   }
 
@@ -1561,124 +2436,164 @@ function drawErik(){
   const R = headR;
   const lock = (lx, ly, r) => { ctx.beginPath(); ctx.arc(lx, ly, r, 0, TAU); ctx.fill(); };
 
-  // bakhårsvolym + axellånga vågiga lockar (bakom ansiktet, ramar in det)
+  // kort bakhår + polisonger (bakom ansiktet)
   ctx.fillStyle = HAIR_D;
-  ctx.beginPath(); ctx.arc(0, -R * 0.05, R * 1.1, 0, TAU); ctx.fill();
-  lock(-R * 1.06, R * 0.02, R * 0.26); lock(R * 1.06, R * 0.02, R * 0.26);
-  lock(-R * 1.10, R * 0.46, R * 0.22); lock(R * 1.10, R * 0.46, R * 0.22);
-  lock(-R * 0.98, R * 0.84, R * 0.18); lock(R * 0.98, R * 0.84, R * 0.18);
-  ctx.fillStyle = HAIR;
-  lock(-R * 1.05, R * 0.08, R * 0.17); lock(R * 1.05, R * 0.08, R * 0.17);
-  lock(-R * 1.07, R * 0.50, R * 0.13); lock(R * 1.07, R * 0.50, R * 0.13);
+  ctx.beginPath(); ctx.arc(0, -R * 0.18, R * 1.06, 0, TAU); ctx.fill();
+  lock(-R * 1.0, R * 0.02, R * 0.2); lock(R * 1.0, R * 0.02, R * 0.2);
+  lock(-R * 0.99, R * 0.3, R * 0.13); lock(R * 0.99, R * 0.3, R * 0.13);
 
   // ansikte
   ctx.fillStyle = SKIN;
   ctx.beginPath(); ctx.arc(0, 0, R, 0, TAU); ctx.fill();
 
-  // skäggstubb (varm ton, låg alfa)
+  // kindstubb (lätt)
   ctx.save();
-  ctx.globalAlpha = 0.28;
-  ctx.fillStyle = '#8A6437';
+  ctx.globalAlpha = 0.13;
+  ctx.fillStyle = BEARD;
   ctx.beginPath();
-  ctx.arc(0, R * 0.30, R * 0.72, 0.15 * Math.PI, 0.85 * Math.PI);
-  ctx.arc(0, R * 0.05, R * 0.85, 0.82 * Math.PI, 0.18 * Math.PI, true);
+  ctx.arc(0, R * 0.24, R * 0.78, 0.2 * Math.PI, 0.8 * Math.PI);
+  ctx.arc(0, R * 0.05, R * 0.9, 0.78 * Math.PI, 0.22 * Math.PI, true);
   ctx.closePath();
   ctx.fill();
   ctx.restore();
 
-  // lugg — högt uppe, vågig kant en bit ovanför ögonbrynen
+  // tufsigt kort hår — öppen panna, svept bakåt
   ctx.save();
   ctx.beginPath();
-  ctx.rect(-R * 1.25, -R * 1.4, R * 2.5, R * 0.97); // allt ovanför y = -0.43R
+  ctx.rect(-R * 1.3, -R * 1.5, R * 2.6, R * 0.98); // allt ovanför y = -0.52R
   ctx.clip();
   ctx.fillStyle = HAIR;
-  ctx.beginPath(); ctx.arc(0, -R * 0.16, R * 1.04, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(0, -R * 0.3, R * 1.05, 0, TAU); ctx.fill();
   ctx.restore();
   ctx.fillStyle = HAIR;
-  lock(0, -R * 0.46, R * 0.19);
-  lock(-R * 0.56, -R * 0.48, R * 0.17); lock(R * 0.56, -R * 0.48, R * 0.17);
-  lock(-R * 0.92, -R * 0.40, R * 0.16); lock(R * 0.92, -R * 0.40, R * 0.16);
+  lock(-R * 0.62, -R * 1.0, R * 0.2);
+  lock(-R * 0.12, -R * 1.12, R * 0.22);
+  lock(0.42 * R, -R * 1.02, R * 0.2);
+  lock(0.8 * R, -R * 0.82, R * 0.17);
+  lock(-R * 0.95, -R * 0.72, R * 0.17);
+  lock(0.2 * R, -R * 0.56, R * 0.16);
+  lock(-R * 0.5, -R * 0.55, R * 0.15);
+  lock(0.93 * R, -R * 0.5, R * 0.14);
+  ctx.strokeStyle = '#D9B078';
+  ctx.lineWidth = R * 0.06;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.7, -R * 0.85);
+  ctx.quadraticCurveTo(-R * 0.1, -R * 1.12, R * 0.5, -R * 0.9);
+  ctx.stroke();
 
   // ögon
   const blink = e.blink > 0 ? clamp(Math.sin((e.blink / 0.14) * Math.PI), 0, 1) : 0;
-  const eyeH = headR * 0.13 * (1 - blink * 0.92);
+  const eyeH = R * 0.13 * (1 - blink * 0.92);
   const eye = (side) => {
     ctx.fillStyle = '#FFF';
     ctx.beginPath();
-    ctx.ellipse(side * headR * 0.34, -headR * 0.02, headR * 0.15, Math.max(eyeH, headR * 0.012), 0, 0, TAU);
+    ctx.ellipse(side * R * 0.34, -R * 0.02, R * 0.15, Math.max(eyeH, R * 0.012), 0, 0, TAU);
     ctx.fill();
     if (blink < 0.8){
-      ctx.fillStyle = '#3A2E22';
+      ctx.fillStyle = '#4A5A44';
       ctx.beginPath();
-      ctx.arc(side * headR * 0.34 + (dizzy ? Math.sin(t * 9 + side) * headR * 0.05 : headR * 0.03 * e.face * (sx >= 0 ? 1 : -1)),
-              -headR * 0.02, headR * 0.065 * (1 - blink), 0, TAU);
+      ctx.arc(side * R * 0.34 + (dizzy ? Math.sin(t * 9 + side) * R * 0.05 : R * 0.03),
+              -R * 0.02, R * 0.065 * (1 - blink), 0, TAU);
       ctx.fill();
     }
   };
   eye(-1); eye(1);
   // ögonbryn
   ctx.strokeStyle = HAIR_D;
-  ctx.lineWidth = headR * 0.07;
+  ctx.lineWidth = R * 0.07;
   ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.moveTo(-headR * 0.48, -headR * 0.24);
-  ctx.quadraticCurveTo(-headR * 0.32, -headR * (dizzy ? 0.26 : 0.34), -headR * 0.18, -headR * 0.27);
+  ctx.moveTo(-R * 0.48, -R * 0.24);
+  ctx.quadraticCurveTo(-R * 0.32, -R * (dizzy ? 0.26 : 0.36), -R * 0.18, -R * 0.28);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(headR * 0.18, -headR * 0.27);
-  ctx.quadraticCurveTo(headR * 0.32, -headR * (dizzy ? 0.26 : 0.34), headR * 0.48, -headR * 0.24);
+  ctx.moveTo(R * 0.18, -R * 0.28);
+  ctx.quadraticCurveTo(R * 0.32, -R * (dizzy ? 0.26 : 0.36), R * 0.48, -R * 0.24);
   ctx.stroke();
 
   // kinder
   ctx.save();
-  ctx.globalAlpha = 0.35;
+  ctx.globalAlpha = 0.3;
   ctx.fillStyle = '#F2917E';
-  ctx.beginPath(); ctx.arc(-headR * 0.52, headR * 0.22, headR * 0.11, 0, TAU); ctx.fill();
-  ctx.beginPath(); ctx.arc(headR * 0.52, headR * 0.22, headR * 0.11, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(-R * 0.55, R * 0.18, R * 0.1, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(R * 0.55, R * 0.18, R * 0.1, 0, TAU); ctx.fill();
   ctx.restore();
 
   // mun — stort leende (yr = o-mun)
   if (dizzy){
     ctx.fillStyle = '#6B3A2E';
-    ctx.beginPath(); ctx.arc(0, headR * 0.42, headR * 0.12, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, R * 0.42, R * 0.11, 0, TAU); ctx.fill();
   } else {
     ctx.fillStyle = '#6B3A2E';
     ctx.beginPath();
-    ctx.moveTo(-headR * 0.34, headR * 0.32);
-    ctx.quadraticCurveTo(0, headR * 0.72, headR * 0.34, headR * 0.32);
-    ctx.quadraticCurveTo(0, headR * 0.5, -headR * 0.34, headR * 0.32);
+    ctx.moveTo(-R * 0.3, R * 0.33);
+    ctx.quadraticCurveTo(0, R * 0.68, R * 0.3, R * 0.33);
+    ctx.quadraticCurveTo(0, R * 0.48, -R * 0.3, R * 0.33);
     ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#FFF';
     ctx.beginPath();
-    ctx.moveTo(-headR * 0.28, headR * 0.335);
-    ctx.quadraticCurveTo(0, headR * 0.47, headR * 0.28, headR * 0.335);
-    ctx.quadraticCurveTo(0, headR * 0.42, -headR * 0.28, headR * 0.335);
+    ctx.moveTo(-R * 0.24, R * 0.345);
+    ctx.quadraticCurveTo(0, R * 0.46, R * 0.24, R * 0.345);
+    ctx.quadraticCurveTo(0, R * 0.41, -R * 0.24, R * 0.345);
     ctx.closePath(); ctx.fill();
   }
+
+  // getabocksskägg: mustasch + hakskägg
+  ctx.strokeStyle = BEARD;
+  ctx.lineCap = 'round';
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+  ctx.lineWidth = R * 0.09;
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.3, R * 0.3);
+  ctx.quadraticCurveTo(-R * 0.14, R * 0.2, -R * 0.03, R * 0.26);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(R * 0.3, R * 0.3);
+  ctx.quadraticCurveTo(R * 0.14, R * 0.2, R * 0.03, R * 0.26);
+  ctx.stroke();
+  ctx.fillStyle = BEARD;
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.3, R * 0.52);
+  ctx.quadraticCurveTo(0, R * 0.4, R * 0.3, R * 0.52);
+  ctx.quadraticCurveTo(R * 0.24, R * 0.95, 0, R * 0.99);
+  ctx.quadraticCurveTo(-R * 0.24, R * 0.95, -R * 0.3, R * 0.52);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+
   // näsa
   ctx.fillStyle = SKIN_D;
-  ctx.beginPath(); ctx.ellipse(0, headR * 0.14, headR * 0.09, headR * 0.07, 0, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0, R * 0.14, R * 0.09, R * 0.07, 0, 0, TAU); ctx.fill();
 
-  // bygghjälm (blixtras efter fix)
+  // grön STAYHOT-mössa (blixtras efter fix)
   if (e.hatT > 0){
     ctx.save();
     ctx.globalAlpha = Math.min(1, e.hatT * 3);
-    ctx.fillStyle = '#FFC94B';
+    ctx.fillStyle = '#2E6B4F';
     ctx.beginPath();
-    ctx.arc(0, -headR * 0.55, headR * 0.78, Math.PI, 0);
+    ctx.arc(0, -R * 0.52, R * 0.84, Math.PI, 0);
     ctx.closePath(); ctx.fill();
-    ctx.fillRect(-headR * 0.9, -headR * 0.55, headR * 1.8, headR * 0.12);
+    ctx.fillStyle = '#255741';
+    const bx = -R * 0.88, by = -R * 0.66;
+    ctx.beginPath();
+    ctx.moveTo(bx, by);
+    ctx.lineTo(-bx, by);
+    ctx.lineTo(-bx, by + R * 0.24);
+    ctx.lineTo(bx, by + R * 0.24);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#FF8A3D';
+    ctx.beginPath(); ctx.arc(0, by + R * 0.12, R * 0.055, 0, TAU); ctx.fill();
     ctx.restore();
   }
-  // yr-stjärnor
   if (dizzy){
     for (let i = 0; i < 3; i++){
       const a = t * 4 + i * TAU / 3;
       ctx.save();
-      ctx.translate(Math.cos(a) * headR * 1.1, -headR * 0.9 + Math.sin(a) * headR * 0.24);
+      ctx.translate(Math.cos(a) * R * 1.1, -R * 0.9 + Math.sin(a) * R * 0.24);
       ctx.rotate(a);
       ctx.fillStyle = '#FFC94B';
-      starPath(headR * 0.14);
+      starPath(R * 0.14);
       ctx.fill();
       ctx.restore();
     }
@@ -1690,7 +2605,7 @@ function drawErik(){
 }
 
 /* ============================================================
-   14. HUD (canvas)
+   16. HUD
    ============================================================ */
 function roundRect(x, y, w2, h2, r){
   ctx.beginPath();
@@ -1704,20 +2619,19 @@ function roundRect(x, y, w2, h2, r){
 function drawHUD(){
   if (G.mode !== 'playing' && G.mode !== 'paused' && G.mode !== 'dying') return;
   const pad = 12, topSafe = 12;
-  // poäng
   ctx.save();
+  // poäng
   const scoreTxt = String(G.score);
   ctx.font = '800 ' + Math.round(U * 0.30) + 'px "Baloo 2","Nunito",sans-serif';
   const tw = ctx.measureText(scoreTxt).width;
   ctx.fillStyle = 'rgba(255,252,244,0.92)';
   roundRect(pad, topSafe, tw + U * 0.66, U * 0.46, U * 0.23);
   ctx.fill();
-  ctx.font = emoFont(Math.round(U * 0.22));
-  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-  ctx.fillText('⭐', pad + U * 0.12, topSafe + U * 0.25);
+  drawSpr('star', pad + U * 0.24, topSafe + U * 0.23, U * 0.3);
   ctx.font = '800 ' + Math.round(U * 0.30) + 'px "Baloo 2","Nunito",sans-serif';
   ctx.fillStyle = '#33261D';
-  ctx.fillText(scoreTxt, pad + U * 0.44, topSafe + U * 0.26);
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(scoreTxt, pad + U * 0.46, topSafe + U * 0.26);
 
   // kombo
   const mult = multOf();
@@ -1738,19 +2652,18 @@ function drawHUD(){
     ctx.restore();
   }
 
-  // hjärtan i egen bricka (under hörnknapparna)
+  // hjärtan i egen bricka
   const hw = U * 0.32 * 3 + U * 0.18;
   const hx0 = W - pad - hw, hy0 = topSafe + 58;
   ctx.fillStyle = 'rgba(255,252,244,0.92)';
   roundRect(hx0, hy0, hw, U * 0.42, U * 0.21);
   ctx.fill();
-  ctx.font = emoFont(Math.round(U * 0.22));
-  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
   for (let i = 0; i < 3; i++){
-    ctx.globalAlpha = i < G.lives ? 1 : 0.2;
-    ctx.fillText('❤️', hx0 + U * 0.11 + i * U * 0.32, hy0 + U * 0.22);
+    drawSpr(i < G.lives ? 'heart' : 'heart_off', hx0 + U * 0.25 + i * U * 0.32, hy0 + U * 0.21, U * 0.27);
   }
-  ctx.globalAlpha = 1;
+
+  // brorsbarns-samlingen
+  drawKidBar(topSafe);
 
   // feber-mätare
   if (G.fever > 0){
@@ -1766,17 +2679,79 @@ function drawHUD(){
     ctx.font = '800 ' + Math.round(U * 0.15) + 'px "Baloo 2",sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     ctx.fillStyle = '#FFF';
-    ctx.fillText('🩰 BALETTFEBER ×2', W / 2, by + bh + 4);
+    ctx.fillText('BALETTFEBER ×2', W / 2, by + bh + 4);
   }
   ctx.restore();
 }
+function drawKidBar(topSafe){
+  const d = U * 0.30, gap = U * 0.06;
+  const total = KIDS.length * d + (KIDS.length - 1) * gap;
+  let x = W / 2 - total / 2 + d / 2;
+  const narrow = W < 640 ? 56 : 0; // under hörnknapparna på smala skärmar
+  const y = topSafe + narrow + (G.fever > 0 ? 46 : 10) + d / 2;
+  for (const k of KIDS){
+    const got = !!G.caught[k.key];
+    let scl = 1;
+    if (got){
+      const since = G.t - G.caught[k.key];
+      if (since < 0.45) scl = 1 + (0.45 - since) * 1.1;
+    }
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scl, scl);
+    ctx.fillStyle = got ? 'rgba(255,252,244,0.95)' : 'rgba(255,252,244,0.55)';
+    ctx.beginPath(); ctx.arc(0, 0, d / 2, 0, TAU); ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = got ? '#E2A426' : 'rgba(120,100,80,0.35)';
+    ctx.stroke();
+    ctx.globalAlpha = got ? 1 : 0.4;
+    drawSpr('kid_' + k.key, 0, 0, d * 0.86);
+    ctx.restore();
+    x += d + gap;
+  }
+}
 
 /* ============================================================
-   15. UPPDATERING
+   17. EXTRA IKON — STAYHOT-mässingsdusch (Eriks verkstad!)
+   ============================================================ */
+ICONS.brass = function(g){
+  out(g);
+  const GOLD = '#E2B33C';
+  // duschhuvud med droppar
+  g.fillStyle = GOLD;
+  g.beginPath(); g.ellipse(50, 18, 14, 6.5, 0, 0, TAU); g.fill(); g.stroke();
+  g.fillStyle = '#6BC6F0';
+  for (const [x, y] of [[40, 28], [50, 31], [60, 28]]){
+    g.beginPath(); g.ellipse(x, y, 2.4, 3.6, 0, 0, TAU); g.fill();
+  }
+  // stigarrör + tvärbalk
+  g.fillStyle = GOLD;
+  rr(g, 44.5, 22, 11, 30, 5); g.fill(); g.stroke();
+  rr(g, 16, 50, 68, 11, 5.5); g.fill(); g.stroke();
+  // anslutningar ner till kranar
+  rr(g, 24, 60, 9, 8, 3); g.fill(); g.stroke();
+  rr(g, 67, 60, 9, 8, 3); g.fill(); g.stroke();
+  // kranar med kryss-vred
+  for (const cx of [28.5, 71.5]){
+    g.fillStyle = GOLD;
+    g.beginPath(); g.arc(cx, 75, 8.5, 0, TAU); g.fill(); g.stroke();
+    g.strokeStyle = '#B98F27'; g.lineWidth = 3.2; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(cx - 5, 75); g.lineTo(cx + 5, 75); g.stroke();
+    g.beginPath(); g.moveTo(cx, 70); g.lineTo(cx, 80); g.stroke();
+    out(g);
+  }
+  // glans
+  g.strokeStyle = 'rgba(255,255,255,0.55)'; g.lineWidth = 2.5; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(20, 53); g.lineTo(78, 53); g.stroke();
+  g.beginPath(); g.moveTo(47, 25); g.lineTo(47, 48); g.stroke();
+};
+TYPES.tool.sprs.push('brass');
+
+/* ============================================================
+   18. UPPDATERING
    ============================================================ */
 function updateErik(dt){
   const e = G.erik;
-  // riktning
   let dir = 0;
   if (keys['ArrowLeft'] || keys['KeyA']) dir -= 1;
   if (keys['ArrowRight'] || keys['KeyD']) dir += 1;
@@ -1796,7 +2771,6 @@ function updateErik(dt){
   }
   e.x = clamp(e.x, U * 0.45, W - U * 0.45);
 
-  // hopp/gravitation
   if (!e.onGround){
     e.vy += gravity() * dt;
     e.y += e.vy * dt;
@@ -1812,7 +2786,6 @@ function updateErik(dt){
 
   e.runPhase += dt * (8 + 6 * e.moving) * (e.moving > 0.05 ? 1 : 0.35);
 
-  // blink
   e.blinkT -= dt;
   if (e.blinkT <= 0){ e.blink = 0.14; e.blinkT = rnd(1.8, 4.5); }
   if (e.blink > 0) e.blink -= dt;
@@ -1821,7 +2794,6 @@ function updateErik(dt){
   if (e.kidT > 0) e.kidT -= dt;
   if (e.glowT > 0) e.glowT -= dt;
 
-  // piruett i feber
   if (G.fever > 0){
     e.spin += dt * 9;
     G.spinAcc += dt * 9;
@@ -1837,6 +2809,13 @@ function updatePlaying(dt){
   if (G.flash > 0) G.flash -= dt * 2;
   if (G.shake > 0) G.shake -= dt;
 
+  // vågor
+  if (G.wave < WAVES.length && G.elapsed >= WAVES[G.wave].t){
+    addFloat(W / 2, H * 0.32, WAVES[G.wave].txt, '#9E3F2F', 1.25, true);
+    AudioMan.sfxHorn();
+    G.wave++;
+  }
+
   if (G.fever > 0){
     G.fever -= dt;
     G.curtain = lerp(G.curtain, 0.001, dt * 3);
@@ -1846,20 +2825,37 @@ function updatePlaying(dt){
   G.spawnT -= dt;
   if (G.spawnT <= 0){
     spawnItem();
-    G.spawnT = lerp(1.15, 0.42, ramp()) * rnd(0.75, 1.25);
-    // dubbelspawn ibland sent i rundan
-    if (ramp() > 0.5 && Math.random() < 0.25) spawnItem();
+    G.spawnT = lerp(1.05, 0.36, ramp()) * rnd(0.75, 1.25);
+    if (ramp() > 0.4 && Math.random() < 0.3) spawnItem();
+    if (ramp() > 0.8 && Math.random() < 0.12) spawnItem();
+  }
+
+  // getingar
+  if (G.elapsed > WASP_START && G.fever <= 0){
+    G.waspT -= dt;
+    if (G.waspT <= 0 && G.wasps.length < 2){
+      spawnWasp();
+      G.waspT = rnd(6, 11) - 2.5 * ramp();
+    }
+  }
+  if (G.wasps.length){
+    G.buzzT -= dt;
+    if (G.buzzT <= 0){ AudioMan.sfxBuzz(); G.buzzT = 0.42; }
   }
 
   updateErik(dt);
   updateItems(dt);
+  updateWasps(dt);
+  updateDogs(dt);
 }
 
 function updateDying(dt){
   G.dieT += dt;
+  G.wasps.length = 0;
   const e = G.erik;
   e.moving = 0;
   e.bow = clamp((G.dieT - 0.4) / 0.5, 0, 1) * (0.5 + Math.sin(Math.min(G.dieT, 2) * 2) * 0.1);
+  updateDogs(dt);
   if (G.dieT > 0.8) G.curtain = clamp(G.curtain + dt * 1.1, 0, 1);
   if (G.dieT > 2.1 && G.mode === 'dying'){
     G.mode = 'over';
@@ -1868,7 +2864,6 @@ function updateDying(dt){
 }
 
 function updateAttract(dt){
-  // Erik underhåller bakom titelkortet
   const e = G.erik;
   G.aiT -= dt;
   if (G.aiT <= 0){
@@ -1878,17 +2873,18 @@ function updateAttract(dt){
     if (Math.random() < 0.3 && e.onGround){ e.onGround = false; e.vy = -Math.sqrt(2 * gravity() * U * 1.3); }
   }
   updateErik(dt);
+  updateDogs(dt);
   if (Math.random() < dt * 0.5) spawnItem(pick(['tool', 'kid', 'patient', 'shoe']));
   for (let i = G.items.length - 1; i >= 0; i--){
     const it = G.items[i];
     it.y += it.vy * dt * 0.55;
     it.x += Math.sin(G.t * it.sway + it.seed) * dt * U * 0.3;
-    if (it.y > groundY + it.r){ G.items.splice(i, 1); poof(it.x, groundY); }
+    if (it.y > groundY + it.r){ it.dead = true; G.items.splice(i, 1); poof(it.x, groundY); }
   }
 }
 
 /* ============================================================
-   16. HUVUDLOOP
+   19. HUVUDLOOP
    ============================================================ */
 let lastT = 0;
 function frame(ts){
@@ -1901,7 +2897,6 @@ function frame(ts){
   if (G.mode === 'playing') updatePlaying(dt);
   else if (G.mode === 'dying') updateDying(dt);
   else if (G.mode === 'title') updateAttract(dt);
-  else if (G.mode === 'over') { /* stilla scen bakom kortet */ }
 
   updateParts(dt);
   updateFloats(dt);
@@ -1919,7 +2914,9 @@ function render(){
   drawGround();
   drawSpotlight();
   drawItems();
+  for (const d of G.dogs) drawDog(d);
   if (G.erik) drawErik();
+  drawWasps();
   drawParts();
   drawFloats();
   drawCurtains();
@@ -1932,7 +2929,7 @@ function render(){
 }
 
 /* ============================================================
-   17. SKÄRMAR & UI
+   20. SKÄRMAR & UI
    ============================================================ */
 const ovlTitle = $('ovl-title'), ovlOver = $('ovl-over'), ovlPause = $('ovl-pause');
 const show = el => el.classList.remove('hidden');
@@ -1944,16 +2941,16 @@ function fmtBoard(listEl, highlightT){
   if (!board.length){
     const d = document.createElement('div');
     d.className = 'board-empty';
-    d.textContent = 'Inga stjärnor ännu — bli först på scenen! 🌟';
+    d.textContent = 'Inga stjärnor ännu — bli först på scenen!';
     listEl.appendChild(d);
     return;
   }
-  const medals = ['🥇', '🥈', '🥉'];
   board.forEach((row, i) => {
     const d = document.createElement('div');
     d.className = 'brow' + (highlightT && row.t === highlightT ? ' me' : '');
-    const pos = document.createElement('span'); pos.className = 'pos';
-    pos.textContent = medals[i] || (i + 1);
+    const pos = document.createElement('span');
+    pos.className = 'pos' + (i < 3 ? ' pos-' + (i + 1) : '');
+    pos.textContent = i + 1;
     const nm = document.createElement('span'); nm.className = 'nm';
     nm.textContent = row.n;
     const sc = document.createElement('span'); sc.className = 'sc';
@@ -1973,7 +2970,7 @@ function startGame(){
   hide(ovlTitle); hide(ovlOver); hide(ovlPause);
   show($('btn-pause')); show($('btn-mute'));
   AudioMan.startMusic('pop');
-  addFloat(W / 2, H * 0.35, 'KÖR ERIK! 💪', '#9E3F2F', 1.4, true);
+  addFloat(W / 2, H * 0.35, 'KÖR ERIK!', '#9E3F2F', 1.4, true);
 }
 function pauseGame(){
   if (G.mode !== 'playing') return;
@@ -2012,20 +3009,36 @@ function showGameOver(){
   $('over-newrec').style.display = (isRecord && G.score > 0) ? '' : 'none';
   $('over-quote').textContent = pick(QUOTES);
 
+  // brorsbarnen
+  const kr = $('over-kids');
+  kr.innerHTML = '';
+  for (const k of KIDS){
+    const got = !!G.caught[k.key];
+    const kp = document.createElement('div');
+    kp.className = 'kp ' + (got ? 'got' : 'miss');
+    const img = document.createElement('img');
+    img.alt = k.name;
+    try { img.src = SPR['kid_' + k.key].toDataURL(); } catch (err) {}
+    const nm = document.createElement('span');
+    nm.textContent = k.name.charAt(0) + k.name.slice(1).toLowerCase();
+    kp.append(img, nm);
+    kr.appendChild(kp);
+  }
+
   const s = G.stats;
   const statDefs = [
-    ['🔧', s.tool, 'fixade'],
-    ['🧒', s.kid, 'barnlek'],
-    ['💆', s.patient, 'ryggar'],
-    ['🩰', G.spins, 'piruetter'],
-    ['⭐', s.maxCombo, 'max kombo']
+    ['i-wrench', s.tool, 'fixade'],
+    ['i-spine', s.patient, 'ryggar'],
+    ['i-paw', s.saves, 'räddningar'],
+    ['i-shoe', G.spins, 'piruetter'],
+    ['i-star', s.maxCombo, 'max kombo']
   ];
   const stEl = $('over-stats');
   stEl.innerHTML = '';
-  statDefs.forEach(([em, val, lbl]) => {
+  statDefs.forEach(([ic, val, lbl]) => {
     const d = document.createElement('div');
     d.className = 'stat';
-    d.innerHTML = em + ' <b>' + val + '</b> ' + lbl;
+    d.innerHTML = '<svg class="ic"><use href="#' + ic + '"/></svg> <b>' + val + '</b> ' + lbl;
     stEl.appendChild(d);
   });
 
@@ -2034,7 +3047,6 @@ function showGameOver(){
   $('inp-name').value = store.get('erikLastName', '');
   fmtBoard($('over-board-list'));
 
-  // räkna upp poängen
   const scoreEl = $('over-score');
   const target = G.score;
   const t0 = performance.now();
@@ -2089,15 +3101,16 @@ $('btn-back').addEventListener('click', () => {
 });
 
 /* ============================================================
-   18. START
+   21. START
    ============================================================ */
 function boot(){
   resize();
-  G.erik = newErik();
+  buildSprites();
+  resetRound();
   G.erik.y = groundY;
   const isTouch = matchMedia('(pointer: coarse)').matches;
   $('hint-controls').innerHTML = isTouch
-    ? '📱 <b>Dra fingret</b> för att springa · <b>snabbtryck</b> för att hoppa'
+    ? '<b>Dra fingret</b> för att springa · <b>snabbtryck</b> för att hoppa'
     : '<kbd>←</kbd><kbd>→</kbd> spring &nbsp; <kbd>mellanslag</kbd> hoppa &nbsp; <kbd>P</kbd> paus &nbsp; <kbd>M</kbd> ljud';
   $('title-quote').textContent = pick(QUOTES);
   AudioMan.setMuted(AudioMan.muted);
@@ -2116,6 +3129,8 @@ window.__erik = {
   start: startGame,
   startFever,
   spawn: spawnItem,
+  spawnWasp,
+  catchKid(key){ G.caught[key] = G.t; },
   forceOver(score){ G.score = score || 1234; beginDeath(); G.dieT = 99; updateDying(0.02); }
 };
 </script>
