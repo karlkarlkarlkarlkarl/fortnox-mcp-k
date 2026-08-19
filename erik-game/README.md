@@ -1,43 +1,49 @@
-# SUPER-ERIK v2 — Superstjärnan
+# SUPER-ERIK — två spel i ett paket
 
-Ett födelsedagsspel för hela familjen, där alla får spela som **Erik**:
-fixaren, lekproffset, osteopaten och balettdansören — i sin STAYHOT-batiktröja,
-med hundarna **Lillen & Bernard** vid sin sida.
+Födelsedagsspel för hela familjen, med **Erik** i huvudrollen: fixaren,
+lekproffset, osteopaten och balettdansören — i STAYHOT-batiktröja, med
+hundarna **Lillen & Bernard** och alla sex brorsbarnen.
 
-All grafik är handritad vektorgrafik (canvas + SVG) — inga emojis.
+All grafik är handritad vektorgrafik (canvas + SVG). Allt ljud är
+syntetiserat (WebAudio). Varje spel är en enda HTML-fil som funkar helt
+offline — typsnitten är inbäddade.
 
-## Så spelar du
+## `index.html` — TURBORUSNINGEN (huvudspelet, v3)
 
-Fånga allt Erik älskar och samla poäng:
+Endless runner genom svensk 90-talssommar (Erik är född 1990 — därav
+eurodance-loopen på 126 BPM, Volvo 245:an, glasskiosken och midsommarstången).
 
-| Föremål | Poäng |
-|---|---|
-| Verktyg, lampor, stolar och STAYHOT-mässingsduschar | 100 |
-| Brorsbarnen **Ruben, Juniper, Emma-Lo, Irma, Olof & Siri** (åker upp på axlarna!) | 150 · +300 första gången |
-| Patienter med ryggskott — *KNAK!* | 200 |
-| Balettsko → **BALETTFEBER**: ridå, strålkastare, tutu, piruetter, ×2 på allt | 300 |
-| Födelsedagstårta (sällsynt) | 500 |
+- **Styrning:** tryck/mellanslag = hoppa (håll = högre) · svep neråt/pil ner = glida.
+  Coyote-time och hoppbuffert gör att det känns proffsigt tajt.
+- **Samla skruvar** i banor och bågar. Undvik STAYHOT-kartonger, hängande
+  mötesskyltar, rullande stressmoln och getingsvärmar.
+- **Fyra krafter:** Magnetbältet (drar skruvar) · **KNÄCK-RUSCHEN** (krossa
+  hinder, KNAK!) · **Balettglidet** (tutu, sväva på valsmusik, allt ×2) ·
+  **MIXTAPE 1990** (eurodancen växlar upp, neonsolnedgång, bakåtvänd keps
+  och solglasögon).
+- **Brorsbarnen** väntar vid hållplatser längs vägen — spring förbi och de
+  hoppar upp på axlarna (+500 och högre skruvvärde). Träffas du flyger de
+  hem säkert med ballong. Alla sex i samma runda = **HELA GÄNGET, +5000**.
+- **Lillen & Bernard** springer med. När sista hjärtat ryker offrar en av
+  dem sin räddning — slow motion, skall och vidare i rusningen. En gång var.
+- **Uppdrag & Familjealbum:** 24 uppdrag ger stjärnor som låser upp åtta
+  ritade minneskort. Uppdrag, stjärnor och album sparas mellan rundorna.
+- **Topplista** (topp 10 med namn, poäng och distans) per enhet.
 
-- **Samla alla sex brorsbarnen** i samma runda → **HELA GÄNGET! +1500**
-- **Lillen** (liten, snabb) och **Bernard** (stor, lång räckvidd) rusar och räddar
-  saker du tappar — kombon överlever! Tassen över huvudet visar att hunden är redo.
-- **Undvik** stressmoln, tråkiga möten — och **getingarna** som jagar dig från våg 3.
-- Vågor var ~30:e sekund höjer tempot: brantare fart, tätare regn, dubbelspawn.
-- Kombo upp till ×5 · **LUFTFÅNGST** (+50 %) för hopp-fångster · 3 hjärtan.
+## `fangaren.html` — FÅNGAREN (klassikern, v2)
 
-**Styrning:** piltangenter/A–D + mellanslag (dator) · dra fingret + snabbtryck för hopp
-(mobil/surfplatta) · `P` paus · `M` ljud av/på.
+Det ursprungliga fångarspelet: spring och fånga verktyg, brorsbarn,
+patienter med ryggskott och balettskor — undvik stressmoln, tråkiga möten
+och getingar. Balettfeber med ridå och strålkastare. Egen topplista.
 
-## Kör spelet
+## Kör spelen
 
-Allt är en enda fil — `index.html` — med inbäddade typsnitt och syntetiserat
-ljud (WebAudio, popslinga + vals under balettfebern). Ingen uppkoppling behövs.
+- **Öppna direkt:** dubbelklicka på valfri HTML-fil.
+- **Lokal server:** `npx serve erik-game` eller `python3 -m http.server`.
+- **Publicera:** ladda upp båda filerna var som helst (Netlify Drop,
+  itch.io, eget webbhotell). `index.html` blir startsidan.
 
-- **Öppna direkt:** dubbelklicka på `index.html` i valfri webbläsare.
-- **Lokal server:** `npx serve erik-game` eller `python3 -m http.server` i den här mappen.
-- **GitHub Pages:** aktivera Pages på repot och länka till `erik-game/index.html`.
-
-Topplistan sparas per enhet (localStorage) — som på ett riktigt arkadspel:
-den som håller i telefonen på kalaset försvarar rekordet.
+All sparad data (topplistor, stjärnor, album) ligger i localStorage —
+per enhet, som på ett riktigt arkadspel.
 
 *Med ❤ från familjen.*

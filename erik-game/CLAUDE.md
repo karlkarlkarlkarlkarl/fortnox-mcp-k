@@ -8,12 +8,22 @@ Ett födelsedagspresent-spel från Karl till hans bror **Erik** (med K, aldrig "
 Hela familjen ska kunna spela det. Ton: varm svensk familjehumor, all speltext på
 svenska (åäö). Publiceras som Claude-artifact och som fristående fil.
 
-- **Spelet:** `index.html` — HELA spelet i en enda fil (~350 kB). Inga beroenden,
-  ingen backend, funkar offline. Typsnitt (Baloo 2 + Nunito, latin) är inbäddade
-  som base64-`@font-face` i ett `<style>`-block i `<head>`.
+- **`index.html` — TURBORUSNINGEN (v3, huvudspelet):** endless runner i
+  90-talssommar (Erik född 1990): eurodance-sequencer 126 BPM, hoppa/glid
+  (coyote-time + hoppbuffert), skruvar, krafter (magnet, knäck-rusch,
+  balettglid=vals ×2, MIXTAPE 1990 = euroX + neonhimmel + keps/brillor),
+  hållplatsräddningar av brorsbarnen (axelridning, ballong-hem vid träff,
+  HELA GÄNGET +5000), hundräddning av sista hjärtat (en per hund, slow-mo),
+  24 uppdrag → stjärnor → 8 albumkort (komponeras av sprites i `cardImg`).
+  Parallax: stugor/björkar/granar (0.18×), buskar/Volvo 245/glasskiosk/
+  midsommarstång (0.55×, mindre + upphöjda = bakgrundskänsla), grusstig (1×).
+- **`fangaren.html` — FÅNGAREN (v2, klassikern):** fångarspelet med
+  balettfeber, vågor och getingar. Rör den inte i onödan — den är klar.
+- **Filer är enskilda och offline:** typsnitt (Baloo 2 + Nunito, latin) är
+  inbäddade som base64-`@font-face`. Inga beroenden, ingen backend.
 - **Branch:** `claude/eric-character-game-8rqfjs`
 - **Artifact-URL (behåll denna!):** `https://claude.ai/code/artifact/4f6fa3cb-dd13-4e52-a685-c36c450de138`
-- **Version:** v2 (hundar + brorsbarn + vågor + helvektor-grafik)
+  (artifacten kör Turborusningen)
 
 ## Personerna (fakta från riktiga foton — ändra inte utan nya referenser)
 
@@ -40,7 +50,7 @@ fräknar, gul) · Olof (`olof`, kort brunt, blå) · Siri (`siri`, hästsvans, t
 störst). De faller som föremål, rider på Eriks axlar när de fångas, och samlas i
 HUD-raden. Alla sex i samma runda → **HELA GÄNGET! +1500**.
 
-## Spelmekanik & balans (v2)
+## Spelmekanik & balans
 
 - Poäng: verktyg 100 · barn 150 (+300 första gången per barn) · patient 200 ·
   balettsko 300 · tårta 500. Kombo-multiplikator upp till ×5 (steg var 6:e fångst).
@@ -50,8 +60,10 @@ HUD-raden. Alla sex i samma runda → **HELA GÄNGET! +1500**.
 - Vågor (banner + hornfanfar): 25 s, 55 s (getingar), 85 s, 115 s. Ramp:
   `ramp() = elapsed/115`. Spawnintervall 1,05→0,36 s, dubbel-/trippelspawn sent.
 - Ranker: 1000/3000/6000/10500/16000/23000 → "DEN ÄKTA ERIK" högst.
-- localStorage-nycklar: `erikTopplista`, `erikMuted`, `erikLastName`.
-  **Byt aldrig namn på dessa** — familjens rekord ska överleva uppdateringar.
+- localStorage-nycklar: Fångaren: `erikTopplista`, `erikLastName`.
+  Turborusningen: `erikRunnerTopplista`, `erikRunnerProfil` (stjärnor,
+  klarade uppdrag, totalstatistik, personbästa, namn). Delad: `erikMuted`.
+  **Byt aldrig namn på dessa** — familjens rekord/album ska överleva uppdateringar.
 
 ## Grafikregler
 
@@ -112,4 +124,5 @@ har inget med spelet att göra. Rör den inte i spelärenden, och rör inte
 ## Idéer som väntar på klartecken (gör inte oombedda)
 
 Foton på riktiga Lillen & Bernard → justera teckningar · engelsk språkväxel ·
-delad topplista via backend · barnläge (långsammare, inga getingar).
+delad topplista via backend · barnläge · fler albumkort/uppdrag ·
+Turborusningen: fler hindertyper och en boss-våg.
