@@ -41,7 +41,9 @@ eurodance-loopen på 126 BPM, Volvo 245:an, glasskiosken och midsommarstången).
   dem sin räddning — slow motion, skall och vidare i rusningen. En gång var.
 - **Uppdrag & Familjealbum:** 24 uppdrag ger stjärnor som låser upp åtta
   ritade minneskort. Uppdrag, stjärnor och album sparas mellan rundorna.
-- **Topplista** (topp 10 med namn, poäng och distans) per enhet.
+- **Topplista:** hela familjens gemensamma lista, synkad mellan alla enheter
+  via familjens egen server (faller automatiskt tillbaka till enhetens lokala
+  lista offline).
 
 ## `fangaren.html` — FÅNGAREN (klassikern, v2)
 
@@ -56,26 +58,29 @@ och getingar. Balettfeber med ridå och strålkastare. Egen topplista.
 - **Publicera:** ladda upp båda filerna var som helst (Netlify Drop,
   itch.io, eget webbhotell). `index.html` blir startsidan.
 
-## Synka topplistan för hela familjen (~5 min)
+## Synkad topplista — REDAN PÅKOPPLAD
 
-Utan server sparas topplistan per enhet. Med den lilla gratisservern i
-`api/worker.js` blir Turborusningens topplista **gemensam för alla, för alltid**:
+Den här `index.html` är färdigkopplad mot familjens server (en gratis
+Cloudflare Worker som kör `api/worker.js`, alias `topplista-worker.js`):
 
-1. Skapa gratis konto på **dash.cloudflare.com**.
-2. *Workers & Pages → Create → Worker* — döp den t.ex. `supererik-topplista`,
-   klicka *Deploy*, sedan *Edit code* och ersätt allt med innehållet i
-   `api/worker.js` (`topplista-worker.js` i zippen). *Deploy*.
-3. *Storage & Databases → KV → Create namespace* — döp den `TOPPLISTA`.
-4. På workern: *Settings → Bindings → Add → KV namespace* —
-   Variable name `TOPPLISTA`, välj ditt namespace. *Save*.
-5. Kopiera worker-adressen (`https://supererik-topplista.DITTNAMN.workers.dev`)
-   och klistra in den i `index.html` på raden märkt **API_BAS** (sök på API_BAS).
-   Ladda upp den uppdaterade filen igen.
+    API_BAS = https://silent-base-a4be.workers-ff7.workers.dev
 
-Klart! Spelet visar "HELA FAMILJENS LISTA — SYNKAD" när servern nås och
-faller automatiskt tillbaka till enhetens lokala lista offline. Servern har
+Spelet visar "HELA FAMILJENS LISTA — SYNKAD" när servern nås och faller
+automatiskt tillbaka till enhetens lokala lista offline. Servern har
 rimlighetskontroller och spam-broms; gratisnivån räcker till tusentals
-rundor om dagen.
+rundor om dagen. Snabbtest av servern: öppna
+`https://silent-base-a4be.workers-ff7.workers.dev/topplista?spel=runner`
+— den ska svara med JSON (`{"lista": ...}`).
+
+**Om servern någon gång flyttar** (ny worker eller nytt konto):
+
+1. *Workers & Pages → Create → Worker* → "Start with Hello World" → *Deploy*,
+   sedan *Edit code* → ersätt allt med innehållet i `topplista-worker.js` → *Deploy*.
+2. *Storage & Databases → KV → Create namespace* — döp den `TOPPLISTA`.
+3. På workern: *Settings → Bindings → Add → KV namespace* —
+   Variable name `TOPPLISTA`, välj ditt namespace. *Save*.
+4. Klistra in den nya worker-adressen i `index.html` på raden märkt **API_BAS**
+   (sök på API_BAS) och ladda upp filen igen.
 
 Stjärnor och album ligger kvar i localStorage per enhet.
 

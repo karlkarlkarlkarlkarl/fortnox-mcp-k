@@ -42,7 +42,13 @@ svenska (åäö). Publiceras som Claude-artifact och som fristående fil.
   överstyr för test, `NET.hamta/spara` + `refreshGlobal()`; global lista
   visas med statusrad ("SYNKAD"/"OFFLINE"), lokal localStorage är alltid
   fallback. E2E-testas i `test-sync.mjs` som kör RIKTIGA worker.js bakom
-  en lokal HTTP-server med fejk-KV — två klientkontexter + offline-fall.
+  en lokal HTTP-server med fejk-KV — två klientkontexter + offline-fall —
+  och i `test-live.mjs` som patchar `window.fetch` och bevisar att den
+  INBAKADE API_BAS-adressen används (ingen ERIK_API-överstyrning).
+  **LIVE sedan 2026-08-20:** Karls worker kör på
+  `https://silent-base-a4be.workers-ff7.workers.dev` och den adressen är
+  inbakad i API_BAS (källa: `r-part2.js` i scratchpad). Sandlådan kan INTE
+  nå workers.dev (proxypolicy) — verifiera live-servern via Karl/mobilen.
 - **Filer är enskilda och offline:** typsnitt (Baloo 2 + Nunito, latin) är
   inbäddade som base64-`@font-face`. Inga beroenden, ingen backend.
 - **Branch:** `claude/eric-character-game-8rqfjs`
@@ -148,5 +154,6 @@ har inget med spelet att göra. Rör den inte i spelärenden, och rör inte
 ## Idéer som väntar på klartecken (gör inte oombedda)
 
 Foton på riktiga Lillen & Bernard → justera teckningar · engelsk språkväxel ·
-delad topplista via backend · barnläge · fler albumkort/uppdrag ·
-Turborusningen: fler hindertyper och en boss-våg.
+barnläge · fler albumkort/uppdrag · synka även Fångarens topplista (servern
+stödjer redan `spel=fangaren`) · snyggare adress typ `api.eriks.family` om
+domänens DNS någon gång flyttas till Cloudflare.

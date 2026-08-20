@@ -725,9 +725,8 @@ function addToBoard(name, score, dist){
 /* ============================================================
    3b. FAMILJENS TOPPLISTA — synkad via api/worker.js
    ============================================================ */
-// ▼▼▼ KLISTRA IN DIN WORKER-URL HÄR när servern är igång ▼▼▼
-// t.ex. 'https://supererik-topplista.kalle.workers.dev'
-const API_BAS = '';
+// ▼▼▼ FAMILJENS SERVER (Cloudflare Worker) — byt bara om servern flyttar ▼▼▼
+const API_BAS = 'https://silent-base-a4be.workers-ff7.workers.dev';
 // ▲▲▲ (tom sträng = bara lokal lista på den här enheten) ▲▲▲
 const apiBas = () => (typeof window !== 'undefined' && window.ERIK_API) || API_BAS;
 
