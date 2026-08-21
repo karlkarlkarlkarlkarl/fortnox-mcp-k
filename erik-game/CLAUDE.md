@@ -202,7 +202,10 @@ familjen spelbar, upplåses med stjärnor, egen superkraft per karaktär, kräve
 karaktärsfält i servern · 2) VÄRLDAR — Sommarvägen → STAYHOT-verkstan →
 Kliniken → Balettscenen, ny värld var ~2000 m med egen musik/parallax/boss ·
 3) VECKANS LOPP + FAMILJESPÖKEN — seedad veckobana med egen lista (kräver
-siffror i workerns spel-param) och spöken av bästa åken.
+siffror i workerns spel-param) och spöken av bästa åken · 4) SYNKAD
+BARN-TOPPLISTA (Karls idé 2026-08-21): barnläget postar till `spel=barn`
+på samma worker — servern klarar det redan, bara klientkoppling + att
+lokala `erikRunnerTopplistaBarn` blir fallgardin precis som stora listan.
 
 Mindre: foton på riktiga Lillen & Bernard → justera teckningar · engelsk
 språkväxel · fler albumkort/uppdrag · snyggare adress typ `api.eriks.family`
