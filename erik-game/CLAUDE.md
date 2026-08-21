@@ -16,10 +16,18 @@ svenska (åäö). Publiceras som Claude-artifact och som fristående fil.
   hållplatsräddningar av brorsbarnen (axelridning, ballong-hem vid träff,
   HELA GÄNGET +5000), hundräddning av sista hjärtat (en per hund, slow-mo),
   32 uppdrag → stjärnor → 8 albumkort (komponeras av sprites i `cardImg`).
-  **Hälsa (v3.4):** `MAXLIV=4` hjärtplatser, start 3, HALVA hjärtan — mjuka
+  **Hälsa (v3.5):** `MAXLIV=5` hjärtplatser, start 4, HALVA hjärtan — mjuka
   träffar (moln/geting/plane/wave/plask) = ½, hårda (låda/skylt/walker-sida/
   boss-sida) = 1, via `hitErik(label, dmg)`. Healing: `osteo`-pickup
   BEHANDLINGEN +½ (vanlig), `heart` +1 (bara i nödläge, lives ≤ 1.5).
+  **Poäng-HUD (v3.5):** mörk pill under distansen, `G.scoreShown` tickar
+  ikapp `G.score` i updatePlaying; boss-pips på topSafe+1.14U och kraft-
+  chips på topSafe+1.12U (+0.5U vid boss) för att ge räknaren plats.
+  **Ryttar-strikes (v3.5):** `e.riderHits` — barnet på axlarna tål 2 törnar
+  ("X HÅLLER I SIG!"), flyger hem med ballong först vid den tredje; nollas
+  i rescueKid. **Skyltnerf (v3.5):** sign h 0.85U, bottom groundY−0.9U
+  (mer glidmarginal), max en skylt per 160 m (`G.lastSign`), och skylten
+  ligger bara i tier 2-poolen (borttagen ur tier 3).
   **Lådregeln (v3.4):** box1/box2 stompas ofarligt uppifrån (KARTONGSTUDS
   +50, ingen kedjeeffekt); framifrån = skada; under KNAK‑KRAFTEN mosas de
   (lyser/darrar i drawObstacles). **NÄRA ÖGAT** +25: expanderad hitbox-koll

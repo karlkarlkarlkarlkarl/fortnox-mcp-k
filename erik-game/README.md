@@ -8,7 +8,7 @@ All grafik är handritad vektorgrafik (canvas + SVG). Allt ljud är
 syntetiserat (WebAudio). Varje spel är en enda HTML-fil som funkar helt
 offline — typsnitten är inbäddade.
 
-## `index.html` — TURBORUSNINGEN (huvudspelet, v3.4)
+## `index.html` — TURBORUSNINGEN (huvudspelet, v3.5)
 
 Endless runner genom svensk 90-talssommar (Erik är född 1990 — därav
 eurodance-loopen på 126 BPM, Volvo 245:an, glasskiosken och midsommarstången).
@@ -17,9 +17,16 @@ eurodance-loopen på 126 BPM, Volvo 245:an, glasskiosken och midsommarstången).
   glida (svep i luften = dyk som blir ett glid). Coyote-time och hoppbuffert
   gör att det känns proffsigt tajt. Den inbyggda skolan körs bara allra
   första rundan (kör om den från pausmenyn när du vill).
-- **Hjärtan med nyanser:** fyra hjärtplatser, och mjuka törnar (moln, getingar,
-  pappersflygplan, plask) kostar bara ett halvt. Osteopaten hjälper till på
-  vägen: plocka **BEHANDLINGEN** (+½ hjärta) och hela hjärtan i nödläge.
+- **Hjärtan med nyanser:** fem hjärtplatser (start på fyra), och mjuka törnar
+  (moln, getingar, pappersflygplan, plask) kostar bara ett halvt. Osteopaten
+  hjälper till på vägen: plocka **BEHANDLINGEN** (+½ hjärta) och hela
+  hjärtan i nödläge.
+- **Poängen syns hela tiden:** en räknare under distansen tickar ikapp så
+  du ser direkt vad varje studs, skruv och räddning ger.
+- **Brorsbarnen håller i sig:** ett barn på axlarna tål två törnar —
+  först vid den tredje flyger det hem med ballong.
+- **MÖTE 08:00-skyltarna** hänger nu högre, kommer aldrig tätt i rad —
+  och den inbyggda skolan lär dig glida under dem.
 - **STAYHOT-lådorna har en enkel regel:** uppifrån är de studsmattor
   (KARTONGSTUDS +50) — framifrån gör de ont. Under **KNAK‑KRAFTEN** lyser
   och darrar de: då mosar du allt.

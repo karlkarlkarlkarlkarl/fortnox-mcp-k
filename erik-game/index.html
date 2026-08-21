@@ -572,7 +572,7 @@ kbd{
         </div>
 
         <p class="quote" id="title-quote">Jag fixar det där sen!</p>
-        <div class="foot">Med <svg class="ic"><use href="#i-heart"/></svg> från familjen · EST. 1990 · Turborusningen v3.4 · <b>eriks.family</b></div>
+        <div class="foot">Med <svg class="ic"><use href="#i-heart"/></svg> från familjen · EST. 1990 · Turborusningen v3.5 · <b>eriks.family</b></div>
       </div>
 
       <div id="title-board" style="display:none">
@@ -1177,7 +1177,7 @@ function missionValue(m){
 const G = {
   mode: 'title',
   t: 0, dist: 0, v: 0,
-  score: 0, screws: 0, lives: 3,
+  score: 0, scoreShown: 0, screws: 0, lives: 4,
   timeScale: 1, slowT: 0,
   erik: null,
   pw: { magnet: 0, knack: 0, glide: 0, tape: 0 },
@@ -1201,7 +1201,7 @@ function newErik(){
     sliding: false, slideT: 0, dive: false,
     coyote: 0, jbuf: 0, holding: false,
     runPhase: 0, blink: 0, blinkT: rnd(1.5, 4),
-    rider: null, kidT: 0,
+    rider: null, kidT: 0, riderHits: 0,
     invuln: 0, bow: 0
   };
 }
@@ -1210,7 +1210,8 @@ function newDog(name, side){
   return { name, big, off: big ? -U * 2.0 : -U * 1.15, x: 0, ph: rnd(TAU), saveUsed: false, saving: 0, cel: 0 };
 }
 function resetRound(){
-  G.dist = 0; G.v = 0; G.score = 0; G.screws = 0; G.lives = 3;
+  G.dist = 0; G.v = 0; G.score = 0; G.scoreShown = 0; G.screws = 0; G.lives = 4;
+  G.lastSign = undefined;
   G.timeScale = 1; G.slowT = 0;
   G.erik = newErik();
   G.pw = { magnet: 0, knack: 0, glide: 0, tape: 0 };
@@ -1641,7 +1642,7 @@ document.addEventListener('visibilitychange', () => {
    9. VÄRLD & FYSIK
    ============================================================ */
 const MPX = () => U * 0.45;                 // pixlar per meter
-const MAXLIV = 4;                           // hjärtplatser (halva hjärtan finns!)
+const MAXLIV = 5;                           // hjärtplatser (halva hjärtan finns!) — start 4
 function targetV(){
   // mjukare tidig ramp än förr — farten kommer, men inte direkt
   const base = U * (3.3 + 1.95 * Math.min(G.dist / 1400, 1) + 0.5 * clamp((G.dist - 1400) / 2200, 0, 1));
@@ -1770,15 +1771,20 @@ function spawnObstacle(){
   } else {
     pool = ['box1', 'cloud'];
     if (tier >= 2) pool.push('sign', 'box2', 'walker', 'box1');
-    if (tier >= 3) pool.push('sign', 'walker');
+    if (tier >= 3) pool.push('walker');
     if (tier >= 4) pool.push('wasp', 'box2', 'cloud', 'walker', 'wasp');
   }
-  const kind = pick(pool);
+  let kind = pick(pool);
+  // MÖTE 08:00-skyltarna var för elaka — max en per ~160 m
+  if (kind === 'sign'){
+    if (G.lastSign !== undefined && G.dist - G.lastSign < 160) kind = 'box1';
+    else G.lastSign = G.dist;
+  }
   const o = { kind, x: W + U * 1.5, passed: false, vx: 0, ph: rnd(TAU) };
   if (kind === 'box1'){ o.w = U * 0.62; o.h = U * 0.72; }
   if (kind === 'box2'){ o.w = U * 0.62; o.h = U * 1.34; }
   if (kind === 'cloud'){ o.w = U * 0.68; o.h = U * 0.6; o.vx = G.v * 0.32; }
-  if (kind === 'sign'){ o.w = U * 0.92; o.h = U * 0.95; o.bottom = groundY - U * 0.8; }
+  if (kind === 'sign'){ o.w = U * 0.92; o.h = U * 0.85; o.bottom = groundY - U * 0.9; }
   if (kind === 'wasp'){ o.w = U * 0.95; o.h = U * 0.5; o.mid = groundY - U * 1.05; o.vx = G.v * 0.14; }
   if (kind === 'walker'){ o.w = U * 0.58; o.h = U * 0.68; o.vx = G.v * 0.22; }
   G.obs.push(o);
@@ -2241,6 +2247,7 @@ function activatePower(pu, x, y){
 function rescueKid(kid){
   const e = G.erik;
   e.rider = kid;
+  e.riderHits = 0;
   const first = !G.rescued[kid.key];
   G.rescued[kid.key] = 1;
   G.run.rescues = Object.keys(G.rescued).length;
@@ -2264,8 +2271,17 @@ function hitErik(label, dmg){
   if (e.invuln > 0) return;
   G.stompChain = 0;
   if (e.rider){
-    kidFlyAway(e.rider);
-    e.rider = null;
+    // three strikes: barnet håller i sig två gånger — tredje törnen blir ballongfärd
+    e.riderHits = (e.riderHits || 0) + 1;
+    if (e.riderHits >= 3){
+      kidFlyAway(e.rider);
+      e.rider = null;
+    } else {
+      AudioMan.sfxSkip();
+      addFloat(ERIK_X + U * 0.6, e.y - U * 2.7,
+        e.rider.name + ' HÅLLER I SIG!' + (e.riderHits === 2 ? ' (SISTA TAGET)' : ''),
+        e.rider.shirt, 0.9);
+    }
   }
   dmg = dmg === undefined ? 1 : dmg;
   if (G.barn) dmg = 0.5;                     // barnläget nöjer sig alltid med ett halvt
@@ -3824,6 +3840,19 @@ function drawHUD(){
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(dTxt, W / 2, topSafe + U * 0.27);
 
+  // poäng — mörk pill direkt under distansen, tickar ikapp så man ser vad allt ger
+  const scTxt = Math.round(G.scoreShown).toLocaleString('sv-SE');
+  ctx.font = '800 ' + Math.round(U * 0.2) + 'px "Baloo 2","Nunito",sans-serif';
+  const scw = ctx.measureText(scTxt).width;
+  const spw = scw + U * 0.56;
+  ctx.fillStyle = 'rgba(51,38,29,0.8)';
+  rrCtx(W / 2 - spw / 2, topSafe + U * 0.56, spw, U * 0.36, U * 0.18);
+  ctx.fill();
+  drawSpr('star', W / 2 - spw / 2 + U * 0.21, topSafe + U * 0.74, U * 0.22);
+  ctx.fillStyle = '#FFE9A8';
+  ctx.textAlign = 'left';
+  ctx.fillText(scTxt, W / 2 - spw / 2 + U * 0.38, topSafe + U * 0.755);
+
   // skruvar — vänster
   const sTxt = String(G.screws);
   ctx.font = '800 ' + Math.round(U * 0.26) + 'px "Baloo 2","Nunito",sans-serif';
@@ -3895,7 +3924,7 @@ function drawHUD(){
     const pw2 = U * 0.3, gap2 = U * 0.07;
     const tot2 = b.max * pw2 + (b.max - 1) * gap2;
     let bx0 = W / 2 - tot2 / 2 + pw2 / 2;
-    const by0 = topSafe + U * 0.48 + U * 0.28;
+    const by0 = topSafe + U * 1.14;
     for (let i = 0; i < b.max; i++){
       ctx.save();
       ctx.globalAlpha = i < b.hp ? 1 : 0.22;
@@ -3905,7 +3934,7 @@ function drawHUD(){
     }
   }
   // aktiva krafter — under distansen (och under bossmätaren vid bossstrid)
-  const puY = topSafe + U * 0.48 + U * 0.3 + (G.boss && G.boss.mode !== 'enter' ? U * 0.52 : 0);
+  const puY = topSafe + U * 1.12 + (G.boss && G.boss.mode !== 'enter' ? U * 0.5 : 0);
   const active = [['magnet', 8, '#D94F3D', 'magnet'], ['knack', 5, '#2FB7A6', 'spine'], ['glide', 6, '#B07BE0', 'shoe'], ['tape', 10, '#FF5E9C', 'tape']]
     .filter(([k]) => G.pw[k] > 0);
   let px = W / 2 - active.length * U * 0.62 / 2 + U * 0.31;
@@ -4050,6 +4079,9 @@ function updatePlaying(dtReal){
   G.t += dt;
   if (G.shake > 0) G.shake -= dtReal;
   if (G.flash > 0) G.flash -= dtReal * 2;
+  // poängräknaren tickar ikapp verkliga poängen
+  G.scoreShown += (G.score - G.scoreShown) * Math.min(1, dtReal * 9);
+  if (G.score - G.scoreShown < 0.6) G.scoreShown = G.score;
 
   updateErikRun(dt);
   updateWorld(dt);
