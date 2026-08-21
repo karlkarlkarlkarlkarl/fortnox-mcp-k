@@ -92,11 +92,16 @@ plus lätt kindstubb, marinblå **STAYHOT-batiktröja** med rosa mönster och or
 "STAYHOT"-brösttryck, mörka arbetsbyxor. Fångar han ett verktyg blixtras hans
 **gröna STAYHOT-mössa** fram. I balettfeber: rosa tutu + tåspetsskor.
 
-**Hundarna** — två bruna australian shepherds som älskar och hjälper Erik:
-- **Lillen** — mindre, tjej. Ljusare brun, rosa halsband, ögonfransar.
+**Hundarna** — två bruna australian shepherds som älskar och hjälper Erik.
+Ritade efter riktigt foto (2026-08-21, badbild i skärgården — kanon!):
+- **Lillen** — mindre, tjej. Ljusare rödbrun TREFÄRG: dubbla kopparbryn +
+  kopparkind, smal vit bläs, vitt bröst, rosa halsband, ögonfransar.
   Snabb cooldown (7,5 s), kortare räckvidd (0.28×W).
-- **Bernard** — större, kille. Mörkare brun, blått halsband.
+- **Bernard** — större, kille. Mörk CHOKLADBRUN med BRED vit bläs över
+  nos/panna, vit kind, stort vitt bröst — nästan ingen koppar. Blått halsband.
   Längre cooldown (10 s), lång räckvidd (0.44×W).
+Båda: fluffig svansplym med ljus undersida. Samma drawDog-stil i båda
+spelfilerna — ändras de, ändra på BÅDA ställena (r-part5.js + fangaren.html).
 De räddar bra föremål som är på väg att missas (dash + fångst i munnen) →
 kombon överlever, +50 p, "LILLEN/BERNARD RÄDDAR!". Tass över huvudet = redo.
 Under balettfebern sitter de vid scenkanten och tittar (inga räddningar).
