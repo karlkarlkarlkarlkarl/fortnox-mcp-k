@@ -8,15 +8,27 @@ All grafik är handritad vektorgrafik (canvas + SVG). Allt ljud är
 syntetiserat (WebAudio). Varje spel är en enda HTML-fil som funkar helt
 offline — typsnitten är inbäddade.
 
-## `index.html` — TURBORUSNINGEN (huvudspelet, v3)
+## `index.html` — TURBORUSNINGEN (huvudspelet, v3.4)
 
 Endless runner genom svensk 90-talssommar (Erik är född 1990 — därav
 eurodance-loopen på 126 BPM, Volvo 245:an, glasskiosken och midsommarstången).
 
-- **Styrning:** tryck/mellanslag = hoppa (håll = högre) · svep neråt/pil ner = glida.
-  Coyote-time och hoppbuffert gör att det känns proffsigt tajt. Varje runda
-  börjar med en snabb inbyggd skola: Erik tar fem steg, spelet semipausar och
-  du lär dig hoppa och glida genom att göra det.
+- **Styrning:** tryck/mellanslag = hoppa (håll = högre) · svep neråt/pil ner =
+  glida (svep i luften = dyk som blir ett glid). Coyote-time och hoppbuffert
+  gör att det känns proffsigt tajt. Den inbyggda skolan körs bara allra
+  första rundan (kör om den från pausmenyn när du vill).
+- **Hjärtan med nyanser:** fyra hjärtplatser, och mjuka törnar (moln, getingar,
+  pappersflygplan, plask) kostar bara ett halvt. Osteopaten hjälper till på
+  vägen: plocka **BEHANDLINGEN** (+½ hjärta) och hela hjärtan i nödläge.
+- **STAYHOT-lådorna har en enkel regel:** uppifrån är de studsmattor
+  (KARTONGSTUDS +50) — framifrån gör de ont. Under **KNAK‑KRAFTEN** lyser
+  och darrar de: då mosar du allt.
+- **NÄRA ÖGAT:** snudda förbi ett hinder utan träff = +25.
+- **GYLLENE SKRUVEN** dyker upp på höga plank och över vattnen — +250 för
+  den modiga (dubbelt under balettglidet).
+- **BARNLÄGE** för de yngsta: lugnare tempo, snälla lådor, plask utan tårar,
+  inga getingar eller bossar, och hundarna räddar om och om igen. Egen lokal
+  barnlista — familjens riktiga topplista lämnas i fred.
 - **Byggplank i höjdled:** hoppa upp på STAYHOT-ställningarna — skruvrader,
   muttrar och krafter väntar på övervåningen. Trappmönster i senare skede.
 - **Hoppa PÅ fienderna:** det tråkiga mötet har fått ben — platta till det
@@ -30,7 +42,7 @@ eurodance-loopen på 126 BPM, Volvo 245:an, glasskiosken och midsommarstången).
   hjärta och ett skruvregn. Varje nytt möte är segare och argare.
 - **Samla skruvar** i banor och bågar. Undvik STAYHOT-kartonger, hängande
   mötesskyltar, rullande stressmoln och getingsvärmar.
-- **Fyra krafter:** Magnetbältet (drar skruvar) · **KNÄCK-RUSCHEN** (krossa
+- **Fyra krafter:** Magnetbältet (drar skruvar) · **KNAK‑KRAFTEN** (krossa
   hinder, KNAK!) · **Balettglidet** (tutu, sväva på valsmusik, allt ×2) ·
   **MIXTAPE 1990** (eurodancen växlar upp, neonsolnedgång, bakåtvänd keps
   och solglasögon).
@@ -39,17 +51,18 @@ eurodance-loopen på 126 BPM, Volvo 245:an, glasskiosken och midsommarstången).
   hem säkert med ballong. Alla sex i samma runda = **HELA GÄNGET, +5000**.
 - **Lillen & Bernard** springer med. När sista hjärtat ryker offrar en av
   dem sin räddning — slow motion, skall och vidare i rusningen. En gång var.
-- **Uppdrag & Familjealbum:** 24 uppdrag ger stjärnor som låser upp åtta
+- **Uppdrag & Familjealbum:** 32 uppdrag ger stjärnor som låser upp åtta
   ritade minneskort. Uppdrag, stjärnor och album sparas mellan rundorna.
-- **Topplista:** hela familjens gemensamma lista, synkad mellan alla enheter
-  via familjens egen server (faller automatiskt tillbaka till enhetens lokala
-  lista offline).
+- **Topplista:** hela familjens gemensamma topp 25, synkad mellan alla
+  enheter via familjens egen server (faller automatiskt tillbaka till
+  enhetens lokala lista offline). Namnet kommer du bara behöva skriva en gång.
 
-## `fangaren.html` — FÅNGAREN (klassikern, v2)
+## `fangaren.html` — FÅNGAREN (klassikern, v2.1)
 
 Det ursprungliga fångarspelet: spring och fånga verktyg, brorsbarn,
 patienter med ryggskott och balettskor — undvik stressmoln, tråkiga möten
-och getingar. Balettfeber med ridå och strålkastare. Egen topplista.
+och getingar. Balettfeber med ridå och strålkastare. Sedan v2.1 går även
+Fångarens topplista mot familjens server (egen lista, `spel=fangaren`).
 
 ## Kör spelen
 
@@ -60,8 +73,9 @@ och getingar. Balettfeber med ridå och strålkastare. Egen topplista.
 
 ## Synkad topplista — REDAN PÅKOPPLAD
 
-Den här `index.html` är färdigkopplad mot familjens server (en gratis
-Cloudflare Worker som kör `api/worker.js`, alias `topplista-worker.js`):
+Både `index.html` och `fangaren.html` är färdigkopplade mot familjens server
+(en gratis Cloudflare Worker som kör `api/worker.js`, alias
+`topplista-worker.js`) — varsin lista på samma server:
 
     API_BAS = https://silent-base-a4be.workers-ff7.workers.dev
 

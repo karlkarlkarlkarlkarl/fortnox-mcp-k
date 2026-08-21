@@ -34,7 +34,8 @@ export default {
     const url = new URL(req.url);
     if (url.pathname !== '/topplista') return json({ fel: 'okänd väg' }, 404);
 
-    const spel = ((url.searchParams.get('spel') || 'runner').toLowerCase().replace(/[^a-z]/g, '') || 'runner').slice(0, 20);
+    const tvatta = v => (String(v || '').toLowerCase().replace(/[^a-z]/g, '') || '').slice(0, 20);
+    const spel = tvatta(url.searchParams.get('spel')) || 'runner';
     const KEY = 'lista:' + spel;
 
     if (req.method === 'GET'){
@@ -53,6 +54,9 @@ export default {
       let body;
       try { body = await req.json(); } catch (e) { return json({ fel: 'ogiltig JSON' }, 400); }
 
+      // spelet får även anges i POST-kroppen (URL-parametern vinner)
+      const KEYP = 'lista:' + (tvatta(url.searchParams.get('spel')) || tvatta(body.spel) || 'runner');
+
       const n = String(body.n || '').replace(/[<>]/g, '').trim().slice(0, 14) || 'Hemlig löpare';
       const s = Math.floor(Number(body.s));
       const d = Math.floor(Number(body.d) || 0);
@@ -61,12 +65,12 @@ export default {
         return json({ fel: 'orimligt resultat' }, 400);
       }
 
-      const lista = (await env.TOPPLISTA.get(KEY, 'json')) || [];
+      const lista = (await env.TOPPLISTA.get(KEYP, 'json')) || [];
       const post = { n, s, d, t: Date.now() };
       lista.push(post);
       lista.sort((a, b) => b.s - a.s || a.t - b.t);
       const sparad = lista.slice(0, 200);
-      await env.TOPPLISTA.put(KEY, JSON.stringify(sparad));
+      await env.TOPPLISTA.put(KEYP, JSON.stringify(sparad));
 
       const plats = sparad.indexOf(post) + 1; // 0 = utanför topp 200
       return json({ ok: true, plats: plats || null, lista: sparad.slice(0, 100) });

@@ -395,6 +395,27 @@ kbd{
   padding:14px;
   box-shadow:0 3px 0 #EDE1CB;
 }
+#title-board-list, #over-board-list{
+  max-height:44vh;
+  overflow-y:auto; overflow-x:hidden;
+  padding:2px 4px 2px 2px;
+  scrollbar-width:thin;
+  overscroll-behavior:contain;
+}
+.board-src{
+  text-align:center;
+  font:800 11px/1.4 "Nunito", sans-serif;
+  letter-spacing:.06em;
+  color:#A8917C;
+  margin:-4px 0 8px;
+}
+.board-src.online{ color:#35753B; }
+.save-status{
+  margin-top:8px;
+  font:800 12.5px/1.4 "Nunito", sans-serif;
+  color:#35753B;
+}
+.save-status.off{ color:#A8917C; }
 
 /* ---------- hörnknappar ---------- */
 .corner{
@@ -482,12 +503,13 @@ kbd{
           <button id="btn-board" class="btn btn-ghost"><svg class="ic"><use href="#i-trophy"/></svg> Topplista</button>
         </div>
         <p class="quote" id="title-quote">Jag fixar det där sen!</p>
-        <div class="foot">Med <svg class="ic"><use href="#i-heart"/></svg> från familjen · Super‑Erik v2.0</div>
+        <div class="foot">Med <svg class="ic"><use href="#i-heart"/></svg> från familjen · Super‑Erik Fångaren v2.1</div>
       </div>
 
       <div id="title-board" style="display:none">
         <div class="eyebrow">Stjärnorna hittills</div>
         <h2 class="over-title" style="font-size:clamp(26px,6vw,36px)">Topplista</h2>
+        <div class="board-src" id="title-board-src"></div>
         <div class="board"><div id="title-board-list"></div></div>
         <button id="btn-back" class="btn btn-ghost">Tillbaka</button>
       </div>
@@ -531,10 +553,12 @@ kbd{
           <input id="inp-name" maxlength="14" placeholder="Ditt namn" autocomplete="off" enterkeyhint="done">
           <button id="btn-save" class="btn btn-save">SPARA</button>
         </div>
+        <div class="save-status" id="save-status"></div>
       </div>
 
       <div class="board">
         <h3><svg class="ic"><use href="#i-trophy"/></svg> Topplista</h3>
+        <div class="board-src" id="over-board-src"></div>
         <div id="over-board-list"></div>
       </div>
 
@@ -615,9 +639,70 @@ function addToBoard(name, score){
   const entry = { n: name, s: score, t: Date.now() };
   board.push(entry);
   board.sort((a, b) => b.s - a.s || a.t - b.t);
-  const top = board.slice(0, 10);
+  const top = board.slice(0, 25);
   store.set(BOARD_KEY, top);
   return top.indexOf(entry);
+}
+/* ---------- familjens synkade topplista (samma server som Turborusningen) ---------- */
+// ▼▼▼ FAMILJENS SERVER (Cloudflare Worker) — byt bara om servern flyttar ▼▼▼
+const API_BAS = 'https://silent-base-a4be.workers-ff7.workers.dev';
+// ▲▲▲ (tom sträng = bara lokal lista på den här enheten) ▲▲▲
+const apiBas = () => (typeof window !== 'undefined' && window.ERIK_API) || API_BAS;
+function fetchT(url, opts, ms){
+  return new Promise((resolve, reject) => {
+    const c = new AbortController();
+    const t = setTimeout(() => c.abort(), ms || 4500);
+    fetch(url, Object.assign({}, opts, { signal: c.signal }))
+      .then(r => { clearTimeout(t); resolve(r); },
+            e => { clearTimeout(t); reject(e); });
+  });
+}
+const NET = {
+  async hamta(){
+    if (!apiBas()) return null;
+    try {
+      const r = await fetchT(apiBas() + '/topplista?spel=fangaren', {}, 4500);
+      if (!r.ok) return null;
+      const data = await r.json();
+      return Array.isArray(data.lista) ? data.lista : null;
+    } catch (e) { return null; }
+  },
+  async spara(post){
+    if (!apiBas()) return null;
+    try {
+      const r = await fetchT(apiBas() + '/topplista?spel=fangaren', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({ spel: 'fangaren' }, post))
+      }, 6000);
+      if (!r.ok) return null;
+      const data = await r.json();
+      return data.ok ? data : null;
+    } catch (e) { return null; }
+  }
+};
+let globalBoard = null;
+let globalOnline = false;
+async function refreshGlobal(){
+  if (!apiBas()){ globalOnline = false; return null; }
+  const lista = await NET.hamta();
+  if (lista){ globalBoard = lista; globalOnline = true; }
+  else globalOnline = false;
+  return lista;
+}
+const boardRows = () => (globalOnline && globalBoard) ? globalBoard : getBoard();
+function boardSrc(el){
+  if (!el) return;
+  if (globalOnline && globalBoard){
+    el.textContent = 'HELA FAMILJENS LISTA — SYNKAD';
+    el.classList.add('online');
+  } else if (apiBas()){
+    el.textContent = 'OFFLINE JUST NU — DEN HÄR ENHETENS LISTA';
+    el.classList.remove('online');
+  } else {
+    el.textContent = 'DEN HÄR ENHETENS LISTA';
+    el.classList.remove('online');
+  }
 }
 
 /* ============================================================
@@ -2935,8 +3020,8 @@ const ovlTitle = $('ovl-title'), ovlOver = $('ovl-over'), ovlPause = $('ovl-paus
 const show = el => el.classList.remove('hidden');
 const hide = el => el.classList.add('hidden');
 
-function fmtBoard(listEl, highlightT){
-  const board = getBoard();
+function fmtBoard(listEl, highlightT, rows, highlightIdx){
+  const board = rows || getBoard();
   listEl.innerHTML = '';
   if (!board.length){
     const d = document.createElement('div');
@@ -2945,9 +3030,10 @@ function fmtBoard(listEl, highlightT){
     listEl.appendChild(d);
     return;
   }
-  board.forEach((row, i) => {
+  board.slice(0, 25).forEach((row, i) => {
     const d = document.createElement('div');
-    d.className = 'brow' + (highlightT && row.t === highlightT ? ' me' : '');
+    const me = (highlightT && row.t === highlightT) || (highlightIdx !== undefined && i === highlightIdx);
+    d.className = 'brow' + (me ? ' me' : '');
     const pos = document.createElement('span');
     pos.className = 'pos' + (i < 3 ? ' pos-' + (i + 1) : '');
     pos.textContent = i + 1;
@@ -2958,6 +3044,14 @@ function fmtBoard(listEl, highlightT){
     d.append(pos, nm, sc);
     listEl.appendChild(d);
   });
+}
+function renderTitleBoard(){
+  fmtBoard($('title-board-list'), null, boardRows());
+  boardSrc($('title-board-src'));
+}
+function renderOverBoard(highlightT, highlightIdx){
+  fmtBoard($('over-board-list'), highlightT, boardRows(), highlightIdx);
+  boardSrc($('over-board-src'));
 }
 
 function startGame(){
@@ -3043,9 +3137,12 @@ function showGameOver(){
   });
 
   $('save-block').style.display = '';
+  document.querySelector('#save-block .namerow').style.display = '';
   $('btn-save').disabled = false;
+  $('save-status').textContent = '';
   $('inp-name').value = store.get('erikLastName', '');
-  fmtBoard($('over-board-list'));
+  renderOverBoard();
+  refreshGlobal().then(() => { if (G.mode === 'over' && !G.savedThisRound) renderOverBoard(); });
 
   const scoreEl = $('over-score');
   const target = G.score;
@@ -3069,14 +3166,38 @@ function saveScore(){
   if (!name) name = 'Hemlig beundrare';
   name = name.slice(0, 14);
   store.set('erikLastName', name);
-  const idx = addToBoard(name, G.score);
+  const score = G.score;
+  const idx = addToBoard(name, score);
   G.savedThisRound = true;
-  $('save-block').style.display = 'none';
+  document.querySelector('#save-block .namerow').style.display = 'none';
   const board = getBoard();
-  const mine = board.find(r => r.n === name && r.s === G.score);
-  fmtBoard($('over-board-list'), mine ? mine.t : null);
+  const mine = board.find(r => r.n === name && r.s === score);
   AudioMan.sfxCake();
   if (idx === 0) confetti(W / 2, H * 0.35, 70);
+  const st = $('save-status');
+  if (apiBas()){
+    st.textContent = 'Sparar till familjelistan…';
+    st.classList.remove('off');
+    NET.spara({ n: name, s: score }).then(res => {
+      if (res && res.lista){
+        globalBoard = res.lista;
+        globalOnline = true;
+        const gIdx = res.plats ? res.plats - 1 : undefined;
+        renderOverBoard(null, (gIdx !== undefined && gIdx < 25) ? gIdx : undefined);
+        st.textContent = res.plats
+          ? 'Sparad! Plats ' + res.plats + ' i hela familjens lista.'
+          : 'Sparad i familjelistan!';
+        if (res.plats === 1) confetti(W / 2, H * 0.3, 60);
+      } else {
+        renderOverBoard(mine ? mine.t : null);
+        st.textContent = 'Sparad lokalt — familjelistan gick inte att nå just nu.';
+        st.classList.add('off');
+      }
+    });
+  } else {
+    renderOverBoard(mine ? mine.t : null);
+    st.textContent = '';
+  }
 }
 
 $('btn-start').addEventListener('click', startGame);
@@ -3092,7 +3213,10 @@ $('btn-board').addEventListener('click', () => {
   AudioMan.sfxClick();
   $('title-main').style.display = 'none';
   $('title-board').style.display = '';
-  fmtBoard($('title-board-list'));
+  renderTitleBoard();
+  refreshGlobal().then(() => {
+    if ($('title-board').style.display !== 'none') renderTitleBoard();
+  });
 });
 $('btn-back').addEventListener('click', () => {
   AudioMan.sfxClick();
@@ -3119,6 +3243,7 @@ function boot(){
     document.fonts.load('800 20px "Baloo 2"');
     document.fonts.load('800 20px "Nunito"');
   }
+  refreshGlobal();
   requestAnimationFrame(ts => { lastT = ts; requestAnimationFrame(frame); });
 }
 boot();
@@ -3131,6 +3256,7 @@ window.__erik = {
   spawn: spawnItem,
   spawnWasp,
   catchKid(key){ G.caught[key] = G.t; },
+  refreshGlobal,
   forceOver(score){ G.score = score || 1234; beginDeath(); G.dieT = 99; updateDying(0.02); }
 };
 </script>
